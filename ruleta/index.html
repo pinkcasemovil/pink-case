@@ -1595,22 +1595,23 @@
 
       /* ================= Datos de la ruleta (orden del flyer, desde arriba, sentido horario) ================= */
       /* Probabilidades = pestaña «Premios» de la hoja (peso = % × 10):
-         10%→28 · 20%→22 · 30%→15 · 40%→10 · 50%→3 · Una mica gratis→8 ·
-         2 micas al precio de una→7 · Gira otra vez→4 · Premio sorpresa→2 · 100%→1
-         El 50% se hizo MÁS RARO a pedido de Axel (bajó de 8% a 3%):
-         los 5 puntos liberados se repartieron entre el 10% (+3) y
-         el 20% (+2), así el total sigue en 100 y los demás premios
-         quedan igual. El 100% aplica SOLO en ciertos productos
-         participantes (ver el apartado «Restricciones»). */
+         10%→32 · 20%→23 · 30%→16 · 40%→9 · 50%→2 · Una mica gratis→6 ·
+         2 micas al precio de una→5 · Gira otra vez→4 · Premio sorpresa→2 · 100%→1
+         Ajuste suave elegido por Axel (2026-11-09, con 500 giros/día
+         previstos): bajaron la mica gratis (8→6), el 2×1 (7→5), el 50%
+         (3→2) y el 40% (10→9); subieron el 10% (28→32), el 20% (22→23)
+         y el 30% (15→16). El 100%, Gira otra vez y el Premio sorpresa
+         quedan igual, y el total sigue en 100. El 100% aplica SOLO en
+         ciertos productos participantes (ver el apartado «Restricciones»). */
       var SEGMENTS = [
         { id:"d100",  big:"100%", small:"DE DESCUENTO", bigSize:34, color:"black", weight:10,  label:"100% de descuento", note:"100% de descuento solo en ciertos productos participantes: en tienda te decimos cuáles.",  chip:"100% de descuento", chipNote:"El premio mayor · Solo en ciertos productos" },
-        { id:"d50",   big:"50%",  small:"DE DESCUENTO", bigSize:44, color:"white", weight:30,  label:"50% de descuento",  note:"La mitad de tu compra, por cuenta de la casa. Es de los premios más raros de la ruleta.", chip:"50% de descuento", chipNote:"Premio mayor" },
-        { id:"d40",   big:"40%",  small:"DE DESCUENTO", bigSize:44, color:"red",   weight:100,  label:"40% de descuento",  note:"Un descuentazo para estrenar este Buen Fin.", chip:"40% de descuento", chipNote:"" },
-        { id:"d30",   big:"30%",  small:"DE DESCUENTO", bigSize:44, color:"black", weight:150, label:"30% de descuento",  note:"Tu funda o accesorio, con un gran descuento.", chip:"30% de descuento", chipNote:"" },
-        { id:"d20",   big:"20%",  small:"DE DESCUENTO", bigSize:44, color:"white", weight:220, label:"20% de descuento",  note:"Un buen empujón para lo que traías en mente.", chip:"20% de descuento", chipNote:"" },
-        { id:"d10",   big:"10%",  small:"DE DESCUENTO", bigSize:44, color:"red",   weight:280, label:"10% de descuento",  note:"Todo suma: tu compra sale más barata.", chip:"10% de descuento", chipNote:"" },
-        { id:"mica",  big:"UNA MICA", small:"GRATIS",   bigSize:24, color:"black", weight:80, label:"Una mica gratis",   note:"Una mica de cristal templado para tu celular, instalada en tienda.", chip:"Una mica gratis", chipNote:"Instalación en tienda", fitBlock:true },
-        { id:"2x1",   big:"2×1",  small:"MICA",         bigSize:44, color:"white", weight:70, label:"2 micas al precio de una", note:"Ganaste 2 micas al precio de una: pagas una y te llevas dos.", chip:"2 micas al precio de una", chipNote:"2×1 en mica" },
+        { id:"d50",   big:"50%",  small:"DE DESCUENTO", bigSize:44, color:"white", weight:20,  label:"50% de descuento",  note:"La mitad de tu compra, por cuenta de la casa. Es de los premios más raros de la ruleta.", chip:"50% de descuento", chipNote:"Premio mayor" },
+        { id:"d40",   big:"40%",  small:"DE DESCUENTO", bigSize:44, color:"red",   weight:90,  label:"40% de descuento",  note:"Un descuentazo para estrenar este Buen Fin.", chip:"40% de descuento", chipNote:"" },
+        { id:"d30",   big:"30%",  small:"DE DESCUENTO", bigSize:44, color:"black", weight:160, label:"30% de descuento",  note:"Tu funda o accesorio, con un gran descuento.", chip:"30% de descuento", chipNote:"" },
+        { id:"d20",   big:"20%",  small:"DE DESCUENTO", bigSize:44, color:"white", weight:230, label:"20% de descuento",  note:"Un buen empujón para lo que traías en mente.", chip:"20% de descuento", chipNote:"" },
+        { id:"d10",   big:"10%",  small:"DE DESCUENTO", bigSize:44, color:"red",   weight:320, label:"10% de descuento",  note:"Todo suma: tu compra sale más barata.", chip:"10% de descuento", chipNote:"" },
+        { id:"mica",  big:"UNA MICA", small:"GRATIS",   bigSize:24, color:"black", weight:60, label:"Una mica gratis",   note:"Una mica de cristal templado para tu celular, instalada en tienda.", chip:"Una mica gratis", chipNote:"Instalación en tienda", fitBlock:true },
+        { id:"2x1",   big:"2×1",  small:"MICA",         bigSize:44, color:"white", weight:50, label:"2 micas al precio de una", note:"Ganaste 2 micas al precio de una: pagas una y te llevas dos.", chip:"2 micas al precio de una", chipNote:"2×1 en mica" },
         { id:"otra",  big:"GIRA", small:"OTRA VEZ",     bigSize:34, color:"red",   weight:40, label:"Gira otra vez",   note:"", chip:"Gira otra vez", chipNote:"Un giro extra al momento" },
         { id:"premio",big:"PREMIO", small:"",           bigSize:27, color:"white", weight:20,  label:"Premio sorpresa",  note:"Un premio especial de la tienda, solo para ti.", chip:"Premio sorpresa", chipNote:"Premio mayor" },
         /* Gajo DECORATIVO de smartwatch: se ve en la ruleta pero su
