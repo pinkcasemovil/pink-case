@@ -457,6 +457,31 @@
       #valCanjearBtn{ margin-top:14px; width:100%; }
       .validator-panel .hint{ margin-top:12px; }
       .validator-panel .val-close{ width:100%; margin-top:10px; }
+      .validator-panel .val-logout{ width:100%; margin-top:10px; color:#ff8296; }
+
+      /* ---------- Acceso administrador (puerta del validador) ---------- */
+      .admin-title{ margin:0 0 6px; font-size:20px; font-weight:900; letter-spacing:.01em; }
+      .admin-sub{ margin:0 0 16px; color:var(--mut); font-size:14px; line-height:1.5; }
+      .admin-field{ margin-bottom:12px; }
+      .admin-field label{ display:block; font-weight:800; font-size:13px; letter-spacing:.04em; text-transform:uppercase; color:#e9e2ea; margin-bottom:7px; }
+      .admin-field input{
+        width:100%;
+        background:#0b090b; color:#fff;
+        border:1.5px solid #3d333d; border-radius:12px;
+        font:inherit; font-size:16.5px; font-weight:600;
+        padding:13px 15px; outline:none;
+        transition:border-color .2s, box-shadow .2s;
+      }
+      .admin-field input:focus{ border-color:var(--gold); box-shadow:0 0 0 4px rgba(255,182,72,.18); }
+      .admin-field input::placeholder{ color:#6d6d78; font-weight:500; }
+      .admin-session-bar{
+        display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+        border:1px solid rgba(255,182,72,.45); border-radius:12px;
+        background:rgba(255,182,72,.08);
+        padding:10px 13px; margin-bottom:16px;
+        font-size:13.5px; font-weight:800; color:var(--gold-soft);
+      }
+      .admin-session-bar .link-btn{ color:#ff8296; }
 
       /* ---------- Secciones ---------- */
       section.block{ max-width:600px; margin:56px auto 0; }
@@ -1493,13 +1518,37 @@
         </div>
         <p class="sub offset">Esto es para el equipo de Pink Case: aquí escaneas el boleto del cliente cuando llegue a canjear su premio.</p>
         <div class="validator-card">
-          <ol class="val-steps">
-            <li><span class="vs-num">1</span><span>Toca <b>«Escanear boleto del cliente»</b> y apunta la cámara al <b>QR de su boleto</b>.</span></li>
-            <li><span class="vs-num">2</span><span>La página te dice si el boleto es <b>válido</b>, qué ganó y si <b>ya se canjeó</b>.</span></li>
-            <li><span class="vs-num">3</span><span>Al entregar el premio, toca <b>«Marcar como canjeado»</b> para que ese folio no se pueda usar dos veces.</span></li>
-          </ol>
-          <button type="button" class="btn btn-gold open-validator-btn" style="width:100%;">Escanear boleto del cliente</button>
-          <p class="hint" id="validatorConnNote">Sin cámara a la mano, también puedes escribir el folio del boleto a mano dentro del escáner.</p>
+          <!-- Sin sesión de administrador solo se ve el inicio de sesión:
+               el escáner completo aparece tras iniciar sesión. -->
+          <div id="adminLoginView">
+            <h3 class="admin-title" id="adminLoginTitle">Acceso administrador</h3>
+            <p class="admin-sub">Solo para el equipo de Pink Case. Inicia sesión para abrir el escáner de boletos.</p>
+            <form id="adminLoginForm" novalidate>
+              <div class="admin-field">
+                <label for="adminUserInput">Usuario</label>
+                <input id="adminUserInput" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" placeholder="Usuario" />
+              </div>
+              <div class="admin-field">
+                <label for="adminPassInput">Contraseña</label>
+                <input id="adminPassInput" type="password" autocomplete="current-password" placeholder="Contraseña" />
+              </div>
+              <p class="form-error" id="adminLoginError" role="alert" hidden>Usuario o contraseña incorrectos. Inténtalo de nuevo.</p>
+              <button type="submit" class="btn btn-gold" style="width:100%; margin-top:14px;">Iniciar sesión</button>
+            </form>
+          </div>
+          <div id="adminPanelView" hidden>
+            <div class="admin-session-bar">
+              <span>Sesión de administrador activa</span>
+              <button type="button" class="link-btn" id="adminLogoutBtn">Cerrar sesión</button>
+            </div>
+            <ol class="val-steps">
+              <li><span class="vs-num">1</span><span>Toca <b>«Escanear boleto del cliente»</b> y apunta la cámara al <b>QR de su boleto</b>.</span></li>
+              <li><span class="vs-num">2</span><span>La página te dice si el boleto es <b>válido</b>, qué ganó y si <b>ya se canjeó</b>.</span></li>
+              <li><span class="vs-num">3</span><span>Al entregar el premio, toca <b>«Marcar como canjeado»</b> para que ese folio no se pueda usar dos veces.</span></li>
+            </ol>
+            <button type="button" class="btn btn-gold open-validator-btn" style="width:100%;">Escanear boleto del cliente</button>
+            <p class="hint" id="validatorConnNote">Sin cámara a la mano, también puedes escribir el folio del boleto a mano dentro del escáner.</p>
+          </div>
         </div>
       </section>
 
@@ -1691,6 +1740,7 @@
           <button type="button" class="btn btn-red" id="valCanjearBtn" hidden>Marcar como canjeado</button>
           <p class="hint" id="valConnNote"></p>
           <button type="button" class="btn btn-ghost val-close" id="validatorCloseBtn">Cerrar</button>
+          <button type="button" class="btn btn-ghost val-logout" id="adminLogoutBtnModal">Cerrar sesión</button>
         </div>
       </div>
     </div>
@@ -1743,6 +1793,16 @@
          ================================================================ */
       var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaLju4YnKKt5C55CTo4B4N01A0WacpsdVKw_QcWmu0D7GJjqYxNud2NaihwrVeDUjInw/exec"; /* Puente de Apps Script de la hoja «Giros» (desplegado 2026-11-08) */
       var SHEET_ID = "1njQK93ZB9Pfzhbi80tC6gZdie7OiIab6RrCls7gw36g";
+
+      /* ================= Acceso administrador del validador =================
+         Credencial sencilla que esconde el escáner «Validar boleto»
+         de quien no la tenga: se compara aquí mismo, en el cliente.
+         La sesión dura solo mientras la pestaña siga abierta: se
+         guarda ÚNICAMENTE un indicador en sessionStorage (la
+         contraseña nunca se guarda en ningún almacenamiento). */
+      var ADMIN_USER = "admin";
+      var ADMIN_PASS = "PinkCaseRuleta";
+      var ADMIN_SESSION_KEY = "pinkcase-ruleta-admin";
 
       /* ================= Datos de la ruleta (orden del flyer, desde arriba, sentido horario) ================= */
       /* Probabilidades = pestaña «Premios» de la hoja (peso = % × 10):
@@ -3861,6 +3921,59 @@
         var n2 = $("valConnNote"); if(n2) n2.textContent = txt;
       })();
 
+      /* ---------- Sesión de administrador del validador ----------
+         Sin sesión, la sección «Validar boleto en tienda» muestra
+         solo el inicio de sesión («Acceso administrador»); con
+         sesión, muestra el acceso al escáner completo y el botón
+         «Cerrar sesión». La sesión vive en sessionStorage: al
+         cerrar la pestaña se pierde sola. */
+      function isAdminLoggedIn(){
+        try{ return sessionStorage.getItem(ADMIN_SESSION_KEY) === "1"; }catch(e){ return false; }
+      }
+      function refreshAdminUI(){
+        var logged = isAdminLoggedIn();
+        var loginView = $("adminLoginView"), panelView = $("adminPanelView");
+        if(loginView) loginView.hidden = logged;
+        if(panelView) panelView.hidden = !logged;
+      }
+      function adminLogout(){
+        try{ sessionStorage.removeItem(ADMIN_SESSION_KEY); }catch(e){ /* noop */ }
+        stopValCamera();
+        closeModal("validatorModal");
+        var passInput = $("adminPassInput"); if(passInput) passInput.value = "";
+        var err = $("adminLoginError"); if(err) err.hidden = true;
+        refreshAdminUI();
+        toast("Sesión de administrador cerrada.");
+      }
+      (function initAdminLogin(){
+        refreshAdminUI();
+        var form = $("adminLoginForm");
+        if(form){
+          form.addEventListener("submit", function(ev){
+            ev.preventDefault();
+            var user = $("adminUserInput") ? $("adminUserInput").value.trim() : "";
+            var pass = $("adminPassInput") ? $("adminPassInput").value : "";
+            var err = $("adminLoginError");
+            if(user === ADMIN_USER && pass === ADMIN_PASS){
+              try{ sessionStorage.setItem(ADMIN_SESSION_KEY, "1"); }catch(e){ /* sin almacenamiento: la sesión vale solo en memoria de esta vista */ }
+              if(err) err.hidden = true;
+              if($("adminPassInput")) $("adminPassInput").value = "";
+              refreshAdminUI();
+              toast("Sesión de administrador iniciada.");
+            }else{
+              /* Aviso corto y genérico: no se dice qué campo falló. */
+              if(err) err.hidden = false;
+              form.classList.remove("shake");
+              void form.offsetWidth;
+              form.classList.add("shake");
+              if($("adminPassInput")) $("adminPassInput").value = "";
+            }
+          });
+        }
+        var out1 = $("adminLogoutBtn"); if(out1) out1.addEventListener("click", adminLogout);
+        var out2 = $("adminLogoutBtnModal"); if(out2) out2.addEventListener("click", adminLogout);
+      })();
+
       function folioFromText(text){
         if(!text) return null;
         var m = String(text).toUpperCase().match(/PC-[A-Z0-9]{6}/);
@@ -4117,6 +4230,14 @@
         closeModal("validatorModal");
       }
       function openValidator(){
+        /* Sin sesión de administrador el escáner no se abre:
+           la sección sigue mostrando el inicio de sesión. */
+        if(!isAdminLoggedIn()){
+          refreshAdminUI();
+          var loginView = $("adminLoginView");
+          if(loginView) loginView.scrollIntoView({ behavior: "smooth", block: "center" });
+          return;
+        }
         openModal("validatorModal");
         /* La cámara se intenta abrir sola: el toque en el botón
            «Escanear boleto» es el gesto que el navegador pide. */
