@@ -9,7 +9,11 @@
     <meta name="description" content="Gira la Ruleta Buen Fin de Pink Case y gana descuentos y premios. Un giro por día por nombre, boleto con QR al instante. Del 13 al 17 de noviembre, Ixtlahuaca Centro." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link rel="preload" as="image" href="assets/logo-pink-case.png" />
+    <link rel="preload" as="audio" href="assets/voz/bienvenida-corta.mp3" />
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
     <style>
       :root{
         --bg:#070608;
@@ -210,17 +214,6 @@
           linear-gradient(112deg, transparent 42%, rgba(255,255,255,.055) 50%, transparent 58%),
           linear-gradient(68deg, transparent 42%, rgba(255,255,255,.055) 50%, transparent 58%);
       }
-      .sound-btn{
-        position:absolute; top:14px; right:14px; z-index:6;
-        width:44px; height:44px; border-radius:50%;
-        background:rgba(10,8,10,.72); border:1px solid #54452a;
-        box-shadow:0 8px 20px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.12);
-        display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--gold-soft);
-      }
-      .sound-btn svg{ width:20px; height:20px; }
-      .sound-btn .icon-off{ display:none; }
-      .sound-btn.muted .icon-on{ display:none; }
-      .sound-btn.muted .icon-off{ display:block; }
       /* Botón simple de sonido: lo único que queda de la antigua
          sección de controles, visible justo tras el registro */
       .sound-row{ display:flex; justify-content:center; margin-top:24px; }
@@ -696,76 +689,6 @@
       .my-ticket .mt-folio{ font-weight:900; letter-spacing:.06em; color:#2a1800; background:linear-gradient(180deg,#ffc966,#e79b1e); border-radius:999px; padding:7px 13px; font-size:13px; box-shadow:0 6px 16px rgba(255,182,72,.3); }
       .my-ticket .hint{ margin-top:13px; }
 
-      /* Indicador de sonido en juego */
-      .now-playing{ display:inline-flex; align-items:center; gap:9px; margin-top:12px; background:rgba(255,255,255,.06); border:1px solid #3d333d; color:#e9e2d0; border-radius:999px; padding:7px 12px; font-size:12.5px; font-weight:700; }
-      .eq{ display:inline-flex; align-items:flex-end; gap:2.5px; height:14px; }
-      .eq i{ display:block; width:3px; border-radius:2px; background:var(--gold); height:5px; }
-      .now-playing.playing .eq i{ animation:eqBounce .55s ease-in-out infinite alternate; }
-      .now-playing.playing .eq i:nth-child(2){ animation-delay:.12s; } .now-playing.playing .eq i:nth-child(3){ animation-delay:.24s; } .now-playing.playing .eq i:nth-child(4){ animation-delay:.06s; }
-      @keyframes eqBounce{ from{ height:4px; } to{ height:14px; } }
-      .now-playing.win{ border-color:#6b5327; background:rgba(255,182,72,.12); color:#ffd9a0; }
-      /* ---------- Música de fondo (pista larga en bucle) ---------- */
-      .bgm-card{
-        display:flex; gap:14px; align-items:center; text-align:left;
-        max-width:520px; margin:14px auto 0;
-        border:1px solid #54452a; border-radius:16px; padding:13px 15px;
-        background:
-          radial-gradient(320px 130px at 100% -50px, rgba(255,182,72,.16), transparent 65%),
-          radial-gradient(280px 130px at 0% -60px, rgba(232,17,45,.18), transparent 65%),
-          linear-gradient(180deg, #211a20, #100d11);
-        box-shadow:0 16px 36px rgba(0,0,0,.5);
-      }
-      .bgm-btn{
-        width:46px; height:46px; border-radius:50%; flex:none; cursor:pointer;
-        border:1px solid rgba(255,217,160,.6); color:#2a1800;
-        background:linear-gradient(180deg,#ffc966,#e79b1e);
-        box-shadow:0 8px 20px rgba(255,182,72,.35), inset 0 1px 0 rgba(255,255,255,.6);
-        display:flex; align-items:center; justify-content:center;
-        transition:transform .12s, filter .2s;
-      }
-      .bgm-btn:active{ transform:scale(.95); }
-      .bgm-btn svg{ width:19px; height:19px; }
-      .bgm-main{ flex:1; min-width:0; }
-      .bgm-title{ font-size:13.5px; font-weight:900; letter-spacing:.04em; color:#fff; display:flex; flex-wrap:wrap; gap:6px; align-items:baseline; }
-      .bgm-title .bgm-state{ font-size:11.5px; font-weight:700; letter-spacing:.02em; color:var(--gold-soft); }
-      .bgm-track{ height:7px; border-radius:99px; background:rgba(255,255,255,.12); margin-top:8px; overflow:hidden; }
-      .bgm-fill{ height:100%; width:100%; border-radius:99px; background:linear-gradient(90deg, var(--red-hi), var(--gold) 70%, var(--pink)); transform:scaleX(0); transform-origin:0 50%; transition:transform .5s linear; }
-      .bgm-meta{ display:flex; flex-wrap:wrap; gap:4px 12px; margin-top:7px; font-size:11.5px; color:var(--mut); font-weight:600; }
-      .bgm-meta .bgm-time{ color:#ffd9a0; font-variant-numeric:tabular-nums; font-weight:800; }
-      /* ---------- Voz del narrador ---------- */
-      .narrator-card{
-        display:flex; gap:14px; align-items:center; text-align:left;
-        max-width:520px; margin:12px auto 0;
-        border:1px solid #4d2a31; border-radius:16px; padding:13px 15px;
-        background:
-          radial-gradient(320px 130px at 100% -50px, rgba(232,17,45,.20), transparent 65%),
-          radial-gradient(280px 130px at 0% -60px, rgba(255,46,146,.10), transparent 65%),
-          linear-gradient(180deg, #221820, #100d11);
-        box-shadow:0 16px 36px rgba(0,0,0,.5);
-      }
-      .narrator-btn{
-        width:46px; height:46px; border-radius:50%; flex:none; cursor:pointer;
-        border:1px solid rgba(255,130,150,.55); color:#fff;
-        background:linear-gradient(180deg,#ff3b47,#8f0016);
-        box-shadow:0 8px 20px rgba(232,17,45,.38), inset 0 1px 0 rgba(255,255,255,.5);
-        display:flex; align-items:center; justify-content:center;
-        transition:transform .12s, filter .2s, opacity .2s;
-      }
-      .narrator-btn:active{ transform:scale(.95); }
-      .narrator-btn.off{ opacity:.45; filter:grayscale(.6); }
-      .narrator-btn svg{ width:20px; height:20px; }
-      .narrator-main{ flex:1; min-width:0; }
-      .narrator-title{ font-size:13.5px; font-weight:900; letter-spacing:.04em; color:#fff; display:flex; flex-wrap:wrap; gap:6px; align-items:baseline; }
-      .narrator-title .narrator-state{ font-size:11.5px; font-weight:700; letter-spacing:.02em; color:#ffb3ba; }
-      .narrator-meta{ margin-top:6px; font-size:11.5px; color:var(--mut); font-weight:600; line-height:1.5; }
-      .narrator-meta .narrator-voice{ color:#ffd9a0; font-weight:800; }
-      .narrator-test{
-        flex:none; background:none; border:1px solid #54452a; color:#ffd9a0;
-        font:inherit; font-size:12px; font-weight:800; cursor:pointer;
-        border-radius:999px; padding:8px 12px;
-      }
-      .narrator-test:hover{ background:rgba(255,182,72,.12); }
-      .narrator-card.speaking{ border-color:var(--gold); box-shadow:0 16px 36px rgba(0,0,0,.5), 0 0 22px rgba(255,182,72,.22); }
       .modal-actions{ display:grid; gap:10px; margin-top:18px; }
       .ticket-send-steps{
         margin:0; font-size:13.5px; line-height:1.55; color:#f6ecdc; text-align:left;
@@ -1089,7 +1012,7 @@
       }
 
       @media (prefers-reduced-motion: reduce){
-        .wheel-float, .wheel-halo, .pill-gana::after, .hub.ready, .btn-spin.ready, .ticket-inner::after, .qr-box::after, .now-playing.playing .eq i, .qr-box.qr-ready, .modal-card, .store-modal-card{ animation:none !important; }
+        .wheel-float, .wheel-halo, .pill-gana::after, .hub.ready, .btn-spin.ready, .ticket-inner::after, .qr-box::after, .qr-box.qr-ready, .modal-card, .store-modal-card{ animation:none !important; }
         .name-card::before, .stage-wrap, .stage-wrap::before, .sound-toggle:not(.muted), .prize-chip.jackpot{ animation:none !important; }
         .rv{ opacity:1 !important; transform:none !important; transition:none !important; }
         .btn::after, .prize-chip::after, .poster::after{ display:none !important; }
@@ -1121,6 +1044,7 @@
         height:100%; width:100%;
         background:linear-gradient(90deg, var(--red-hi), var(--gold) 65%, var(--pink));
         transform:scaleX(0); transform-origin:0 50%;
+        will-change:transform;
         box-shadow:0 2px 10px rgba(232,17,45,.45);
       }
       .showcase-block{ margin-bottom:0; }
@@ -1268,7 +1192,7 @@
         </div>
         <div class="duo">
           <div class="poster">
-            <img src="assets/flyer-ruleta.jpg" alt="Flyer oficial de la Ruleta Buen Fin de Pink Case: Tadeo junto a la ruleta de premios, del 13 al 17 de noviembre en Ixtlahuaca Centro" loading="lazy" />
+            <img src="assets/flyer-ruleta.webp" alt="Flyer oficial de la Ruleta Buen Fin de Pink Case: Tadeo junto a la ruleta de premios, del 13 al 17 de noviembre en Ixtlahuaca Centro" loading="lazy" />
           </div>
           <div class="bases">
             <h3>En corto — lo que debes saber</h3>
@@ -1335,16 +1259,16 @@
               <div class="carousel-track" id="carouselTrack">
           <figure class="car-card hero-card"><img src="assets/scroll-smartwatch.webp" alt="Smartwatch G-Tide Q1 en su caja negra junto a su empaque azul, sobre el mostrador de cristal de Pink Case" loading="lazy" decoding="async" /><figcaption class="sc-cap">Smartwatch G-Tide Q1</figcaption></figure>
           <figure class="car-card"><img src="assets/scroll-funda.webp" alt="Funda transparente con aro magnético blanco, sostenida en la mano frente al espejo con el logo Pink Case" loading="lazy" decoding="async" /><figcaption class="sc-cap">Funda transparente</figcaption></figure>
-          <figure class="car-card"><img src="assets/scroll-audifonos.jpg" alt="Audífonos inalámbricos G-Tide L22 blancos en su estuche abierto, frente a su caja azul" loading="lazy" decoding="async" /><figcaption class="sc-cap">Audífonos G-Tide L22</figcaption></figure>
-          <figure class="car-card"><img src="assets/scroll-mica-privacidad.jpg" alt="Mica de privacidad Super Glass en su empaque, sostenida en la mano frente al espejo de Pink Case" loading="lazy" decoding="async" /><figcaption class="sc-cap">Mica de privacidad</figcaption></figure>
-          <figure class="car-card"><img src="assets/scroll-mica-normal.jpg" alt="Mica normal de cristal Dragón Feliz en empaque rosa, sostenida en la mano" loading="lazy" decoding="async" /><figcaption class="sc-cap">Mica de cristal</figcaption></figure>
-          <figure class="car-card"><img src="assets/scroll-mica-iphone.jpg" alt="Mica Super Glass 9D+ para iPhone en su empaque negro Dragón Feliz, junto a exhibidor de fundas" loading="lazy" decoding="async" /><figcaption class="sc-cap">Mica Super Glass 9D+</figcaption></figure>
+          <figure class="car-card"><img src="assets/scroll-audifonos.webp" alt="Audífonos inalámbricos G-Tide L22 blancos en su estuche abierto, frente a su caja azul" loading="lazy" decoding="async" /><figcaption class="sc-cap">Audífonos G-Tide L22</figcaption></figure>
+          <figure class="car-card"><img src="assets/scroll-mica-privacidad.webp" alt="Mica de privacidad Super Glass en su empaque, sostenida en la mano frente al espejo de Pink Case" loading="lazy" decoding="async" /><figcaption class="sc-cap">Mica de privacidad</figcaption></figure>
+          <figure class="car-card"><img src="assets/scroll-mica-normal.webp" alt="Mica normal de cristal Dragón Feliz en empaque rosa, sostenida en la mano" loading="lazy" decoding="async" /><figcaption class="sc-cap">Mica de cristal</figcaption></figure>
+          <figure class="car-card"><img src="assets/scroll-mica-iphone.webp" alt="Mica Super Glass 9D+ para iPhone en su empaque negro Dragón Feliz, junto a exhibidor de fundas" loading="lazy" decoding="async" /><figcaption class="sc-cap">Mica Super Glass 9D+</figcaption></figure>
           <figure class="car-card hero-card" aria-hidden="true"><img src="assets/scroll-smartwatch.webp" alt="" loading="lazy" decoding="async" /><figcaption class="sc-cap">Smartwatch G-Tide Q1</figcaption></figure>
           <figure class="car-card" aria-hidden="true"><img src="assets/scroll-funda.webp" alt="" loading="lazy" decoding="async" /><figcaption class="sc-cap">Funda transparente</figcaption></figure>
-          <figure class="car-card" aria-hidden="true"><img src="assets/scroll-audifonos.jpg" alt="" loading="lazy" decoding="async" /><figcaption class="sc-cap">Audífonos G-Tide L22</figcaption></figure>
-          <figure class="car-card" aria-hidden="true"><img src="assets/scroll-mica-privacidad.jpg" alt="" loading="lazy" decoding="async" /><figcaption class="sc-cap">Mica de privacidad</figcaption></figure>
-          <figure class="car-card" aria-hidden="true"><img src="assets/scroll-mica-normal.jpg" alt="" loading="lazy" decoding="async" /><figcaption class="sc-cap">Mica de cristal</figcaption></figure>
-          <figure class="car-card" aria-hidden="true"><img src="assets/scroll-mica-iphone.jpg" alt="" loading="lazy" decoding="async" /><figcaption class="sc-cap">Mica Super Glass 9D+</figcaption></figure>
+          <figure class="car-card" aria-hidden="true"><img src="assets/scroll-audifonos.webp" alt="" loading="lazy" decoding="async" /><figcaption class="sc-cap">Audífonos G-Tide L22</figcaption></figure>
+          <figure class="car-card" aria-hidden="true"><img src="assets/scroll-mica-privacidad.webp" alt="" loading="lazy" decoding="async" /><figcaption class="sc-cap">Mica de privacidad</figcaption></figure>
+          <figure class="car-card" aria-hidden="true"><img src="assets/scroll-mica-normal.webp" alt="" loading="lazy" decoding="async" /><figcaption class="sc-cap">Mica de cristal</figcaption></figure>
+          <figure class="car-card" aria-hidden="true"><img src="assets/scroll-mica-iphone.webp" alt="" loading="lazy" decoding="async" /><figcaption class="sc-cap">Mica Super Glass 9D+</figcaption></figure>
               </div>
             </div>
           </div>
@@ -1401,7 +1325,7 @@
         <p class="sub offset">Toca la foto de tu sucursal para verla grande, con su referencia y el botón de llegada.</p>
         <div class="stores">
           <article class="store">
-            <button type="button" class="photo store-photo-btn" data-store="pc1" aria-haspopup="dialog" aria-label="Ver foto grande y datos de Pink Case 1"><img src="assets/tienda-pc1.jpg" alt="Fachada de la sucursal Pink Case 1 (PC1): entrada abierta con muro de azulejo piedra, vitrina de accesorios y letrero redondo de Recargas" loading="lazy" decoding="async" /><span class="photo-hint"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M11 8v6M8 11h6"/></svg>Toca para ver</span></button>
+            <button type="button" class="photo store-photo-btn" data-store="pc1" aria-haspopup="dialog" aria-label="Ver foto grande y datos de Pink Case 1"><img src="assets/tienda-pc1.webp" alt="Fachada de la sucursal Pink Case 1 (PC1): entrada abierta con muro de azulejo piedra, vitrina de accesorios y letrero redondo de Recargas" loading="lazy" decoding="async" /><span class="photo-hint"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M11 8v6M8 11h6"/></svg>Toca para ver</span></button>
             <div class="info">
               <span class="tag">PC1</span>
               <h3>Pink Case 1</h3>
@@ -1411,7 +1335,7 @@
             </div>
           </article>
           <article class="store">
-            <button type="button" class="photo store-photo-btn" data-store="pc2" aria-haspopup="dialog" aria-label="Ver foto grande y datos de Pink Case 2"><img src="assets/tienda-pc2.jpg" alt="Fachada de la sucursal Pink Case 2 (PC2): mural negro gigante con el logo PINK CASE en blanco y rosa y el robot de Android" loading="lazy" decoding="async" /><span class="photo-hint"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M11 8v6M8 11h6"/></svg>Toca para ver</span></button>
+            <button type="button" class="photo store-photo-btn" data-store="pc2" aria-haspopup="dialog" aria-label="Ver foto grande y datos de Pink Case 2"><img src="assets/tienda-pc2.webp" alt="Fachada de la sucursal Pink Case 2 (PC2): mural negro gigante con el logo PINK CASE en blanco y rosa y el robot de Android" loading="lazy" decoding="async" /><span class="photo-hint"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M11 8v6M8 11h6"/></svg>Toca para ver</span></button>
             <div class="info">
               <span class="tag">PC2</span>
               <h3>Pink Case 2</h3>
@@ -1421,7 +1345,7 @@
             </div>
           </article>
           <article class="store">
-            <button type="button" class="photo store-photo-btn" data-store="pc4" aria-haspopup="dialog" aria-label="Ver foto grande y datos de Pink Case 4"><img src="assets/tienda-pc4.jpg" alt="Fachada de la sucursal Pink Case 4 (PC4): local con toldo vino que dice Accesorios y Tecnología y anuncio de mica de cristal" loading="lazy" decoding="async" /><span class="photo-hint"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M11 8v6M8 11h6"/></svg>Toca para ver</span></button>
+            <button type="button" class="photo store-photo-btn" data-store="pc4" aria-haspopup="dialog" aria-label="Ver foto grande y datos de Pink Case 4"><img src="assets/tienda-pc4.webp" alt="Fachada de la sucursal Pink Case 4 (PC4): local con toldo vino que dice Accesorios y Tecnología y anuncio de mica de cristal" loading="lazy" decoding="async" /><span class="photo-hint"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M11 8v6M8 11h6"/></svg>Toca para ver</span></button>
             <div class="info">
               <span class="tag">PC4</span>
               <h3>Pink Case 4</h3>
@@ -1431,7 +1355,7 @@
             </div>
           </article>
           <article class="store">
-            <button type="button" class="photo store-photo-btn" data-store="pc5" aria-haspopup="dialog" aria-label="Ver foto grande y datos de Pink Case 5"><img src="assets/tienda-pc5.jpg" alt="Fachada de la sucursal Pink Case 5 (PC5): frente de cristal con el logo PINK CASE y el letrero de Gran Reapertura, Bienvenidos" loading="lazy" decoding="async" /><span class="photo-hint"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M11 8v6M8 11h6"/></svg>Toca para ver</span></button>
+            <button type="button" class="photo store-photo-btn" data-store="pc5" aria-haspopup="dialog" aria-label="Ver foto grande y datos de Pink Case 5"><img src="assets/tienda-pc5.webp" alt="Fachada de la sucursal Pink Case 5 (PC5): frente de cristal con el logo PINK CASE y el letrero de Gran Reapertura, Bienvenidos" loading="lazy" decoding="async" /><span class="photo-hint"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M11 8v6M8 11h6"/></svg>Toca para ver</span></button>
             <div class="info">
               <span class="tag">PC5</span>
               <h3>Pink Case 5</h3>
@@ -1539,7 +1463,7 @@
     <div class="backdrop" id="storeModal" hidden role="dialog" aria-modal="true" aria-labelledby="storeModalTitle">
       <div class="store-modal-card">
         <button type="button" class="sm-close" id="storeModalCloseTop" aria-label="Cerrar vista previa">×</button>
-        <div class="sm-photo"><img id="storeModalImg" src="assets/tienda-pc1.jpg" alt="Foto de la sucursal seleccionada" loading="lazy" decoding="async" /></div>
+        <div class="sm-photo"><img id="storeModalImg" src="assets/tienda-pc1.webp" alt="Foto de la sucursal seleccionada" loading="lazy" decoding="async" /></div>
         <div class="sm-info">
           <span class="sm-tag" id="storeModalTag">PC1</span>
           <h3 id="storeModalTitle">Pink Case 1</h3>
@@ -1591,7 +1515,6 @@
          el boleto ni la validación.
          ================================================================ */
       var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaLju4YnKKt5C55CTo4B4N01A0WacpsdVKw_QcWmu0D7GJjqYxNud2NaihwrVeDUjInw/exec"; /* Puente de Apps Script de la hoja «Giros» (desplegado 2026-11-08) */
-      var SHEET_ID = "1njQK93ZB9Pfzhbi80tC6gZdie7OiIab6RrCls7gw36g";
 
       /* ================= Datos de la ruleta (orden del flyer, desde arriba, sentido horario) ================= */
       /* Probabilidades = pestaña «Premios» de la hoja (peso = % × 10):
@@ -2070,15 +1993,6 @@
       }
       function playClick(){ ensureAudio(); blip(920, .06, "triangle", .055, 0); blip(1420, .05, "sine", .04, .03); }
       function playPop(){ blip(420, .12, "sine", .06, 0, 880); blip(1180, .08, "triangle", .035, .05); }
-      /* Campanita suave de dos notas (Mi–Sol). Ya NO suena al
-         colocar el nombre: ese momento ahora lo cubre la
-         bienvenida corta de Helio (narrateWelcome). Queda
-         disponible como efecto corto de la capa de sonidos. */
-      function playChime(){
-        blip(1318.51, .18, "sine", .038, 0);
-        blip(1567.98, .22, "sine", .032, .07);
-        blip(659.25, .14, "triangle", .016, 0);
-      }
       function playSpinStart(){ noiseBurst(.65,.10,0,420,2800); blip(220,.55,"sawtooth",.028,0,880); blip(440,.5,"triangle",.04,.05,1320); }
       /* Clic de gajo + nota musical: suena distinto a la música de fondo */
       function tickSound(progress){
@@ -2097,9 +2011,6 @@
       function startSpinMusic(){
         stopSpinMusic(); spinMusicStep = 0; spinMusicNextAt = 0;
         duckBgm(.32); /* la música de fondo baja para que luzca el giro */
-        var nowEl = document.getElementById("nowPlaying"), txt = document.getElementById("nowPlayingText");
-        if(nowEl){ nowEl.classList.add("playing"); nowEl.classList.remove("win"); }
-        if(txt) txt.textContent = "¡Sonando! Música de juego mientras gira la ruleta…";
       }
       function tickSpinMusic(progress, elapsedMs){
         if(!state.sound || !actx) return;
@@ -2118,10 +2029,6 @@
       function stopSpinMusic(){
         if(spinMusicTimer){ clearInterval(spinMusicTimer); spinMusicTimer = null; }
         duckBgm(1); /* la música de fondo vuelve a su volumen normal */
-        var nowEl = document.getElementById("nowPlaying");
-        if(nowEl) nowEl.classList.remove("playing");
-        var txt = document.getElementById("nowPlayingText");
-        if(txt && !state.spinning) txt.textContent = "Música de fondo sonando en bucle de 5:20 · fanfarria lista al ganar";
       }
       function coinCascade(count, delay){
         for(var i=0;i<(count||10);i++){
@@ -2142,8 +2049,6 @@
           extra.forEach(function(n,i){ blip(n,.32,"triangle",.06,.78+i*.12); blip(n*1.5,.22,"sine",.028,.78+i*.12); });
           coinCascade(14, 1.25);
         }
-        var nowEl = document.getElementById("nowPlaying"), txt = document.getElementById("nowPlayingText");
-        if(nowEl){ nowEl.classList.add("win"); } if(txt) txt.textContent = isJackpot ? "¡Premio Mayor! Fanfarria especial para ti ★" : "¡Ganaste! Así suena tu premio";
       }
       function playRetrySound(){ var n=[783.99,987.77,1174.66,1567.98]; n.forEach(function(f,i){ blip(f,.16,"triangle",.05,i*.08); }); noiseBurst(.3,.05,.05,700,2600); }
 
@@ -2181,15 +2086,6 @@
         /* Y en cuanto pasa el saludo, entra la MÚSICA DE FONDO
            completa (5:20 en bucle), que ya no se detiene. */
         setTimeout(function(){ startBgm(); }, 950);
-        var nowEl = document.getElementById("nowPlaying"), txt = document.getElementById("nowPlayingText");
-        if(nowEl){ nowEl.classList.add("playing"); nowEl.classList.remove("win"); }
-        if(txt) txt.textContent = "¡Bienvenido a la Ruleta Buen Fin! Así suena la página al entrar ♪";
-        setTimeout(function(){
-          if(state.spinning) return;
-          if(nowEl) nowEl.classList.remove("playing");
-          if(txt && !welcomePlayed) return;
-          if(txt && txt.textContent.indexOf("Bienvenido") === 1) txt.textContent = "Música de fondo sonando en bucle de 5:20 · fanfarria lista al ganar";
-        }, 1600);
       }
       function onFirstGestureForWelcome(ev){
         if(welcomePlayed) return;
@@ -2412,22 +2308,6 @@
           }
         }
       }
-      function fmtClock(sec){
-        sec = Math.max(0, Math.floor(sec));
-        return Math.floor(sec / 60) + ":" + ("0" + (sec % 60)).slice(-2);
-      }
-      function updateBgmUI(){
-        var stateEl = $("bgmState"), timeEl = $("bgmTime"), fillEl = $("bgmFill");
-        var playI = $("bgmPlayIcon"), pauseI = $("bgmPauseIcon");
-        var elapsed = bgm.playing ? bgm.dispBase + (Date.now() - bgm.dispStart) / 1000 : bgm.dispBase;
-        if(elapsed > BGM_TOTAL_SEC) elapsed = elapsed % BGM_TOTAL_SEC;
-        if(timeEl) timeEl.textContent = fmtClock(elapsed) + " / " + fmtClock(BGM_TOTAL_SEC);
-        if(fillEl) fillEl.style.transform = "scaleX(" + (elapsed / BGM_TOTAL_SEC).toFixed(4) + ")";
-        if(stateEl) stateEl.textContent = bgm.playing ? "Sonando ahora · pista de 5:20 en bucle, sin parar" : (bgm.everStarted ? "En pausa · toca ▶ para que siga la música" : "Toca la página para que empiece · dura 5:20 y se repite en bucle");
-        if(playI) playI.hidden = bgm.playing;
-        if(pauseI) pauseI.hidden = !bgm.playing;
-        if(bgmBtnEl) bgmBtnEl.setAttribute("aria-pressed", bgm.playing ? "true" : "false");
-      }
       function startBgm(){
         if(!state.sound) return;
         /* Con la página oculta o cerrada la música NUNCA arranca:
@@ -2435,7 +2315,7 @@
            encenderla mientras la página no está a la vista. */
         if(document.hidden) return;
         ensureAudio();
-        if(!actx || !bgmGain || bgm.playing) { updateBgmUI(); return; }
+        if(!actx || !bgmGain || bgm.playing) return;
         if(actx.state === "suspended"){ actx.resume(); }
         bgm.playing = true; bgm.everStarted = true;
         bgm.bar = Math.floor(bgm.dispBase / BGM_BAR) % BGM_BARS;
@@ -2447,38 +2327,19 @@
         bgmSchedulerTick();
         if(bgm.schedTimer) clearInterval(bgm.schedTimer);
         bgm.schedTimer = setInterval(bgmSchedulerTick, 200);
-        if(bgm.uiTimer) clearInterval(bgm.uiTimer);
-        bgm.uiTimer = setInterval(updateBgmUI, 500);
-        updateBgmUI();
       }
       function pauseBgm(){
-        if(!bgm.playing) { updateBgmUI(); return; }
+        if(!bgm.playing) return;
         bgm.dispBase = bgm.dispBase + (Date.now() - bgm.dispStart) / 1000;
         if(bgm.dispBase >= BGM_TOTAL_SEC) bgm.dispBase = bgm.dispBase % BGM_TOTAL_SEC;
         bgm.playing = false;
         if(bgm.schedTimer){ clearInterval(bgm.schedTimer); bgm.schedTimer = null; }
-        if(bgm.uiTimer){ clearInterval(bgm.uiTimer); bgm.uiTimer = null; }
         if(actx && bgmGain) bgmGain.gain.setTargetAtTime(0, actx.currentTime, .08);
-        updateBgmUI();
       }
       function duckBgm(mult){
         if(!actx || !bgmGain || !bgm.playing) return;
         try{ bgmGain.gain.setTargetAtTime(.9 * mult, actx.currentTime, .18); }catch(e){ /* noop */ }
       }
-      if(bgmBtnEl){
-        bgmBtnEl.addEventListener("click", function(){
-          if(!state.sound){
-            toast("Primero activa el sonido con el botón de altavoz de la ruleta.");
-            return;
-          }
-          if(bgm.playing){ pauseBgm(); toast("Música de fondo en pausa. Toca ▶ cuando quieras que siga."); }
-          else{
-            ensureAudio(); welcomePlayed = true; startBgm();
-            toast("Música de fondo sonando: 5 minutos 20 en bucle, sin parar.");
-          }
-        });
-      }
-
       /* ============ VOZ — HELIO: BIENVENIDA CORTA Y PREMIO EXACTO ============
          Ajuste pedido por Axel: nada de voz hablando en cada
          paso, porque se oye de más y da pena escucharlo.
@@ -2566,17 +2427,29 @@
         }
         return narrator.cache[key];
       }
-      /* Precarga de los clips: SOLO al primer gesto del usuario
-         (toque, clic o tecla), nunca al abrir la página. Antes se
-         descargaban los 13 clips (~400 KB) en cuanto cargaba la
-         página y eso pesaba en teléfonos baratos; ahora el primer
-         toque los deja listos y la bienvenida y el premio suenan
-         al instante cuando tocan. */
-      var narrPreloaded = false;
-      function preloadNarratorClips(){
-        if(narrPreloaded) return;
-        narrPreloaded = true;
-        Object.keys(NARR_CLIPS).forEach(function(k){ try{ narrAudio(k).load(); }catch(e){ /* noop */ } });
+      /* Precarga de los clips POR ETAPAS, nunca al abrir la
+         página: al primer gesto del usuario (toque, clic o tecla)
+         se carga SOLO la bienvenida — que además viene precargada
+         desde el <head> —; los clips de premio se cargan recién
+         cuando el cliente ya se registró (setPlayer), con el
+         arranque del giro como respaldo. Antes el primer toque
+         descargaba los 13 clips juntos (~400 KB) y eso pesaba en
+         teléfonos baratos; ahora la bienvenida y el premio suenan
+         al instante cuando tocan, sin bajar todo de golpe. */
+      var welcomeClipPreloaded = false;
+      function preloadWelcomeClip(){
+        if(welcomeClipPreloaded) return;
+        welcomeClipPreloaded = true;
+        try{ narrAudio("bienvenidaCorta").load(); }catch(e){ /* noop */ }
+      }
+      var prizeClipsPreloaded = false;
+      function preloadPrizeClips(){
+        if(prizeClipsPreloaded) return;
+        prizeClipsPreloaded = true;
+        Object.keys(NARR_CLIPS).forEach(function(k){
+          if(k === "bienvenidaCorta") return;
+          try{ narrAudio(k).load(); }catch(e){ /* noop */ }
+        });
       }
       function narratorStopAudio(){
         Object.keys(narrator.cache).forEach(function(k){
@@ -2607,13 +2480,6 @@
           if(p && p.catch) p.catch(function(){ /* el navegador lo libera con el siguiente toque */ });
           return true;
         }catch(e){ return false; }
-      }
-      function narratorCue(delayMs, key){
-        /* Cada frase del giro corta la anterior: la narración sigue
-           el ritmo real de la rueda (arranque, giro, frenado) en
-           vez de amontonarse en cola. */
-        var t = setTimeout(function(){ narratorPlay(key); }, delayMs);
-        narrator.timers.push(t);
       }
       /* ============ Bienvenida al registrar el nombre ============
          Corrección definitiva (auditoría completa, reporte
@@ -2694,7 +2560,8 @@
       });
       /* Primer gesto en la página: se reanuda el AudioContext
          (requisito de iOS/Android para que cualquier sonido suene),
-         se precargan los clips de Helio y se piden las librerías
+         se precarga SOLO la bienvenida de Helio (los clips de
+         premio llegan tras el registro) y se piden las librerías
          que el juego va a necesitar en seguida (el generador de QR
          y, si el teléfono aguanta, el confeti). Todo ocurre tras el
          toque, así que nada de esto pesa en la carga inicial. */
@@ -2704,7 +2571,7 @@
         firstGestureDone = true;
         ensureAudio();
         if(actx && actx.state === "suspended"){ try{ actx.resume(); }catch(e){ /* noop */ } }
-        preloadNarratorClips();
+        preloadWelcomeClip();
         loadLib("qrcode");
         loadLib("confetti");
       }
@@ -2904,36 +2771,6 @@
         var t = setTimeout(function(){ narratorPlay("ganoOtra"); }, 700);
         narrator.timers.push(t);
       }
-      if(narratorBtnEl){
-        narratorBtnEl.addEventListener("click", function(){
-          narrator.enabled = !narrator.enabled;
-          narratorBtnEl.classList.toggle("off", !narrator.enabled);
-          narratorBtnEl.setAttribute("aria-pressed", narrator.enabled ? "true" : "false");
-          if(narratorStateEl) narratorStateEl.textContent = narrator.enabled ? "Activada · bienvenida corta y tu premio al ganar" : "Apagada · toca el micrófono para activarla";
-          if(!narrator.enabled){ narratorStop(); toast("Voz de Helio apagada."); }
-          else{
-            toast("Voz de Helio activada: bienvenida corta al registrarte y tu premio exacto al ganar.");
-          }
-        });
-      }
-      var narratorTestBtnEl = $("narratorTestBtn");
-      if(narratorTestBtnEl){
-        narratorTestBtnEl.addEventListener("click", function(){
-          if(!state.sound){ toast("Primero activa el sonido con el botón de altavoz de la ruleta."); return; }
-          if(!narrator.enabled){
-            narrator.enabled = true;
-            narratorBtnEl.classList.remove("off");
-            narratorBtnEl.setAttribute("aria-pressed", "true");
-            if(narratorStateEl) narratorStateEl.textContent = "Activada · bienvenida corta y tu premio al ganar";
-          }
-          ensureAudio();
-          /* Muestra de cómo suena Helio al ganar: dice solo
-             «¡Felicidades! ¡Te ganaste…!» con un premio exacto
-             (en el juego usa el clip del premio que te toque) */
-          narratorPlay("gano50");
-        });
-      }
-
       /* ================= Toast ================= */
       var toastTimer = null;
       function toast(msg){
@@ -3042,6 +2879,12 @@
         nameForm.hidden = true;
         playerChip.hidden = false;
         refreshUI();
+        /* Ya quedó registrado: desde ahora se descargan los clips
+           de premio de Helio (sonarán al ganar) y la librería del
+           QR, para que durante los 6.4 s del giro ya vaya llegando
+           y el boleto salga con el QR al instante. */
+        preloadPrizeClips();
+        loadLib("qrcode");
         if(state.record && !state.record.retry){
           toast("Ese nombre ya giró hoy: aquí está su boleto.");
         }else if(state.record && state.record.retry){
@@ -3232,6 +3075,7 @@
         }
         ensureAudio();
         loadLib("qrcode"); /* el QR del boleto se genera al terminar el giro: la librería va llegando mientras la ruleta gira */
+        preloadPrizeClips(); /* respaldo: los clips de premio ya vienen desde el registro; si algo falló ahí, llegan con el giro */
         playSpinStart();
         narrateSpinStart();
         state.spinning = true;
@@ -3369,32 +3213,34 @@
          celular con la librería QRCode.js (nivel H, para que se lea
          aunque lleve el punto de marca al centro). Ningún dato del
          boleto sale a ningún servicio externo para dibujar el QR.
-         Si la librería no cargó, se reintenta una vez y al final se
-         deja el folio grande como comprobante para tienda. */
-      function generateQR(box, payload, folio, tries){
+         Si la librería aún va en camino, se espera su promesa y
+         el QR se genera en el instante en que llega; solo si de
+         plano no cargó se deja el folio grande como comprobante
+         para tienda. */
+      function generateQR(box, payload, folio){
         box.innerHTML = '<div style="font-weight:700;font-size:12px;color:#777;text-align:center;padding:10px;">Generando tu QR…</div>';
         box.classList.remove("qr-ready");
         function addLogo(){
           var logo = document.createElement("span"); logo.className = "qr-logo"; logo.innerHTML = 'PIN<i>K</i>';
           box.appendChild(logo); box.classList.add("qr-ready");
         }
-        if(typeof window.QRCode === "function"){
+        function drawQR(){
           try{
             box.innerHTML = "";
             new window.QRCode(box, { text: payload, width: 152, height: 152, correctLevel: window.QRCode.CorrectLevel ? window.QRCode.CorrectLevel.H : 2 });
             setTimeout(addLogo, 30);
-            return;
-          }catch(e){ /* cae al respaldo de folio */ }
+            return true;
+          }catch(e){ return false; }
         }
-        if((tries || 0) < 2){
-          /* La librería del QR se carga bajo demanda: se pide (si
-             aún no llegó del primer toque) y se reintenta; solo si
-             de plano no cargó se deja el folio grande. */
-          loadLib("qrcode");
-          setTimeout(function(){ generateQR(box, payload, folio, (tries||0)+1); }, 700);
-          return;
-        }
-        box.innerHTML = '<div style="font-weight:900;font-size:16px;text-align:center;padding:8px;line-height:1.3;">'+escapeHtml(folio)+'<div style="font-weight:600;font-size:11px;color:#55555f;margin-top:5px;">Muestra tu folio en tienda para canjear</div></div>';
+        if(typeof window.QRCode === "function" && drawQR()) return;
+        /* La librería se pide desde el primer toque, el registro
+           y el arranque del giro, así que normalmente ya está
+           aquí. Si aún no llega, se espera su promesa y el QR se
+           dibuja en cuanto aterriza, sin reintentos por sondeo. */
+        loadLib("qrcode").then(function(ok){
+          if(ok && typeof window.QRCode === "function" && drawQR()) return;
+          box.innerHTML = '<div style="font-weight:900;font-size:16px;text-align:center;padding:8px;line-height:1.3;">'+escapeHtml(folio)+'<div style="font-weight:600;font-size:11px;color:#55555f;margin-top:5px;">Muestra tu folio en tienda para canjear</div></div>';
+        });
       }
       function openTicket(ticket){
         state.lastTicket = ticket;
@@ -3419,7 +3265,7 @@
           "Premio: " + ticket.prizeLabel + "\n" +
           "Fecha del giro: " + ticket.date + " " + (ticket.time || "") + "\n" +
           "Canje: 13-17 nov 2026, Pink Case Ixtlahuaca Centro";
-        generateQR($("qrBox"), payload, ticket.folio, 0);
+        generateQR($("qrBox"), payload, ticket.folio);
 
         var waText = "Hola Pink Case, gané en la Ruleta Buen Fin: " + ticket.prizeLabel +
           ". Mi folio es " + ticket.folio + ", a nombre de " + ticket.name +
@@ -3730,7 +3576,7 @@
       var STORES = {
         pc1: {
           tag: "PC1", name: "Pink Case 1",
-          src: "assets/tienda-pc1.jpg",
+          src: "assets/tienda-pc1.webp",
           alt: "Fachada de la sucursal Pink Case 1 (PC1): entrada abierta con muro de azulejo piedra, vitrina de accesorios y letrero redondo de Recargas",
           ref: "a un lado de Laboratorios El Chopo",
           desc: "Entrada abierta con muro de azulejo piedra, vitrina de accesorios a la izquierda y letrero redondo de «Recargas». Así se ve el local de frente.",
@@ -3738,7 +3584,7 @@
         },
         pc2: {
           tag: "PC2", name: "Pink Case 2",
-          src: "assets/tienda-pc2.jpg",
+          src: "assets/tienda-pc2.webp",
           alt: "Fachada de la sucursal Pink Case 2 (PC2): mural negro gigante con el logo PINK CASE en blanco y rosa y el robot de Android",
           ref: "cerca de Las Premier · local con mural negro en vertical",
           desc: "El local del mural negro en vertical: logo PINK CASE gigante en blanco y rosa, el robot de Android y «Recargas» pintados en la pared. Inconfundible.",
@@ -3746,7 +3592,7 @@
         },
         pc4: {
           tag: "PC4", name: "Pink Case 4",
-          src: "assets/tienda-pc4.jpg",
+          src: "assets/tienda-pc4.webp",
           alt: "Fachada de la sucursal Pink Case 4 (PC4): local con toldo vino que dice Accesorios y Tecnología y anuncio de mica de cristal",
           ref: "a un lado de Mariscos Enríquez",
           desc: "Local con toldo vino que dice «Accesorios y Tecnología» y anuncio verde de mica de cristal $30 colgando a la derecha de la entrada.",
@@ -3754,7 +3600,7 @@
         },
         pc5: {
           tag: "PC5", name: "Pink Case 5",
-          src: "assets/tienda-pc5.jpg",
+          src: "assets/tienda-pc5.webp",
           alt: "Fachada de la sucursal Pink Case 5 (PC5): frente de cristal con el logo PINK CASE y el letrero de Gran Reapertura, Bienvenidos",
           ref: "a un lado de la Panadería La Estrella del Sabor, frente a la Farmacia Santísima Trinidad",
           desc: "Frente de cristal con el logo PINK CASE y el letrero «Gran Reapertura · Bienvenidos»; por dentro se ven los exhibidores negros y el mostrador.",
@@ -3793,7 +3639,7 @@
         soundBtn.classList.toggle("muted", !state.sound);
         soundBtn.setAttribute("aria-pressed", state.sound ? "true" : "false");
         if(state.sound){ ensureAudio(); playClick(); if(!welcomePlayed) setTimeout(tryWelcomeSound, 180); else if(bgm.everStarted && !bgm.playing) setTimeout(startBgm, 220); }
-        else{ stopSpinMusic(); narratorStop(); pauseBgm(); var np=document.getElementById("nowPlaying"); if(np) np.classList.remove("playing","win"); }
+        else{ stopSpinMusic(); narratorStop(); pauseBgm(); }
         toast(state.sound ? "Sonido activado: música de fondo de 5:20 en bucle, sonido al girar y fanfarria al ganar" : "Sonido silenciado: también se pausa la música de fondo");
       });
 
@@ -3825,8 +3671,6 @@
             if(suspendP && suspendP.catch) suspendP.catch(function(){ /* noop */ });
           }catch(e){ /* noop */ }
         }
-        var npEl = document.getElementById("nowPlaying");
-        if(npEl) npEl.classList.remove("playing", "win");
       }
       window.addEventListener("pagehide", silenceAllAudioOnHide);
       document.addEventListener("visibilitychange", function(){
@@ -3904,11 +3748,21 @@
         Array.prototype.forEach.call(spotEls, function(el){ el.classList.add("spot"); });
         if(finePointer && !reduced){
           Array.prototype.forEach.call(spotEls, function(el){
+            /* La luz se actualiza una vez por cuadro (rAF), no en
+               cada evento del puntero: se ve igual y el rectángulo
+               de la tarjeta se lee una sola vez por fotograma. */
+            var spotRaf = 0, spotEv = null;
             el.addEventListener("pointermove", function(ev){
-              var r = el.getBoundingClientRect();
-              if(!r.width || !r.height) return;
-              el.style.setProperty("--mx", ((ev.clientX - r.left) / r.width * 100).toFixed(1) + "%");
-              el.style.setProperty("--my", ((ev.clientY - r.top) / r.height * 100).toFixed(1) + "%");
+              spotEv = ev;
+              if(spotRaf) return;
+              spotRaf = requestAnimationFrame(function(){
+                spotRaf = 0;
+                if(!spotEv) return;
+                var r = el.getBoundingClientRect();
+                if(!r.width || !r.height) return;
+                el.style.setProperty("--mx", ((spotEv.clientX - r.left) / r.width * 100).toFixed(1) + "%");
+                el.style.setProperty("--my", ((spotEv.clientY - r.top) / r.height * 100).toFixed(1) + "%");
+              });
             }, { passive:true });
           });
         }
@@ -4002,14 +3856,22 @@
       /* Respaldo sin GSAP: la barra superior sigue al scroll */
       if(!window.gsap || !window.ScrollTrigger){
         if(bar && !reduced){
-          var onScroll = function(){
+          /* El alto total se mide solo al cargar y al cambiar el
+             tamaño de la ventana: el handler de scroll ya no lee
+             el layout en cada evento, solo aplica el transform. */
+          var maxScroll = 0;
+          var measureBar = function(){
             var h = document.documentElement;
-            var max = h.scrollHeight - h.clientHeight;
-            var pr = max > 0 ? (h.scrollTop || window.scrollY || 0) / max : 0;
+            maxScroll = h.scrollHeight - h.clientHeight;
+          };
+          var onScroll = function(){
+            var pr = maxScroll > 0 ? (document.documentElement.scrollTop || window.scrollY || 0) / maxScroll : 0;
             bar.style.transform = "scaleX(" + Math.min(1, Math.max(0, pr)).toFixed(4) + ")";
           };
           window.addEventListener("scroll", onScroll, { passive:true });
-          window.addEventListener("resize", onScroll);
+          window.addEventListener("resize", function(){ measureBar(); onScroll(); });
+          window.addEventListener("load", function(){ measureBar(); onScroll(); });
+          measureBar();
           onScroll();
         } else if(bar){ bar.style.transform = "scaleX(1)"; }
         return;
