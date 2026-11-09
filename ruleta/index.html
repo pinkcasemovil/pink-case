@@ -2616,12 +2616,12 @@
       }
       /* ============ Bienvenida al registrar el nombre ============
          Corrección definitiva (auditoría completa, reporte
-         repetido: «no suena esa parte»). Verificado primero lo
-         que NO es: el archivo bienvenida-corta.mp3 está sano
-         (3.79 s, voz con buen volumen, misma codificación
-         MP3 24 kHz/64 kbps que los clips de ganar que SÍ se
-         escuchan) y su dirección es la simple, sin query.
-         El problema es la RUTA de reproducción: la bienvenida
+         repetido: «no suena esa parte»). Había DOS problemas:
+         el clip anterior decía la frase vieja («¡Bienvenido a
+         Pink Case! ¡Mucha suerte!») y fue reemplazado por la
+         grabación nueva con la frase que pidió Axel (3.84 s,
+         misma voz Helio, mismo formato MP3 24 kHz/64 kbps); y
+         la RUTA de reproducción era frágil: la bienvenida
          era el único clip que se reproducía dentro del evento
          «submit» del formulario, con un elemento creado en el
          momento. Varios navegadores de celular (iOS Safari y
@@ -2630,45 +2630,66 @@
          después, y bloquean ese play() en silencio; los clips
          de ganar no sufren eso porque reutilizan elementos ya
          precargados y «cebados» por la interacción previa.
-         La corrección ataca las tres capas a la vez:
+         La corrección ataca las capas a la vez:
            1) UN SOLO elemento persistente para la bienvenida,
               creado al cargar la página y registrado en la
               caché del narrador (narrateSpinStart aún puede
               cortarlo si el cliente gira de inmediato).
-           2) CEBADO silencioso: con el primer toque o tecla en
-              cualquier parte de la página, ese elemento se
-              reproduce en volumen 0 y se rebobina, que es lo
-              que deja el elemento «desbloqueado» en iOS y en
-              webviews para poder sonar después sin gesto.
-           3) DOBLE disparo con deduplicación: la voz arranca
-              en el «click» directo del botón «Participar»
-              (gesto puro, antes del submit) y el submit conserva
-              su llamada como respaldo; una marca de tiempo
-              impide que suene dos veces y que el submit pause
-              la voz que el click ya arrancó.
+           2) CARGA REAL + CEBADO en el primer gesto: con el
+              primer toque o tecla, primeWelcomeAudio pone
+              preload «auto», llama a load() y espera a que el
+              clip esté listo (canplaythrough) antes del cebado
+              silencioso que «desbloquea» el elemento en iOS y
+              en webviews. Antes el cebado era solo un play en
+              volumen 0 que podía llegar antes de que el archivo
+              cargara, y fallaba en silencio.
+           3) DOBLE disparo con deduplicación que NO bloquea
+              reintentos: la voz arranca en el «click» directo
+              del botón «Participar» (gesto puro, antes del
+              submit) y el submit conserva su llamada como
+              respaldo. La marca de «ya sonó» se pone SOLO cuando
+              el audio suena de verdad (evento «playing» o la
+              promesa de play() resuelta); si play() es rechazado
+              o el audio no arranca, se reintenta a los 300 ms y
+              a los 900 ms en el mismo elemento ya cebado.
+           4) ÚLTIMO RECURSO: si tras los reintentos el mp3 no
+              suena, la voz del sistema (speechSynthesis, en
+              español) dice la frase exacta «¡Bienvenido a Pink
+              Case! Gira la ruleta para ganar.»: el momento del
+              registro nunca queda en silencio. La campanita de
+              WebAudio queda solo para cuando el sonido está
+              apagado o el narrador desactivado.
          La música de fondo entra recién cuando Helio termina
-         de hablar. Si el navegador aun así rechazara la voz,
-         suena la campanita por WebAudio (capa que el toque sí
-         desbloquea): el momento del registro nunca queda en
-         silencio. */
+         de hablar. */
       var welcomeBgmStarted = false, lastWelcomeChime = 0;
       var welcomeAudioEl = new Audio();
       /* Sin descarga al abrir: el archivo se pide recién en el
-         primer gesto (el cebado silencioso de primeWelcomeAudio),
-         que es cuando el navegador además permite que suene. */
+         primer gesto (primeWelcomeAudio pone preload «auto» y
+         llama a load()), que es cuando el navegador además
+         permite que suene. */
       welcomeAudioEl.preload = "none";
       welcomeAudioEl.src = NARR_CLIPS.bienvenidaCorta;
       narrator.cache["bienvenidaCorta"] = welcomeAudioEl;
       welcomeAudioEl.addEventListener("play", function(){ narrator.speaking = true; duckBgm(.35); });
-      welcomeAudioEl.addEventListener("ended", function(){ narrator.speaking = false; startBgmAfterWelcome(); });
+      /* La marca de «ya sonó» SOLO se pone cuando el audio está
+         sonando de verdad (evento «playing») y nunca durante el
+         cebado silencioso: marcarla antes de intentarlo era lo
+         que bloqueaba los reintentos tras un fallo. */
+      welcomeAudioEl.addEventListener("playing", function(){
+        if(welcomePriming) return;
+        welcomeVoiceAt = Date.now();
+        welcomePlaying = true;
+      });
+      welcomeAudioEl.addEventListener("pause", function(){ welcomePlaying = false; });
+      welcomeAudioEl.addEventListener("ended", function(){ narrator.speaking = false; welcomePlaying = false; startBgmAfterWelcome(); });
       welcomeAudioEl.addEventListener("error", function(){
-        /* La bienvenida no cargó: el momento no queda en silencio
-           (suena la campanita WebAudio) y la música entra igual.
-           Nada de errores en pantalla. */
+        /* La bienvenida no cargó: se marca el fallo y el momento
+           del registro lo cubre la cadena de playWelcomeVoice
+           (reintentos y, como último recurso, la voz del sistema
+           con la misma frase). Nada de errores en pantalla. */
         narrator.speaking = false;
+        welcomePlaying = false;
         narrator.failed["bienvenidaCorta"] = true;
-        playWelcomeChime();
-        setTimeout(startBgmAfterWelcome, 900);
       });
       /* Primer gesto en la página: se reanuda el AudioContext
          (requisito de iOS/Android para que cualquier sonido suene),
@@ -2689,25 +2710,52 @@
       ["pointerdown", "touchstart", "keydown"].forEach(function(evt){
         document.addEventListener(evt, onFirstGestureAudio, { passive: true });
       });
-      /* Cebado silencioso del elemento en el primer gesto */
-      var welcomePrimed = false, welcomeVoiceAt = 0;
+      /* Cebado en el primer gesto: primero se CARGA el archivo
+         de verdad (preload «auto» + load()) y se espera a que
+         esté listo para sonar (canplaythrough); recién entonces
+         va el cebado silencioso que desbloquea el elemento. */
+      var welcomePrimed = false, welcomeVoiceAt = 0, welcomePlaying = false,
+          welcomeAttemptAt = 0, welcomeClaimed = false, welcomePriming = false;
       function primeWelcomeAudio(){
+        try{
+          welcomeAudioEl.preload = "auto";
+          if(welcomeAudioEl.readyState < 3 && welcomeAudioEl.networkState !== 2) welcomeAudioEl.load();
+        }catch(e){ /* noop */ }
         if(welcomePrimed) return;
         welcomePrimed = true;
-        try{
-          welcomeAudioEl.volume = 0;
-          var p = welcomeAudioEl.play();
-          var unprime = function(){
-            welcomeAudioEl.volume = 1;
-            /* Si la bienvenida real ya arrancó en este mismo
-               elemento (toque directo en «Participar»), no se
-               pausa ni se rebobina: solo se restaura el volumen. */
-            if(welcomeVoiceAt && Date.now() - welcomeVoiceAt < 4000) return;
-            try{ welcomeAudioEl.pause(); welcomeAudioEl.currentTime = 0; }catch(e){ /* noop */ }
-          };
-          if(p && p.then){ p.then(function(){ setTimeout(unprime, 60); }).catch(function(){ welcomeAudioEl.volume = 1; welcomePrimed = false; }); }
-          else setTimeout(unprime, 60);
-        }catch(e){ welcomeAudioEl.volume = 1; welcomePrimed = false; }
+        var doPrime = function(){
+          /* La bienvenida real ya fue reclamada por el click en
+             «Participar»: nada de cebado silencioso encima. */
+          if(welcomeClaimed || welcomePlaying){ welcomeAudioEl.volume = 1; return; }
+          try{
+            welcomePriming = true;
+            welcomeAudioEl.volume = 0;
+            var p = welcomeAudioEl.play();
+            var unprime = function(){
+              welcomePriming = false;
+              welcomeAudioEl.volume = 1;
+              /* Si la bienvenida real ya arrancó en este mismo
+                 elemento (toque directo en «Participar»), no se
+                 pausa ni se rebobina: solo se restaura el volumen. */
+              if(welcomeClaimed || welcomePlaying) return;
+              try{ welcomeAudioEl.pause(); welcomeAudioEl.currentTime = 0; }catch(e){ /* noop */ }
+            };
+            if(p && p.then){ p.then(function(){ setTimeout(unprime, 60); }).catch(function(){ welcomePriming = false; welcomeAudioEl.volume = 1; welcomePrimed = false; }); }
+            else setTimeout(unprime, 60);
+          }catch(e){ welcomePriming = false; welcomeAudioEl.volume = 1; welcomePrimed = false; }
+        };
+        if(welcomeAudioEl.readyState >= 3){ doPrime(); return; }
+        var primeDone = false;
+        var onReady = function(){
+          if(primeDone) return;
+          primeDone = true;
+          welcomeAudioEl.removeEventListener("canplaythrough", onReady);
+          doPrime();
+        };
+        welcomeAudioEl.addEventListener("canplaythrough", onReady);
+        /* Si la red tarda, el cebado no espera para siempre: a
+           los 1.5 s se intenta igual con lo que haya cargado. */
+        setTimeout(onReady, 1500);
       }
       ["pointerdown", "touchstart", "keydown"].forEach(function(evt){
         document.addEventListener(evt, primeWelcomeAudio, { passive: true });
@@ -2728,36 +2776,87 @@
           blip(f / 2, .22, "triangle", .02, i * .08);
         });
       }
+      /* Último recurso de la bienvenida: si el mp3 no suena tras
+         los reintentos, la voz del sistema dice la frase exacta
+         en español, para que el registro nunca quede en silencio.
+         La campanita WebAudio queda SOLO para cuando el sonido
+         está apagado o el narrador desactivado. */
+      function welcomeFallbackSpeak(){
+        try{
+          if(window.speechSynthesis){
+            var u = new SpeechSynthesisUtterance("¡Bienvenido a Pink Case! Gira la ruleta para ganar.");
+            u.lang = "es-MX";
+            try{
+              var vs = speechSynthesis.getVoices() || [];
+              for(var i = 0; i < vs.length; i++){
+                if(vs[i].lang && vs[i].lang.toLowerCase().indexOf("es") === 0){ u.voice = vs[i]; break; }
+              }
+            }catch(e){ /* sin lista de voces: manda el lang del enunciado */ }
+            speechSynthesis.cancel();
+            speechSynthesis.speak(u);
+            welcomeVoiceAt = Date.now();
+            setTimeout(startBgmAfterWelcome, 1600);
+            return;
+          }
+        }catch(e){ /* sin voz del sistema disponible */ }
+        setTimeout(startBgmAfterWelcome, 900);
+      }
       function playWelcomeVoice(){
         if(!narrator.enabled || !state.sound){
           playWelcomeChime();
           setTimeout(startBgmAfterWelcome, 700);
           return;
         }
-        /* Deduplicación: si la voz ya arrancó con el click
-           directo en «Participar» (que ocurre antes del submit),
-           esta llamada del submit no la reinicia ni la corta. */
+        /* Deduplicación SIN bloquear reintentos: la llamada solo
+           se ignora si la voz ya está SONANDO o si hay un intento
+           en curso. La marca de «ya sonó» (welcomeVoiceAt) se pone
+           en el evento «playing», cuando el audio suena de verdad;
+           un play() rechazado jamás la pone, así que un fallo
+           nunca impide volver a intentarlo en el siguiente toque. */
         var now = Date.now();
-        if(now - welcomeVoiceAt < 2500) return;
-        welcomeVoiceAt = now;
+        if(welcomePlaying) return;
+        if(welcomeAttemptAt && now - welcomeAttemptAt < 3000) return;
+        welcomeClaimed = true;
+        welcomeAttemptAt = now;
         duckBgm(.22); /* el fondo baja ANTES de que Helio hable */
         welcomeAudioEl.volume = 1;
-        try{ welcomeAudioEl.currentTime = 0; }catch(e){ /* noop */ }
-        var p = null;
-        try{ p = welcomeAudioEl.play(); }catch(e){ p = null; }
-        if(p && p.catch){
-          p.catch(function(){
-            /* Un reintento en el mismo elemento ya cebado; si el
-               navegador lo vuelve a rechazar, la campanita de
-               WebAudio cubre el momento. */
-            var p2 = null;
-            try{ p2 = welcomeAudioEl.play(); }catch(e){ p2 = null; }
-            if(p2 && p2.catch) p2.catch(function(){ playWelcomeChime(); setTimeout(startBgmAfterWelcome, 900); });
-            else if(!p2){ playWelcomeChime(); setTimeout(startBgmAfterWelcome, 900); }
-          });
-        }else if(!p){
-          playWelcomeChime(); setTimeout(startBgmAfterWelcome, 900);
-        }
+        /* Reintentos en el mismo elemento ya cebado: si play() es
+           rechazado o el audio no arranca, se vuelve a intentar a
+           los 300 ms y a los 900 ms; si ni así suena, habla la
+           voz del sistema con la misma frase. */
+        var delays = [300, 900];
+        var attempt = function(i){
+          if(welcomePlaying) return; /* ya arrancó: no cortarla */
+          var p = null;
+          try{ welcomeAudioEl.currentTime = 0; }catch(e){ /* noop */ }
+          try{ p = welcomeAudioEl.play(); }catch(e){ p = null; }
+          var settled = false;
+          var fail = function(){
+            if(settled) return;
+            settled = true;
+            if(i < delays.length){
+              setTimeout(function(){ attempt(i + 1); }, delays[i]);
+            }else{
+              welcomeAttemptAt = 0; /* el fallo no bloquea futuros registros */
+              welcomeFallbackSpeak();
+            }
+          };
+          if(p && p.then){
+            p.then(function(){ settled = true; /* aceptado: «playing» pone welcomeVoiceAt */ }, fail);
+            /* Si play() no fue rechazado pero el audio no arrancó
+               (sin «playing» en 800 ms), también cuenta como fallo. */
+            setTimeout(function(){
+              if(settled) return;
+              if(welcomePlaying){ settled = true; }
+              else fail();
+            }, 800);
+          }else if(!p){
+            fail();
+          }else{
+            settled = true; /* navegadores viejos sin promesa: se asume que arrancó */
+          }
+        };
+        attempt(0);
         /* La música entra sí o sí al terminar la frase (~3.8 s),
            aunque el evento «ended» no llegara por algún bloqueo. */
         setTimeout(startBgmAfterWelcome, 4300);
@@ -2766,13 +2865,15 @@
          «¡Bienvenido a Pink Case! Gira la ruleta para ganar.»
          Arranca en el click directo del botón «Participar»
          (ver el listener junto al submit) y esta función queda
-         como respaldo desde el submit, deduplicada por
-         welcomeVoiceAt para nunca sonar dos veces ni cortarse
-         a sí misma. El saludo sonoro de entrada se marca como
-         escuchado para que su musiquita no se encime. */
+         como respaldo desde el submit; si la voz ya suena o hay
+         un intento en curso, no la toca, para nunca sonar dos
+         veces ni cortarse a sí misma. El saludo sonoro de entrada
+         se marca como escuchado para que su musiquita no se
+         encime. */
       function narrateWelcome(alreadyWon, hasRetry){
         welcomePlayed = true;
-        if(Date.now() - welcomeVoiceAt < 2500) return; /* ya suena desde el click */
+        if(welcomePlaying) return; /* ya suena desde el click */
+        if(welcomeAttemptAt && Date.now() - welcomeAttemptAt < 3000) return; /* intento en curso desde el click */
         narratorClearTimers();
         narratorStopAudio();
         playWelcomeVoice();
