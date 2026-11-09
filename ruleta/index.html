@@ -214,26 +214,28 @@
           linear-gradient(112deg, transparent 42%, rgba(255,255,255,.055) 50%, transparent 58%),
           linear-gradient(68deg, transparent 42%, rgba(255,255,255,.055) 50%, transparent 58%);
       }
-      /* Botón simple de sonido: lo único que queda de la antigua
-         sección de controles, visible justo tras el registro */
-      .sound-row{ display:flex; justify-content:center; margin-top:24px; }
-      .sound-toggle{
-        display:inline-flex; align-items:center; gap:10px;
-        font:inherit; font-weight:800; font-size:14.5px; cursor:pointer;
-        color:var(--gold-soft);
+      /* Botón flotante de música de fondo: una bocina circular fija
+         en la esquina inferior derecha, visible en toda la página.
+         SOLO silencia o reactiva la cumbia de fondo; la voz de
+         Helio y los sonidos de la ruleta y de ganar no dependen
+         de este botón. */
+      .sound-fab{
+        position:fixed; right:16px; bottom:calc(16px + env(safe-area-inset-bottom, 0px)); z-index:40;
+        width:54px; height:54px; border-radius:50%; padding:0;
+        display:flex; align-items:center; justify-content:center;
+        font:inherit; cursor:pointer; color:var(--gold-soft);
         background:linear-gradient(180deg, #221a20, var(--panel));
-        border:1px solid #54452a; border-radius:999px; padding:11px 22px;
-        box-shadow:0 10px 24px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08);
+        border:1px solid #54452a;
+        box-shadow:0 14px 30px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.08);
         transition:filter .2s, transform .12s, color .2s, border-color .2s;
       }
-      .sound-toggle:hover{ filter:brightness(1.1); }
-      .sound-toggle:active{ transform:scale(.97); }
-      .sound-toggle svg{ width:20px; height:20px; flex:none; }
-      .sound-toggle .icon-off, .sound-toggle .lbl-off{ display:none; }
-      .sound-toggle.muted{ color:var(--mut); border-color:#3d333d; }
-      .sound-toggle.muted .icon-on, .sound-toggle.muted .lbl-on{ display:none; }
-      .sound-toggle.muted .icon-off{ display:block; }
-      .sound-toggle.muted .lbl-off{ display:inline; }
+      .sound-fab:hover{ filter:brightness(1.12); }
+      .sound-fab:active{ transform:scale(.93); }
+      .sound-fab svg{ width:26px; height:26px; flex:none; }
+      .sound-fab .icon-off{ display:none; }
+      .sound-fab.muted{ color:var(--mut); border-color:#3d333d; }
+      .sound-fab.muted .icon-on{ display:none; }
+      .sound-fab.muted .icon-off{ display:block; }
       /* La ruleta cierra la secuencia, justo antes del pie */
       .wheel-zone{ max-width:600px; margin:64px auto 0; }
       .wheel-zone .stage-wrap{ margin-top:0; }
@@ -595,10 +597,9 @@
       .backdrop[hidden]{ display:none; }
       .modal-card{ position:relative; z-index:1; width:100%; max-width:430px; margin:auto 0; animation:pop .45s cubic-bezier(.2,1.35,.4,1); }
       @keyframes pop{ from{ transform:scale(.86) translateY(16px); opacity:0; } to{ transform:scale(1) translateY(0); opacity:1; } }
-      .win-head{ text-align:center; margin-bottom:16px; }
+      .win-head{ text-align:center; margin-bottom:12px; }
       .win-head .win-kicker{ display:inline-flex; align-items:center; gap:8px; font-weight:900; letter-spacing:.28em; font-size:11.5px; color:#ffd9a0; margin-left:.28em; background:rgba(255,182,72,.12); border:1px solid rgba(255,182,72,.45); padding:6px 12px 7px; border-radius:999px; }
       .win-head h2{ font-family:"Anton","Archivo",sans-serif; font-size:clamp(32px, 8.4vw, 44px); margin:10px 0 0; letter-spacing:.02em; line-height:1.05; text-shadow:0 10px 30px rgba(0,0,0,.6); }
-      .win-head .win-sub{ color:#d8cfd8; font-size:14px; margin-top:6px; }
       /* ===== Boleto ganador premium ===== */
       .ticket{
         position:relative; color:#f6efdf; border-radius:22px; text-align:center;
@@ -611,40 +612,35 @@
       .ticket-inner{ position:relative; background:radial-gradient(420px 200px at 50% -70px, rgba(255,182,72,.16), transparent 65%), radial-gradient(360px 220px at 100% 40%, rgba(232,17,45,.12), transparent 65%), linear-gradient(180deg,#221a21 0%,#120e13 55%,#191219 100%); border-radius:19px; overflow:hidden; }
       .ticket-inner::after{ content:""; position:absolute; top:-40%; left:-70%; width:55%; height:180%; background:linear-gradient(100deg,transparent,rgba(255,255,255,.14),transparent); transform:rotate(8deg); animation:ticketShine 4.2s ease-in-out infinite; pointer-events:none; }
       @keyframes ticketShine{ 0%,58%{ left:-70%; } 88%,100%{ left:135%; } }
-      /* Muescas de boleto perforado */
-      .ticket-notch{ position:absolute; top:61.5%; width:26px; height:26px; border-radius:50%; background:#0a0709; z-index:4; box-shadow:inset 0 0 0 2px rgba(255,182,72,.55); }
-      .ticket-notch.left{ left:-14px; } .ticket-notch.right{ right:-14px; }
       .ticket-band{
         position:relative;
         background:radial-gradient(340px 130px at 50% -50px, rgba(255,182,72,.42), transparent 68%), radial-gradient(300px 120px at 50% -40px, rgba(232,17,45,.55), transparent 70%), linear-gradient(180deg,#24131a,#070507);
-        color:#fff; padding:18px 18px 15px; border-bottom:3px solid var(--gold);
+        color:#fff; padding:13px 16px 12px; border-bottom:3px solid var(--gold);
       }
-      .ticket-band .t-wm{ font-weight:900; letter-spacing:.13em; font-size:22px; margin-left:.13em; line-height:1; }
+      .ticket-band .band-row{ display:flex; align-items:center; justify-content:center; gap:7px 12px; flex-wrap:wrap; }
+      .ticket-band .t-wm{ font-weight:900; letter-spacing:.13em; font-size:20px; line-height:1; white-space:nowrap; }
       .ticket-band .t-wm .k{ color:var(--pink); text-shadow:0 0 16px rgba(255,46,146,.7); }
-      .ticket-band .t-sub{ font-size:9px; letter-spacing:.34em; color:#d9c9a8; margin-top:4px; margin-left:.34em; font-weight:700; }
-      .ticket-band .t-type{ margin-top:11px; display:inline-block; background:linear-gradient(180deg,#ff3b47,var(--red) 55%,var(--red-dark)); color:#fff; font-weight:900; font-size:11px; letter-spacing:.2em; padding:6px 13px 7px; border-radius:999px; box-shadow:0 8px 18px rgba(232,17,45,.4), inset 0 1px 0 rgba(255,255,255,.5); }
-      .ticket-badge{ margin:12px auto 0; display:inline-flex; align-items:center; gap:7px; background:linear-gradient(180deg,#ffc966,#e79b1e); color:#3a2400; font-size:10.5px; font-weight:900; letter-spacing:.14em; padding:5px 11px 6px; border-radius:999px; box-shadow:0 6px 16px rgba(255,182,72,.35); }
-      .ticket-body{ position:relative; padding:24px 22px 4px; }
+      .ticket-band .t-type{ display:inline-block; background:linear-gradient(180deg,#ff3b47,var(--red) 55%,var(--red-dark)); color:#fff; font-weight:900; font-size:10px; letter-spacing:.16em; padding:5px 11px 6px; border-radius:999px; box-shadow:0 8px 18px rgba(232,17,45,.4), inset 0 1px 0 rgba(255,255,255,.5); white-space:nowrap; }
+      .ticket-badge{ margin:9px auto 0; display:inline-flex; align-items:center; gap:7px; background:linear-gradient(180deg,#ffc966,#e79b1e); color:#3a2400; font-size:10.5px; font-weight:900; letter-spacing:.14em; padding:5px 11px 6px; border-radius:999px; box-shadow:0 6px 16px rgba(255,182,72,.35); }
+      .ticket-body{ position:relative; padding:17px 20px 2px; }
       .ticket-eyebrow{ font-size:10.5px; font-weight:900; letter-spacing:.26em; color:var(--gold); margin-left:.26em; }
       .ticket-prize{ font-family:"Anton","Archivo",sans-serif; font-size:clamp(34px, 9vw, 44px); color:var(--gold-soft); line-height:1.02; letter-spacing:.01em; margin-top:5px; text-shadow:0 3px 0 rgba(194,0,31,.55), 0 12px 30px rgba(0,0,0,.65); text-wrap:balance; }
       .ticket-note{ color:#ddd2dd; font-size:13.5px; line-height:1.5; margin:7px auto 0; max-width:28em; }
-      .ticket-seal{ position:absolute; right:14px; top:-31px; z-index:5; width:68px; height:68px; border-radius:50%; border:2px solid var(--gold); color:var(--gold-soft); display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:8px; font-weight:900; letter-spacing:.07em; line-height:1.25; transform:rotate(11deg); background:rgba(12,8,10,.9); box-shadow:0 8px 18px rgba(0,0,0,.5), 0 0 18px rgba(255,182,72,.28); text-align:center; padding:5px; }
-      .ticket-seal b{ font-size:11px; letter-spacing:.04em; }
-      .ticket-rows{ margin:16px 0 2px; text-align:left; border:1px solid rgba(255,182,72,.4); background:rgba(255,255,255,.05); box-shadow:inset 0 1px 0 rgba(255,255,255,.07); border-radius:14px; padding:13px 14px; display:grid; gap:9px; }
+      .ticket-rows{ margin:13px 0 2px; text-align:left; border:1px solid rgba(255,182,72,.4); background:rgba(255,255,255,.05); box-shadow:inset 0 1px 0 rgba(255,255,255,.07); border-radius:14px; padding:11px 13px; display:grid; gap:7px; }
       .ticket-rows .row{ display:flex; justify-content:space-between; gap:14px; font-size:13.5px; align-items:baseline; }
       .ticket-rows .row span{ color:#d8b26a; font-weight:700; font-size:11.5px; letter-spacing:.07em; text-transform:uppercase; flex:none; }
       .ticket-rows .row b{ font-weight:800; text-align:right; word-break:break-word; color:#fff; }
       .ticket-rows .row b.folio{ font-variant-numeric:tabular-nums; letter-spacing:.06em; color:#2a1800; background:linear-gradient(180deg,#ffc966,#e79b1e); border:1px dashed rgba(58,36,0,.55); padding:3px 8px; border-radius:999px; font-size:13px; }
-      .qr-zone{ position:relative; padding:14px 22px 4px; }
+      .qr-zone{ position:relative; padding:11px 20px 16px; }
       .qr-title{ font-size:11px; font-weight:900; letter-spacing:.22em; color:var(--gold-soft); margin-left:.22em; }
-      .qr-frame{ position:relative; width:196px; margin:11px auto 0; padding:12px; }
+      .qr-frame{ position:relative; width:176px; margin:9px auto 0; padding:10px; }
       .qr-corner{ position:absolute; width:26px; height:26px; border-color:var(--red); border-style:solid; border-width:0; z-index:2; }
       .qr-corner.tl{ top:0; left:0; border-top-width:3px; border-left-width:3px; border-top-left-radius:10px; }
       .qr-corner.tr{ top:0; right:0; border-top-width:3px; border-right-width:3px; border-top-right-radius:10px; }
       .qr-corner.bl{ bottom:0; left:0; border-bottom-width:3px; border-left-width:3px; border-bottom-left-radius:10px; }
       .qr-corner.br{ bottom:0; right:0; border-bottom-width:3px; border-right-width:3px; border-bottom-right-radius:10px; }
       .qr-box{
-        position:relative; width:172px; height:172px; margin:0 auto; overflow:hidden;
+        position:relative; width:156px; height:156px; margin:0 auto; overflow:hidden;
         border:1.5px solid #17131a; border-radius:12px; padding:9px;
         box-shadow:0 0 0 4px #fdf3df, 0 0 0 6px var(--gold), 0 12px 26px rgba(0,0,0,.2);
         display:flex; align-items:center; justify-content:center; background:#fff;
@@ -657,17 +653,9 @@
       @keyframes qrPop{ from{ transform:scale(.92); opacity:.4; } to{ transform:scale(1); opacity:1; } }
       .qr-logo{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:30px; height:30px; border-radius:50%; background:#0b0b0d; color:#fff; border:2px solid #fff; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:900; letter-spacing:.02em; z-index:2; box-shadow:0 3px 8px rgba(0,0,0,.3); }
       .qr-logo i{ color:var(--pink); font-style:normal; }
-      .qr-cap{ font-size:12.5px; color:#d3c8d3; margin-top:10px; font-weight:600; line-height:1.45; }
+      .qr-cap{ font-size:12.5px; color:#d3c8d3; margin-top:9px; font-weight:600; line-height:1.45; }
       .qr-cap b{ color:#fff; }
       .qr-folio-line{ margin-top:5px; font-size:11.5px; color:var(--gold); font-weight:800; letter-spacing:.12em; }
-      .ticket-stub{
-        position:relative; border-top:2px dashed #c9b98a; margin-top:16px; padding:14px 20px 18px;
-        background:linear-gradient(180deg,#1d151c,#0d0a0e);
-        display:grid; gap:10px; font-size:12.5px; color:#cfc3cf; text-align:left;
-      }
-      .ticket-stub .stub-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
-      .ticket-stub b{ color:#fff; display:block; font-size:13.5px; }
-      .ticket-stub .stub-folio{ font-weight:900; letter-spacing:.05em; color:var(--gold-soft); font-size:14px; white-space:nowrap; }
       /* ---------- Mi boleto de hoy: acceso permanente tras agotar el giro ---------- */
       .btn-gold{ background:linear-gradient(180deg,#ffc966,#e79b1e); color:#2a1800; box-shadow:0 8px 22px rgba(255,182,72,.35), inset 0 1px 0 rgba(255,255,255,.55), inset 0 -2px 0 rgba(0,0,0,.18); }
       .btn-gold:hover{ filter:brightness(1.07); }
@@ -841,20 +829,20 @@
         box-shadow:var(--lift-shadow), inset 0 1px 0 rgba(255,255,255,.10);
       }
 
-      /* ---------- Botón de sonido: pastilla de cristal viva ---------- */
-      .sound-toggle{
+      /* ---------- Botón flotante de música: cristal vivo ---------- */
+      .sound-fab{
         background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02)), linear-gradient(180deg, #221a20, var(--panel));
         backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
         transition:transform .25s var(--ease-out), box-shadow .3s ease, color .2s, border-color .2s, filter .2s;
       }
-      .sound-toggle:not(.muted){
+      .sound-fab:not(.muted){
         animation:soundPulse 2.8s ease-in-out infinite;
       }
       @keyframes soundPulse{
-        0%,100%{ box-shadow:0 10px 24px rgba(0,0,0,.45), 0 0 0 0 rgba(255,182,72,.28), inset 0 1px 0 rgba(255,255,255,.10); }
-        50%{ box-shadow:0 10px 24px rgba(0,0,0,.45), 0 0 0 9px rgba(255,182,72,0), inset 0 1px 0 rgba(255,255,255,.10); }
+        0%,100%{ box-shadow:0 14px 30px rgba(0,0,0,.55), 0 0 0 0 rgba(255,182,72,.28), inset 0 1px 0 rgba(255,255,255,.10); }
+        50%{ box-shadow:0 14px 30px rgba(0,0,0,.55), 0 0 0 9px rgba(255,182,72,0), inset 0 1px 0 rgba(255,255,255,.10); }
       }
-      .sound-toggle:hover{ transform:translateY(-2px); }
+      .sound-fab:hover{ transform:translateY(-2px); }
 
       /* ---------- Flyer (póster) con marco de vitrina ---------- */
       .poster{
@@ -1015,7 +1003,7 @@
 
       @media (prefers-reduced-motion: reduce){
         .wheel-float, .wheel-halo, .pill-gana::after, .hub.ready, .btn-spin.ready, .ticket-inner::after, .qr-box::after, .qr-box.qr-ready, .modal-card, .store-modal-card{ animation:none !important; }
-        .name-card::before, .stage-wrap, .stage-wrap::before, .sound-toggle:not(.muted), .prize-chip.jackpot{ animation:none !important; }
+        .name-card::before, .stage-wrap, .stage-wrap::before, .sound-fab:not(.muted), .prize-chip.jackpot{ animation:none !important; }
         .rv{ opacity:1 !important; transform:none !important; transition:none !important; }
         .btn::after, .prize-chip::after, .poster::after{ display:none !important; }
         .spot::after{ display:none !important; }
@@ -1036,8 +1024,6 @@
            de TODA la página (script al final). Sin GSAP, el
            carrusel sigue girando y la página se ve completa.
          ============================================================ */
-      .sound-row{ gap:10px; flex-wrap:wrap; }
-
       .scroll-progress{
         position:fixed; top:0; left:0; right:0; height:4px; z-index:90;
         background:rgba(255,255,255,.08); pointer-events:none;
@@ -1177,14 +1163,6 @@
           </div>
           <p class="hint">Guardado en este celular. Mañana giras de nuevo.</p>
         </div>
-      </div>
-
-      <div class="sound-row reveal d3">
-        <button type="button" class="sound-toggle" id="soundBtn" aria-label="Activar o silenciar el sonido" aria-pressed="true">
-          <svg class="icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5Z" fill="currentColor" stroke="none"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.4 5.6a9 9 0 0 1 0 12.8"/></svg>
-          <svg class="icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5Z" fill="currentColor" stroke="none"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>
-          <span class="lbl-on">Sonido activado</span><span class="lbl-off">Sonido silenciado</span>
-        </button>
       </div>
 
 <section class="block wide" aria-labelledby="basesTitle">
@@ -1399,19 +1377,17 @@
         <div class="win-head">
           <div class="win-kicker">★ ¡FELICIDADES! ★</div>
           <h2 id="winTitle">Ganaste un premio</h2>
-          <div class="win-sub">Descarga tu boleto y mándalo por WhatsApp.</div>
         </div>
         <div class="ticket" id="ticketCard">
-          <span class="ticket-notch left" aria-hidden="true"></span><span class="ticket-notch right" aria-hidden="true"></span>
           <div class="ticket-inner">
           <div class="ticket-band">
-            <div class="t-wm">PIN<span class="k">K</span> CASE</div>
-            <div class="t-sub">TECNOLOGÍA QUE TE CONECTA</div>
-            <div><span class="t-type">BOLETO GANADOR · BUEN FIN 2026</span></div>
+            <div class="band-row">
+              <div class="t-wm">PIN<span class="k">K</span> CASE</div>
+              <span class="t-type">BOLETO GANADOR · BUEN FIN 2026</span>
+            </div>
             <div><span class="ticket-badge" id="tBadge" hidden>★ PREMIO MAYOR ★</span></div>
           </div>
           <div class="ticket-body">
-            <div class="ticket-seal" aria-hidden="true"><span>BOLETO</span><b>VÁLIDO</b><span>13–17 NOV</span></div>
             <div class="ticket-eyebrow">GANASTE</div>
             <div class="ticket-prize" id="tPrize">—</div>
             <div class="ticket-note" id="tNote">—</div>
@@ -1428,12 +1404,8 @@
               <span class="qr-corner tl"></span><span class="qr-corner tr"></span><span class="qr-corner bl"></span><span class="qr-corner br"></span>
               <div class="qr-box" id="qrBox" aria-label="Código QR del boleto"></div>
             </div>
-            <div class="qr-cap"><b>Muestra este QR en tienda</b> y canjea tu premio.</div>
+            <div class="qr-cap"><b>Muestra este QR en tienda</b> y canjea tu premio. Si no se puede escanear, presenta tu folio.</div>
             <div class="qr-folio-line" id="qrFolioLine">FOLIO —</div>
-          </div>
-          <div class="ticket-stub">
-            <div class="stub-top"><div><b id="tStubPrize">—</b>Pink Case · Ixtlahuaca Centro · Presenta este talón si el QR no se puede escanear</div>
-            <div class="stub-folio" id="tStubFolio">—</div></div>
           </div>
           </div>
         </div>
@@ -1479,6 +1451,14 @@
         </div>
       </div>
     </div>
+
+    <!-- Botón flotante de la bocina: controla SOLO la música de
+         fondo (la cumbia en bucle). La voz de Helio, el sonido al
+         girar y la fanfarria al ganar no dependen de este botón. -->
+    <button type="button" class="sound-fab" id="soundBtn" aria-label="Silenciar la música de fondo" aria-pressed="false" title="Música de fondo">
+      <svg class="icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5Z" fill="currentColor" stroke="none"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.4 5.6a9 9 0 0 1 0 12.8"/></svg>
+      <svg class="icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5Z" fill="currentColor" stroke="none"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>
+    </button>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -1625,7 +1605,8 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         spinning: false,
         checking: false,     /* verificando el giro de hoy contra la hoja */
         rotation: 0,
-        sound: true,
+        sound: true,        /* efectos y voz: siempre activos; el botón flotante ya NO los toca */
+        bgmMuted: false,    /* SOLO la música de fondo: la controla el botón flotante de la bocina */
         lastTicket: null
       };
 
@@ -1969,8 +1950,9 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
          Los efectos se generan con WebAudio y se reanudan en el
          primer toque del usuario (requisito de iOS/Android); la
          MÚSICA DE FONDO es otra capa aparte: la cumbia en archivo
-         que se documenta en su propia sección. El botón de altavoz
-         silencia todo al instante. */
+         que se documenta en su propia sección. El botón flotante
+         de la bocina controla SOLO esa música de fondo: estos
+         efectos y la voz de Helio suenan siempre. */
       var actx = null, masterGain = null;
       var tickIdx = 0, spinMusicTimer = null, spinMusicStep = 0, spinMusicNextAt = 0;
       function ensureAudio(){
@@ -2162,7 +2144,8 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
          así que la pista empieza con el primer toque en la
          página (junto con el saludo de bienvenida o al terminar
          la bienvenida de Helio) y de ahí suena SIN PARAR en bucle
-         hasta que el cliente silencie todo con el altavoz.
+         hasta que el cliente la silencie con el botón flotante
+         de la bocina (ese botón SOLO controla esta música).
          Al girar la ruleta y al ganar, el fondo baja solo
          (ducking) y vuelve a subir cuando termina el efecto. */
       var BGM_BASE_VOL = .22;
@@ -2190,7 +2173,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         }, 40);
       }
       function startBgm(){
-        if(!state.sound) return;
+        if(state.bgmMuted) return;
         /* Con la página oculta o cerrada la música NUNCA arranca:
            ningún temporizador (bienvenida, reintentos) puede
            encenderla mientras la página no está a la vista. */
@@ -3179,8 +3162,6 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         $("tName").textContent = ticket.name;
         $("tFolio").textContent = ticket.folio;
         $("tDate").textContent = fmtDateLong(ticket.date) + (ticket.time ? " · " + ticket.time.slice(0,5) + " h" : "");
-        $("tStubPrize").textContent = ticket.prizeLabel;
-        $("tStubFolio").textContent = ticket.folio;
         var qfl = $("qrFolioLine"); if(qfl) qfl.textContent = "FOLIO " + ticket.folio + " · QR GENERADO AUTOMÁTICAMENTE";
         $("winTitle").textContent = "¡" + ticket.name.split(" ")[0] + ", ganaste!";
 
@@ -3562,13 +3543,19 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       /* ================= Controles ================= */
       spinBtn.addEventListener("click", spin);
       hubBtn.addEventListener("click", spin);
+      /* El botón flotante de la bocina controla SOLO la música de
+         fondo: al tocarlo se silencia o se reactiva la cumbia, y
+         nada más. La voz de Helio, el sonido al girar, la fanfarria
+         al ganar y los demás efectos NO dependen de este botón y
+         siguen sonando igual (pedido de Axel, 2026-11-09). */
       soundBtn.addEventListener("click", function(){
-        state.sound = !state.sound;
-        soundBtn.classList.toggle("muted", !state.sound);
-        soundBtn.setAttribute("aria-pressed", state.sound ? "true" : "false");
-        if(state.sound){ ensureAudio(); playClick(); if(!welcomePlayed) setTimeout(tryWelcomeSound, 180); else if(bgm.everStarted && !bgm.playing) setTimeout(startBgm, 220); }
-        else{ stopSpinMusic(); narratorStop(); pauseBgm(); }
-        toast(state.sound ? "Sonido activado: «No Frills Cumbia» de fondo en bucle, sonido al girar y fanfarria al ganar" : "Sonido silenciado: también se pausa la música de fondo");
+        state.bgmMuted = !state.bgmMuted;
+        soundBtn.classList.toggle("muted", state.bgmMuted);
+        soundBtn.setAttribute("aria-pressed", state.bgmMuted ? "true" : "false");
+        soundBtn.setAttribute("aria-label", state.bgmMuted ? "Activar la música de fondo" : "Silenciar la música de fondo");
+        if(state.bgmMuted){ pauseBgm(); }
+        else{ ensureAudio(); if(bgm.everStarted && !bgm.playing) startBgm(); else if(!bgm.everStarted) setTimeout(startBgm, 150); }
+        toast(state.bgmMuted ? "Música de fondo silenciada — la voz y los demás sonidos siguen activos" : "Música de fondo activada");
       });
 
       /* ============ Silencio al salir de la página ============
@@ -3698,7 +3685,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         /* Aparición suave de cada contenedor al entrar en pantalla */
         if(reduced || !("IntersectionObserver" in window)) return;
         var groups = [
-          { sel:".name-card, .poster, .bases, .stage-wrap, .sound-toggle", stagger:0 },
+          { sel:".name-card, .poster, .bases, .stage-wrap", stagger:0 },
           { sel:".step", stagger:110 },
           { sel:".prize-chip", stagger:55 },
           { sel:".store", stagger:110 }
