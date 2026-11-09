@@ -4,31 +4,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
-    <script>
-      /* ===== Detección temprana de teléfono de pocos recursos =====
-         Corre antes de pintar la página: si el teléfono tiene pocos
-         núcleos, poca memoria, conexión lenta (o ahorro de datos) o
-         pide movimiento reducido, se activa el MODO LIGERO desde el
-         inicio (clase «lite» en <html>): sin animaciones pesadas,
-         sin desenfoques, carrusel simple y focos fijos. La página se
-         ve igual en lo esencial; solo deja de trabarse. El cliente
-         también puede prenderlo o apagarlo a mano con el botón
-         «Modo ligero» junto al botón de sonido. */
-      (function(){
-        try{
-          var nav = window.navigator || {};
-          var lite = false;
-          if((nav.hardwareConcurrency || 8) <= 4) lite = true;
-          if(nav.deviceMemory && nav.deviceMemory <= 2) lite = true;
-          var conn = nav.connection;
-          if(conn && (conn.saveData || /^(slow-2g|2g|3g)$/.test(conn.effectiveType || ""))) lite = true;
-          if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) lite = true;
-          window.__LITE_AUTO = lite;
-          window.__LITE = lite;
-          if(lite) document.documentElement.classList.add("lite");
-        }catch(e){ window.__LITE = false; window.__LITE_AUTO = false; }
-      })();
-    </script>
     <link rel="icon" href="data:," />
     <title>Ruleta Buen Fin — Pink Case | Gira y Gana</title>
     <meta name="description" content="Gira la Ruleta Buen Fin de Pink Case y gana descuentos y premios. Un giro por día por nombre, boleto con QR al instante. Del 13 al 17 de noviembre, Ixtlahuaca Centro." />
@@ -288,6 +263,7 @@
         background:conic-gradient(from 0deg, rgba(232,17,45,.34), rgba(255,182,72,.30) 25%, rgba(232,17,45,.06) 50%, rgba(255,182,72,.30) 75%, rgba(232,17,45,.34));
         filter:blur(13px);
         animation:haloSpin 14s linear infinite;
+        will-change:transform;
       }
       @keyframes haloSpin{ to{ transform:rotate(360deg); } }
       .wheel-float{ animation:floaty 5.5s ease-in-out infinite; }
@@ -846,7 +822,7 @@
       .bgm-title{ font-size:13.5px; font-weight:900; letter-spacing:.04em; color:#fff; display:flex; flex-wrap:wrap; gap:6px; align-items:baseline; }
       .bgm-title .bgm-state{ font-size:11.5px; font-weight:700; letter-spacing:.02em; color:var(--gold-soft); }
       .bgm-track{ height:7px; border-radius:99px; background:rgba(255,255,255,.12); margin-top:8px; overflow:hidden; }
-      .bgm-fill{ height:100%; width:0%; border-radius:99px; background:linear-gradient(90deg, var(--red-hi), var(--gold) 70%, var(--pink)); transition:width .5s linear; }
+      .bgm-fill{ height:100%; width:100%; border-radius:99px; background:linear-gradient(90deg, var(--red-hi), var(--gold) 70%, var(--pink)); transform:scaleX(0); transform-origin:0 50%; transition:transform .5s linear; }
       .bgm-meta{ display:flex; flex-wrap:wrap; gap:4px 12px; margin-top:7px; font-size:11.5px; color:var(--mut); font-weight:600; }
       .bgm-meta .bgm-time{ color:#ffd9a0; font-variant-numeric:tabular-nums; font-weight:800; }
       /* ---------- Voz del narrador ---------- */
@@ -1228,48 +1204,6 @@
            de TODA la página (script al final). Sin GSAP, el
            carrusel sigue girando y la página se ve completa.
          ============================================================ */
-      /* ============================================================
-         MODO LIGERO (teléfonos de pocos recursos)
-         Se activa solo en equipos modestos (detección en el <head>)
-         o a mano con el botón «Modo ligero». La página se ve igual
-         en lo esencial —mismos colores, orden, textos y la ruleta
-         con su gajo dorado— pero sin lo que traba un teléfono
-         barato: nada de desenfoques (blur), halo y flotación
-         detenidos, brillos sin animación, focos fijos (JS) y el
-         carrusel como fila simple que se desliza con el dedo en
-         vez de correr en bucle con transformaciones constantes.
-         ============================================================ */
-      html.lite .wheel-halo,
-      html.lite .wheel-float,
-      html.lite .pill-gana::after,
-      html.lite .ticket-inner::after,
-      html.lite .qr-box::after,
-      html.lite .hub.ready,
-      html.lite .btn-spin.ready,
-      html.lite .now-playing.playing .eq i,
-      html.lite .scan-frame.live .scan-line{ animation:none !important; }
-      html.lite .stage-glow,
-      html.lite .wheel-halo,
-      html.lite .stand-lights{ filter:none !important; }
-      html.lite .backdrop,
-      html.lite .toast{ backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
-      html.lite .carousel-track{ animation:none !important; }
-      html.lite .carousel-shift{ will-change:auto; }
-      html.lite .carousel-viewport{ overflow-x:auto; -webkit-mask-image:none; mask-image:none; }
-      html.lite .showcase-bgword{ display:none; }
-      html.lite .wheel-tilt{ filter:none; }
-      /* Interruptor del modo ligero: pequeño y discreto, junto al
-         botón de sonido que ya existía. */
-      .lite-toggle{
-        display:inline-flex; align-items:center; gap:7px;
-        font:inherit; font-weight:700; font-size:12.5px; cursor:pointer;
-        color:var(--mut);
-        background:rgba(255,255,255,.04);
-        border:1px solid #3d333d; border-radius:999px; padding:8px 14px;
-        transition:color .2s, border-color .2s;
-      }
-      .lite-toggle b{ color:var(--gold-soft); font-weight:800; }
-      .lite-toggle[aria-pressed="true"]{ color:#e8ddcb; border-color:#54452a; }
       .sound-row{ gap:10px; flex-wrap:wrap; }
 
       .scroll-progress{
@@ -1418,7 +1352,6 @@
           <svg class="icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5Z" fill="currentColor" stroke="none"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>
           <span class="lbl-on">Sonido activado</span><span class="lbl-off">Sonido silenciado</span>
         </button>
-        <button type="button" class="lite-toggle" id="liteBtn" aria-pressed="false" aria-label="Activar o quitar el modo ligero para teléfonos de pocos recursos">Modo ligero: <b id="liteState">No</b></button>
       </div>
 
 <section class="block wide" aria-labelledby="basesTitle">
@@ -1846,13 +1779,11 @@
       var LAST_KEY = LS_KEY + "-ultimo"; /* último nombre que giró en este celular */
       var REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-      /* ================= Modo ligero + librerías bajo demanda =================
-         window.__LITE lo fija el detector del <head> (pocos núcleos,
-         poca memoria, conexión lenta o movimiento reducido) y el
-         botón «Modo ligero» lo prende/apaga a mano. En modo ligero:
-         sin GSAP, sin desenfoques, focos fijos, carrusel simple y
-         confeti mínimo (ver la CSS «html.lite» y applyLiteMode). */
-      function isLite(){ return !!window.__LITE; }
+      /* ================= Librerías bajo demanda =================
+         Las librerías externas se descargan UNA sola vez y solo
+         cuando se necesitan (ver loadLib, abajo): al abrir la
+         página no se descarga ninguna, así el primer pintado no
+         espera a ningún CDN y un teléfono barato abre al instante. */
       /* Cargador de librerías externas UNA sola vez y solo cuando se
          necesitan: al abrir la página no se descarga ninguna, así el
          primer pintado no espera a ningún CDN. Si una librería falla,
@@ -2193,8 +2124,8 @@
           bulbsBox.appendChild(b);
           bulbs.push(b);
         }
-        if(REDUCED || isLite()){
-          /* Con movimiento reducido —y en modo ligero— los focos quedan encendidos
+        if(REDUCED){
+          /* Con movimiento reducido los focos quedan encendidos
              fijos en su patrón, sin parpadear (antes el parpadeo
              por JS ignoraba esa preferencia). */
           bulbs.forEach(function(b, i){
@@ -2214,7 +2145,7 @@
         });
       }
       function setBulbSpeed(fast){
-        if(REDUCED || isLite()) return; /* sin parpadeo que acelerar */
+        if(REDUCED) return; /* sin parpadeo que acelerar */
         if(fast === bulbFast) return;
         bulbFast = fast;
         clearInterval(bulbTimer);
@@ -2251,7 +2182,7 @@
          primer toque del usuario (requisito de iOS/Android). El botón
          de altavoz silencia las 3 capas al instante. */
       var actx = null, masterGain = null, bgmGain = null;
-      var tickIdx = 0, spinMusicTimer = null, spinMusicStep = 0, spinPhase = 0;
+      var tickIdx = 0, spinMusicTimer = null, spinMusicStep = 0, spinMusicNextAt = 0;
       function ensureAudio(){
         if(!state.sound) return;
         try{
@@ -2314,21 +2245,26 @@
         blip(pitch, .03, "square", .026, 0);
         blip(note, .07, "sine", .022, 0);
       }
-      /* Música mientras se juega: arpegio alegre + pulso. El tempo lo
-         marca tickSpinMusic() desde el loop de animación según la
-         velocidad real de la rueda, así frena junto con ella. */
+      /* Música mientras se juega: arpegio alegre + pulso. El tempo
+         lo marca tickSpinMusic() con el RELOJ del giro (ms reales
+         transcurridos), no contando fotogramas: el espacio entre
+         notas crece conforme la rueda frena, igual en un teléfono
+         rápido y en uno lento. */
       function startSpinMusic(){
-        stopSpinMusic(); spinMusicStep = 0;
+        stopSpinMusic(); spinMusicStep = 0; spinMusicNextAt = 0;
         duckBgm(.32); /* la música de fondo baja para que luzca el giro */
         var nowEl = document.getElementById("nowPlaying"), txt = document.getElementById("nowPlayingText");
         if(nowEl){ nowEl.classList.add("playing"); nowEl.classList.remove("win"); }
         if(txt) txt.textContent = "¡Sonando! Música de juego mientras gira la ruleta…";
       }
-      function tickSpinMusic(progress){
+      function tickSpinMusic(progress, elapsedMs){
         if(!state.sound || !actx) return;
-        spinPhase += 1 - (progress || 0) * .55;
-        if(spinPhase < 2.2) return; /* al inicio suena más seguido; al frenar, se espacia */
-        spinPhase = 0; spinMusicStep++;
+        if(elapsedMs == null || elapsedMs < spinMusicNextAt) return;
+        /* Intervalo entre notas en ms reales: ~37 ms al arrancar
+           (ritmo de 60 fps de antes) y ~82 ms al frenar, calculado
+           del avance del giro, nunca del conteo de fotogramas. */
+        spinMusicNextAt = elapsedMs + (1000 / 60) * 2.2 / (1 - (progress || 0) * .55);
+        spinMusicStep++;
         var arp = [523.25, 659.25, 783.99, 1046.5, 783.99, 659.25];
         var f = arp[spinMusicStep % arp.length];
         blip(f, .14, "triangle", .032, 0);
@@ -2570,13 +2506,6 @@
       /* Programa UN compás completo de la pista en el tiempo t */
       function scheduleBgmBar(barIdx, t){
         var section = BGM_SECTIONS[Math.floor(barIdx / 16) % BGM_SECTIONS.length];
-        if(isLite()){
-          /* Modo ligero: la música de fondo suena igual de alegre
-             pero con la mitad de capas (colchón, bajo y un arpegio
-             suave; sin batería ni melodía extra), para no quitarle
-             procesador al giro en teléfonos de pocos recursos. */
-          section = { pad: section.pad, arp: section.arp ? .5 : 0, bass: section.bass ? 1 : 0, mel: 0, kick: 0, snare: 0, hat: 0 };
-        }
         var chordShift = (Math.floor(barIdx / 16) === 4) ? 2 : 0; /* el puente arranca en La menor */
         var chord = BGM_CHORDS[BGM_PROG_ORDER[(barIdx + chordShift) % 8]];
         var step, tt;
@@ -2649,7 +2578,7 @@
         var elapsed = bgm.playing ? bgm.dispBase + (Date.now() - bgm.dispStart) / 1000 : bgm.dispBase;
         if(elapsed > BGM_TOTAL_SEC) elapsed = elapsed % BGM_TOTAL_SEC;
         if(timeEl) timeEl.textContent = fmtClock(elapsed) + " / " + fmtClock(BGM_TOTAL_SEC);
-        if(fillEl) fillEl.style.width = (elapsed / BGM_TOTAL_SEC * 100).toFixed(1) + "%";
+        if(fillEl) fillEl.style.transform = "scaleX(" + (elapsed / BGM_TOTAL_SEC).toFixed(4) + ")";
         if(stateEl) stateEl.textContent = bgm.playing ? "Sonando ahora · pista de 5:20 en bucle, sin parar" : (bgm.everStarted ? "En pausa · toca ▶ para que siga la música" : "Toca la página para que empiece · dura 5:20 y se repite en bucle");
         if(playI) playI.hidden = bgm.playing;
         if(pauseI) pauseI.hidden = !bgm.playing;
@@ -2907,7 +2836,7 @@
         if(actx && actx.state === "suspended"){ try{ actx.resume(); }catch(e){ /* noop */ } }
         preloadNarratorClips();
         loadLib("qrcode");
-        if(!isLite()) loadLib("confetti");
+        loadLib("confetti");
       }
       ["pointerdown", "touchstart", "keydown"].forEach(function(evt){
         document.addEventListener(evt, onFirstGestureAudio, { passive: true });
@@ -3067,21 +2996,19 @@
       /* ================= Confeti =================
          La librería se carga bajo demanda (al primer toque o al
          ganar): si aún no llegó, se pide y el confeti sale en
-         cuanto carga; si falla, no sale y nada se rompe. En modo
-         ligero es UNA sola ráfaga pequeña, sin cañones laterales. */
+         cuanto carga; si falla, no sale y nada se rompe. Las
+         ráfagas usan menos partículas que antes (120/64 en vez
+         de 170/90): a la vista la lluvia se ve igual de llena,
+         pero cada fotograma le cuesta mucho menos al teléfono. */
       function celebrate(big){
         if(REDUCED) return;
         var colors = ["#e8112d", "#ff2438", "#ffffff", "#ffb648", "#ff2e92"];
         function fire(){
           if(typeof window.confetti !== "function") return;
-          if(isLite()){
-            window.confetti({ particleCount: 26, spread: 55, startVelocity: 32, origin: { y: .55 }, colors: colors, disableForReducedMotion: true });
-            return;
-          }
-          window.confetti({ particleCount: big ? 170 : 90, spread: big ? 85 : 60, startVelocity: 42, origin: { y: .55 }, colors: colors, disableForReducedMotion: true });
+          window.confetti({ particleCount: big ? 120 : 64, spread: big ? 85 : 60, startVelocity: 42, origin: { y: .55 }, colors: colors, disableForReducedMotion: true });
           if(big){
-            setTimeout(function(){ window.confetti({ particleCount: 90, angle: 60, spread: 60, origin: { x: 0, y: .7 }, colors: colors, disableForReducedMotion: true }); }, 220);
-            setTimeout(function(){ window.confetti({ particleCount: 90, angle: 120, spread: 60, origin: { x: 1, y: .7 }, colors: colors, disableForReducedMotion: true }); }, 380);
+            setTimeout(function(){ window.confetti({ particleCount: 60, angle: 60, spread: 60, origin: { x: 0, y: .7 }, colors: colors, disableForReducedMotion: true }); }, 220);
+            setTimeout(function(){ window.confetti({ particleCount: 60, angle: 120, spread: 60, origin: { x: 1, y: .7 }, colors: colors, disableForReducedMotion: true }); }, 380);
           }
         }
         if(typeof window.confetti === "function") fire();
@@ -3376,16 +3303,34 @@
         var start = state.rotation;
         var end = start + turns + delta;
         var duration = REDUCED ? 1000 : 6400;
-        var t0 = null, lastSeg = Math.floor(start / SEG_ANGLE);
+        var t0 = null, lastSeg = Math.floor(start / SEG_ANGLE), spinDone = false;
 
         function easeOut(t){ return 1 - Math.pow(1 - t, 5); }
+        /* FÍSICA POR TIEMPO REAL, no por fotogramas: la posición de
+           la ruleta en cada instante sale SOLO del reloj (ms desde
+           que arrancó el giro ÷ duración total, con la misma curva
+           de frenado easeOut). Un teléfono barato dibuja menos
+           fotogramas por segundo, pero cada fotograma cae en la
+           posición exacta de ese instante: la duración (6.4 s), la
+           desaceleración y el gajo final son IDÉNTICOS en cualquier
+           dispositivo. El premio lo decide el sorteo ponderado de
+           arriba (pickSegment, pesos intactos); esto solo mueve. */
+        function finishNow(){
+          if(spinDone) return;
+          spinDone = true;
+          state.rotation = end % 360;
+          rotor.style.transform = "rotate(" + state.rotation + "deg)";
+          finishSpin(seg);
+        }
         function frame(ts){
-          if(!t0) t0 = ts;
-          var t = Math.min(1, (ts - t0) / duration);
+          if(spinDone) return;
+          if(t0 === null) t0 = ts;
+          var elapsed = ts - t0;
+          var t = Math.min(1, elapsed / duration);
           var rot = start + (end - start) * easeOut(t);
           rotor.style.transform = "rotate(" + rot + "deg)";
           var curSeg = Math.floor(rot / SEG_ANGLE);
-          tickSpinMusic(t);
+          tickSpinMusic(t, elapsed);
           if(curSeg !== lastSeg){
             lastSeg = curSeg;
             tickSound(t);
@@ -3395,12 +3340,15 @@
           if(t < 1){
             requestAnimationFrame(frame);
           }else{
-            state.rotation = end % 360;
-            rotor.style.transform = "rotate(" + state.rotation + "deg)";
-            finishSpin(seg);
+            finishNow();
           }
         }
         requestAnimationFrame(frame);
+        /* Red de seguridad por reloj: si el navegador detiene
+           requestAnimationFrame (pestaña en segundo plano o un
+           teléfono al límite), el giro termina a su hora exacta
+           de todos modos, en el mismo gajo sorteado. */
+        setTimeout(finishNow, duration + 600);
       }
 
       function finishSpin(seg){
@@ -4194,49 +4142,6 @@
       });
       $("retryLaterBtn").addEventListener("click", function(){ closeModal("retryModal"); });
 
-      /* ================= Modo ligero: aplicar / quitar =================
-         Prende o apaga la clase «lite» (la CSS quita desenfoques y
-         animaciones pesadas y deja el carrusel simple) y deja los
-         focos del aro fijos, sin temporizador. El detector del
-         <head> ya lo prendió solo si el teléfono es modesto; este
-         botón junto al de sonido lo cambia a mano en cualquier
-         momento, y la vigilancia de trabas (abajo) lo prende sola
-         si el teléfono se está atorando tras el primer toque. */
-      function applyLiteMode(on){
-        window.__LITE = !!on;
-        document.documentElement.classList.toggle("lite", !!on);
-        var btn = $("liteBtn"), st = $("liteState");
-        if(btn) btn.setAttribute("aria-pressed", on ? "true" : "false");
-        if(st) st.textContent = on ? "Sí" : "No";
-        if(on){
-          /* Si GSAP ya había cargado (teléfono capaz que prendió
-             el modo ligero a mano), se apagan también sus
-             animaciones ligadas al scroll. */
-          if(window.ScrollTrigger){
-            try{
-              window.ScrollTrigger.getAll().forEach(function(t){ t.kill(); });
-              var pb = $("scrollProgressBar");
-              if(pb) pb.style.transform = "scaleX(1)";
-            }catch(e){ /* noop */ }
-          }
-          if(bulbTimer){ clearInterval(bulbTimer); bulbTimer = null; }
-          bulbs.forEach(function(b, i){
-            b.classList.remove("lit-red", "lit-white");
-            if(i % 2 === 0) b.classList.add(i % 4 === 0 ? "lit-red" : "lit-white");
-          });
-        }else if(!REDUCED && bulbs.length && !bulbTimer){
-          bulbTimer = setInterval(tickBulbs, 420);
-        }
-      }
-      var liteBtnEl = $("liteBtn");
-      if(liteBtnEl){
-        liteBtnEl.addEventListener("click", function(){
-          var on = !isLite();
-          applyLiteMode(on);
-          toast(on ? "Modo ligero activado: animaciones simples para que tu teléfono no se trabe." : "Modo ligero desactivado: vuelven todas las animaciones.");
-        });
-      }
-
       /* ================= Controles ================= */
       spinBtn.addEventListener("click", spin);
       hubBtn.addEventListener("click", spin);
@@ -4271,31 +4176,7 @@
       buildWheel();
       buildBulbs();
       buildPrizeGrid();
-      applyLiteMode(isLite()); /* refleja en el botón y en los focos lo que detectó el <head> */
       restoreLastPlayer();
-      /* Vigilancia de trabas: tras el primer toque se miden 50
-         cuadros de animación; si el teléfono tarda más de 50 ms
-         por cuadro en promedio (menos de 20 fps), se prende el
-         modo ligero solo, para que la página deje de trabarse. */
-      (function watchForJank(){
-        if(isLite() || REDUCED) return;
-        var armed = false;
-        document.addEventListener("pointerdown", function(){
-          if(armed) return;
-          armed = true;
-          var frames = 0, last = 0, total = 0;
-          function loop(ts){
-            if(last) { total += ts - last; frames++; }
-            last = ts;
-            if(frames < 50){ requestAnimationFrame(loop); return; }
-            if(total / frames > 50 && !isLite()){
-              applyLiteMode(true);
-              toast("Modo ligero activado: tu teléfono lo pidió para que la página no se trabe.");
-            }
-          }
-          requestAnimationFrame(loop);
-        }, { passive: true });
-      })();
       /* Sonido de bienvenida SOLO por entrar a la página:
          se intenta de inmediato y, si el navegador lo bloquea
          hasta el primer toque, queda armado para ese momento. */
@@ -4407,10 +4288,9 @@
        el carrusel sigue en bucle por CSS (o fijo y deslizable
        con el dedo si el sistema pide poco movimiento).
        CARGA DIFERIDA: GSAP ya no se descarga al abrir la página.
-       El cargador de abajo solo lo pide si el teléfono NO está en
-       modo ligero; en modo ligero (o si GSAP falla) corre el
-       respaldo de la barra de progreso y la página se ve completa
-       sin una sola animación de scroll. */
+       El cargador de abajo lo pide recién cuando la primera
+       pantalla ya pintó; si GSAP falla, corre el respaldo de la
+       barra de progreso y la página se ve completa igual. */
     window.__initScrollFx = function(){
       "use strict";
       /* --- Carrusel infinito: NUNCA se detiene ---
@@ -4518,27 +4398,39 @@
     </script>
     <script>
     /* ============ Cargador diferido de GSAP ============
-       Solo pide gsap.min.js + ScrollTrigger si el teléfono NO está
-       en modo ligero y NO pide movimiento reducido; al llegar (o al
-       fallar) corre __initScrollFx, que sin GSAP usa su respaldo de
-       barra de progreso. En modo ligero ni siquiera se descargan:
-       cero peso y cero trabas para teléfonos de pocos recursos. */
+       Pide gsap.min.js + ScrollTrigger SOLO después de que la
+       primera pantalla ya pintó (evento load o tiempo libre del
+       navegador), para que ningún teléfono espere al CDN antes
+       de ver la página. Si el sistema pide movimiento reducido,
+       o si GSAP falla, corre __initScrollFx, que sin GSAP usa su
+       respaldo de barra de progreso: la página se ve completa. */
     (function(){
       "use strict";
       function run(){ if(typeof window.__initScrollFx === "function") window.__initScrollFx(); }
       var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if(window.__LITE || reduced){ run(); return; }
-      var s1 = document.createElement("script");
-      s1.src = "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js";
-      s1.onload = function(){
-        var s2 = document.createElement("script");
-        s2.src = "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js";
-        s2.onload = run;
-        s2.onerror = run;
-        document.head.appendChild(s2);
-      };
-      s1.onerror = run;
-      document.head.appendChild(s1);
+      if(reduced){ run(); return; }
+      var started = false;
+      function loadGsap(){
+        if(started) return;
+        started = true;
+        var s1 = document.createElement("script");
+        s1.src = "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js";
+        s1.onload = function(){
+          var s2 = document.createElement("script");
+          s2.src = "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js";
+          s2.onload = run;
+          s2.onerror = run;
+          document.head.appendChild(s2);
+        };
+        s1.onerror = run;
+        document.head.appendChild(s1);
+      }
+      if(document.readyState === "complete") loadGsap();
+      else{
+        window.addEventListener("load", loadGsap);
+        if(window.requestIdleCallback) window.requestIdleCallback(loadGsap, { timeout: 1800 });
+        else setTimeout(loadGsap, 1200);
+      }
     })();
     </script>
   </body>
