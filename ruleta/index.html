@@ -1212,6 +1212,46 @@
         </div>
       </div>
 
+      <div class="wheel-zone" id="ruleta">
+<div class="stage-wrap">
+          
+
+          <div class="stage">
+            <div class="stage-glow" aria-hidden="true"></div>
+            <div class="wheel-float" id="wheelFloat">
+              <div class="wheel-tilt">
+                <div class="wheel-halo" aria-hidden="true"></div>
+                <svg class="pointer" id="pointer" viewBox="0 0 46 52" aria-hidden="true">
+                  <path d="M23 50 L5 12 Q4 4 12 4 L34 4 Q42 4 41 12 Z" fill="#e8112d" stroke="#ffffff" stroke-width="2.5"/>
+                  <circle cx="23" cy="13" r="4.5" fill="#ffb648" stroke="#ffffff" stroke-width="1.6"/>
+                </svg>
+                <div class="wheel-disc">
+                  <div class="rotor" id="rotor"></div>
+                  <div class="disc-shine" aria-hidden="true"></div>
+                  <div class="bulbs" id="bulbs" aria-hidden="true"></div>
+                  <button type="button" class="hub" id="hubBtn" aria-label="Girar la ruleta">
+                    <span class="h-top">PIN<span class="k">K</span></span>
+                    <span class="h-mid">CASE</span>
+                    <span class="h-cta" id="hubCta">GIRAR</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="stand" aria-hidden="true">
+              <div class="stand-neck"></div>
+              <div class="stand-base"></div>
+              <div class="stand-lights"></div>
+            </div>
+          </div>
+        </div>
+
+<div class="spin-zone">
+          <button type="button" class="btn-spin" id="spinBtn" disabled>GIRAR LA RULETA</button>
+          <p class="status" id="statusLine" aria-live="polite">Escribe tu nombre para activar tu giro de hoy.</p>
+          <p class="sync-note" id="syncNote" role="status" hidden></p>
+        </div>
+      </div>
+
 <section class="block wide" aria-labelledby="basesTitle">
         <div class="block-head">
           <span class="block-badge ink" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></span>
@@ -1269,47 +1309,6 @@
         <p class="sub offset">10 premios. Los de marco dorado son los mayores.</p>
         <div class="prizes" id="prizeGrid"></div>
       </section>
-
-
-      <div class="wheel-zone" id="ruleta">
-<div class="stage-wrap">
-          
-
-          <div class="stage">
-            <div class="stage-glow" aria-hidden="true"></div>
-            <div class="wheel-float" id="wheelFloat">
-              <div class="wheel-tilt">
-                <div class="wheel-halo" aria-hidden="true"></div>
-                <svg class="pointer" id="pointer" viewBox="0 0 46 52" aria-hidden="true">
-                  <path d="M23 50 L5 12 Q4 4 12 4 L34 4 Q42 4 41 12 Z" fill="#e8112d" stroke="#ffffff" stroke-width="2.5"/>
-                  <circle cx="23" cy="13" r="4.5" fill="#ffb648" stroke="#ffffff" stroke-width="1.6"/>
-                </svg>
-                <div class="wheel-disc">
-                  <div class="rotor" id="rotor"></div>
-                  <div class="disc-shine" aria-hidden="true"></div>
-                  <div class="bulbs" id="bulbs" aria-hidden="true"></div>
-                  <button type="button" class="hub" id="hubBtn" aria-label="Girar la ruleta">
-                    <span class="h-top">PIN<span class="k">K</span></span>
-                    <span class="h-mid">CASE</span>
-                    <span class="h-cta" id="hubCta">GIRAR</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="stand" aria-hidden="true">
-              <div class="stand-neck"></div>
-              <div class="stand-base"></div>
-              <div class="stand-lights"></div>
-            </div>
-          </div>
-        </div>
-
-<div class="spin-zone">
-          <button type="button" class="btn-spin" id="spinBtn" disabled>GIRAR LA RULETA</button>
-          <p class="status" id="statusLine" aria-live="polite">Escribe tu nombre para activar tu giro de hoy.</p>
-          <p class="sync-note" id="syncNote" role="status" hidden></p>
-        </div>
-      </div>
 
       <section class="block wide" aria-labelledby="ubicacionesTitle">
         <div class="block-head">
