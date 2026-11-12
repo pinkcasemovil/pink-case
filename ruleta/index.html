@@ -1571,7 +1571,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
            de «Lo que puedes ganar» (displayOnly). Decisión de Axel:
            que se vea como premio, sin que nadie lo gane. */
         { id:"smartwatch", big:"SMARTWATCH", small:"", bigSize:13, bigLen:72, bigY:-130, color:"gold", weight:0, label:"Smartwatch", note:"", chip:"", chipNote:"", displayOnly:true, img:"assets/smartwatch-v5.png", imgW:84, imgH:56, imgY:-198, wedge:"assets/gajo-smartwatch-v3.jpg" },
-        { id:"cable", big:"CABLE", small:"TIPO C", bigSize:16, bigLen:40, bigY:-158, smallSize:13, smallLen:40, smallY:-114, color:"red",   weight:80,  label:"Cable tipo C",   note:"Un cable tipo C para tu celular.", chip:"Cable tipo C", chipNote:"", img:"assets/cable-v5.png", imgW:68, imgH:44, imgY:-206, wedge:"assets/gajo-cable-v2.png" },
+        { id:"cable", big:"CABLE", small:"TIPO C", bigSize:16, bigLen:40, bigY:-158, smallSize:13, smallLen:40, smallY:-114, color:"red",   weight:80,  label:"Cable tipo C",   note:"Un cable tipo C para tu celular.", chip:"Cable tipo C", chipNote:"", img:"assets/cable-v5.png", imgW:68, imgH:44, imgY:-206, wedge:"assets/gajo-cable.png" },
         { id:"mica",  big:"MICA GRATIS",  small:"", bigSize:12, bigLen:60, bigY:-124, color:"black", weight:180, label:"Una mica gratis",   note:"Una mica de cristal templado para tu celular, instalada en tienda.", chip:"Una mica gratis", chipNote:"Instalación en tienda", img:"assets/mica-v5.png", imgW:56, imgH:76, imgY:-195, wedge:"assets/gajo-mica.png" },
         { id:"otra",  big:"GIRA", small:"OTRA VEZ", bigSize:16, bigLen:40, bigY:-158, smallSize:11, smallLen:40, smallY:-114, color:"red",   weight:50,  label:"Gira otra vez",   note:"", chip:"Gira otra vez", chipNote:"Un giro extra al momento", icon:"retry", wedge:"assets/gajo-otra.png" }
       ];
@@ -3251,7 +3251,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         d50:   { photo: "assets/boleto-billete-50.jpg", tilt: true, side: true, mid: "grid",
                  gridTitle: "ÚSALO EN TUS ACCESORIOS FAVORITOS", gridSub: "", mirror: true,
                  caption: "Muestra tu QR en tienda para canjear tu premio." },
-        cable: { photo: "assets/boleto-cable.jpg", mid: "bar",
+        cable: { photo: "assets/boleto-cable-v2.jpg", mid: "bar",
                  caption: "Muestra tu QR en tienda para canjear tu premio." },
         mica:  { photo: "assets/boleto-mica.jpg", mid: "chips",
                  caption: "Muestra tu QR en tienda para canjear tu premio." }
@@ -3267,7 +3267,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       /* Precarga las fotos del boleto para que el modal las muestre al instante. */
       (function preloadTicketPhotos(){
         var files = ["boleto-billete-200.jpg","boleto-billete-100.jpg","boleto-billete-50.jpg",
-          "boleto-cable.jpg","boleto-mica.jpg","boleto-funda.jpg","boleto-mica-chip.jpg",
+          "boleto-cable-v2.jpg","boleto-mica.jpg","boleto-funda.jpg","boleto-mica-chip.jpg",
           "boleto-cargador.jpg","boleto-bocina.jpg","boleto-reloj.jpg","boleto-audifonos.jpg",
           "boleto-bocina200.jpg","boleto-mica-v.jpg"];
         for(var i = 0; i < files.length; i++){ var im = new Image(); im.src = "assets/" + files[i]; }
