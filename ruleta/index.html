@@ -611,65 +611,93 @@
       .backdrop[hidden]{ display:none; }
       .modal-card{ position:relative; z-index:1; width:100%; max-width:430px; margin:auto 0; animation:pop .45s cubic-bezier(.2,1.35,.4,1); }
       @keyframes pop{ from{ transform:scale(.86) translateY(16px); opacity:0; } to{ transform:scale(1) translateY(0); opacity:1; } }
-      .win-head{ text-align:center; margin-bottom:12px; }
-      .win-head .win-kicker{ display:inline-flex; align-items:center; gap:8px; font-weight:900; letter-spacing:.28em; font-size:11.5px; color:#ffd9a0; margin-left:.28em; background:rgba(255,182,72,.12); border:1px solid rgba(255,182,72,.45); padding:6px 12px 7px; border-radius:999px; }
-      .win-head h2{ font-family:"Anton","Archivo",sans-serif; font-size:clamp(32px, 8.4vw, 44px); margin:10px 0 0; letter-spacing:.02em; line-height:1.05; text-shadow:0 10px 30px rgba(0,0,0,.6); }
-      /* ===== Boleto ganador premium ===== */
+      /* ===== Boleto ganador (rediseño 2026-11-12, boceto de Axel) ===== */
       .ticket{
-        position:relative; color:#f6efdf; border-radius:22px; text-align:center;
-        background:linear-gradient(180deg,#2a2027 0%,#171218 58%,#0d0a0e 100%);
-        padding:3px;
-        box-shadow:0 0 0 1px rgba(255,182,72,.65), 0 34px 80px rgba(0,0,0,.68), 0 18px 44px rgba(232,17,45,.22);
+        position:relative; color:#fff; border-radius:22px; text-align:center;
+        box-shadow:0 34px 80px rgba(0,0,0,.68), 0 18px 44px rgba(232,17,45,.22);
         overflow:hidden;
       }
-      .ticket::before{ content:""; position:absolute; inset:0; border-radius:22px; padding:3px; background:linear-gradient(135deg,#ffb648,#e8112d 32%,#17131a 55%,#ffb648 78%,#ff2e92); -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; z-index:3; }
-      .ticket-inner{ position:relative; background:radial-gradient(420px 200px at 50% -70px, rgba(255,182,72,.16), transparent 65%), radial-gradient(360px 220px at 100% 40%, rgba(232,17,45,.12), transparent 65%), linear-gradient(180deg,#221a21 0%,#120e13 55%,#191219 100%); border-radius:19px; overflow:hidden; }
-      .ticket-inner::after{ content:""; position:absolute; top:-40%; left:-70%; width:55%; height:180%; background:linear-gradient(100deg,transparent,rgba(255,255,255,.14),transparent); transform:rotate(8deg); animation:ticketShine 4.2s ease-in-out infinite; pointer-events:none; }
-      @keyframes ticketShine{ 0%,58%{ left:-70%; } 88%,100%{ left:135%; } }
-      .ticket-band{
-        position:relative;
-        background:radial-gradient(340px 130px at 50% -50px, rgba(255,182,72,.42), transparent 68%), radial-gradient(300px 120px at 50% -40px, rgba(232,17,45,.55), transparent 70%), linear-gradient(180deg,#24131a,#070507);
-        color:#fff; padding:13px 16px 12px; border-bottom:3px solid var(--gold);
-      }
-      .ticket-band .band-row{ display:flex; align-items:center; justify-content:center; gap:7px 12px; flex-wrap:wrap; }
-      .ticket-band .t-wm{ font-weight:900; letter-spacing:.13em; font-size:20px; line-height:1; white-space:nowrap; }
+      .ticket-inner{ position:relative; background:#0a0a0c; border:2px solid rgba(255,255,255,.28); border-radius:22px; overflow:hidden; }
+      .ticket-band{ position:relative; padding:16px 16px 4px; }
+      .ticket-band .t-wm{ font-weight:900; letter-spacing:.13em; font-size:26px; line-height:1; white-space:nowrap; }
       .ticket-band .t-wm .k{ color:var(--pink); text-shadow:0 0 16px rgba(255,46,146,.7); }
-      .ticket-band .t-type{ display:inline-block; background:linear-gradient(180deg,#ff3b47,var(--red) 55%,var(--red-dark)); color:#fff; font-weight:900; font-size:10px; letter-spacing:.16em; padding:5px 11px 6px; border-radius:999px; box-shadow:0 8px 18px rgba(232,17,45,.4), inset 0 1px 0 rgba(255,255,255,.5); white-space:nowrap; }
-      .ticket-badge{ margin:9px auto 0; display:inline-flex; align-items:center; gap:7px; background:linear-gradient(180deg,#ffc966,#e79b1e); color:#3a2400; font-size:10.5px; font-weight:900; letter-spacing:.14em; padding:5px 11px 6px; border-radius:999px; box-shadow:0 6px 16px rgba(255,182,72,.35); }
-      .ticket-body{ position:relative; padding:17px 20px 2px; }
-      .ticket-eyebrow{ font-size:10.5px; font-weight:900; letter-spacing:.26em; color:var(--gold); margin-left:.26em; }
-      .ticket-prize{ font-family:"Anton","Archivo",sans-serif; font-size:clamp(34px, 9vw, 44px); color:var(--gold-soft); line-height:1.02; letter-spacing:.01em; margin-top:5px; text-shadow:0 3px 0 rgba(194,0,31,.55), 0 12px 30px rgba(0,0,0,.65); text-wrap:balance; }
-      .ticket-note{ color:#ddd2dd; font-size:13.5px; line-height:1.5; margin:7px auto 0; max-width:28em; }
-      .ticket-rows{ margin:13px 0 2px; text-align:left; border:1px solid rgba(255,182,72,.4); background:rgba(255,255,255,.05); box-shadow:inset 0 1px 0 rgba(255,255,255,.07); border-radius:14px; padding:11px 13px; display:grid; gap:7px; }
-      .ticket-rows .row{ display:flex; justify-content:space-between; gap:14px; font-size:13.5px; align-items:baseline; }
-      .ticket-rows .row span{ color:#d8b26a; font-weight:700; font-size:11.5px; letter-spacing:.07em; text-transform:uppercase; flex:none; }
-      .ticket-rows .row b{ font-weight:800; text-align:right; word-break:break-word; color:#fff; }
-      .ticket-rows .row b.folio{ font-variant-numeric:tabular-nums; letter-spacing:.06em; color:#2a1800; background:linear-gradient(180deg,#ffc966,#e79b1e); border:1px dashed rgba(58,36,0,.55); padding:3px 8px; border-radius:999px; font-size:13px; }
-      .qr-zone{ position:relative; padding:11px 20px 16px; }
-      .qr-title{ font-size:11px; font-weight:900; letter-spacing:.22em; color:var(--gold-soft); margin-left:.22em; }
-      .qr-frame{ position:relative; width:176px; margin:9px auto 0; padding:10px; }
-      .qr-corner{ position:absolute; width:26px; height:26px; border-color:var(--red); border-style:solid; border-width:0; z-index:2; }
-      .qr-corner.tl{ top:0; left:0; border-top-width:3px; border-left-width:3px; border-top-left-radius:10px; }
-      .qr-corner.tr{ top:0; right:0; border-top-width:3px; border-right-width:3px; border-top-right-radius:10px; }
-      .qr-corner.bl{ bottom:0; left:0; border-bottom-width:3px; border-left-width:3px; border-bottom-left-radius:10px; }
-      .qr-corner.br{ bottom:0; right:0; border-bottom-width:3px; border-right-width:3px; border-bottom-right-radius:10px; }
-      .qr-box{
-        position:relative; width:156px; height:156px; margin:0 auto; overflow:hidden;
-        border:1.5px solid #17131a; border-radius:12px; padding:9px;
-        box-shadow:0 0 0 4px #fdf3df, 0 0 0 6px var(--gold), 0 12px 26px rgba(0,0,0,.2);
-        display:flex; align-items:center; justify-content:center; background:#fff;
-      }
-      .qr-box::after{ content:""; position:absolute; left:8px; right:8px; height:2px; top:12%; background:linear-gradient(90deg,transparent,#e8112d,transparent); box-shadow:0 0 12px rgba(232,17,45,.75); animation:qrScan 2.4s ease-in-out infinite; pointer-events:none; z-index:3; }
-      @keyframes qrScan{ 0%,100%{ top:10%; opacity:.35; } 50%{ top:88%; opacity:1; } }
+      .ticket-band .t-type{ display:inline-block; background:var(--pink); color:#fff; font-weight:900; font-size:11px; letter-spacing:.14em; padding:6px 14px 7px; border-radius:999px; margin-top:10px; white-space:nowrap; box-shadow:0 6px 16px rgba(255,46,146,.35); }
+      .ticket-badge{ margin:10px auto 0; display:inline-flex; align-items:center; gap:7px; background:linear-gradient(180deg,#ffc966,#e79b1e); color:#3a2400; font-size:10.5px; font-weight:900; letter-spacing:.14em; padding:5px 11px 6px; border-radius:999px; box-shadow:0 6px 16px rgba(255,182,72,.35); }
+      .ticket-hero{ padding:8px 18px 0; }
+      .ticket-win{ font-family:"Anton","Archivo",sans-serif; font-size:clamp(38px, 10vw, 52px); color:#fff; line-height:1; letter-spacing:.01em; }
+      .ticket-prize{ font-family:"Anton","Archivo",sans-serif; font-size:clamp(32px, 9vw, 46px); line-height:1.04; letter-spacing:.01em; margin-top:2px; background:linear-gradient(180deg,#ffedb0,#f7c948 45%,#d99a16); -webkit-background-clip:text; background-clip:text; color:transparent; text-wrap:balance; }
+      .ticket-prize.split{ display:flex; align-items:center; justify-content:center; gap:10px; background:none; -webkit-background-clip:initial; background-clip:initial; color:#fff; }
+      .ticket-prize.split .sp-amt{ font-size:1.45em; line-height:1; background:linear-gradient(180deg,#ffedb0,#f7c948 45%,#d99a16); -webkit-background-clip:text; background-clip:text; color:transparent; }
+      .ticket-prize.split .sp-bar{ width:4px; align-self:stretch; background:var(--pink); border-radius:2px; flex:none; }
+      .ticket-prize.split .sp-lbl{ font-size:.58em; line-height:1.05; text-align:left; }
+      .ticket-photo{ position:relative; margin:20px auto 0; max-width:340px; }
+      .ticket-photo img{ display:block; width:100%; height:auto; border-radius:14px; }
+      .ticket-photo.tilt{ margin-top:24px; }
+      .ticket-photo.tilt img{ transform:rotate(-6deg); }
+      .ticket-note{ color:#fff; font-size:15px; font-weight:600; line-height:1.45; margin:13px auto 0; max-width:30em; }
+      .ticket-seal{ position:absolute; top:-16px; right:-6px; width:74px; height:74px; border-radius:50%; background:rgba(12,8,10,.94); border:2.5px solid var(--gold); color:#ffd9a0; transform:rotate(11deg); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:2; box-shadow:0 6px 16px rgba(0,0,0,.5); }
+      .ticket-seal span{ font-size:8.5px; font-weight:900; letter-spacing:.08em; line-height:1.2; }
+      .ticket-seal b{ font-size:12px; font-weight:900; letter-spacing:.06em; line-height:1.2; margin:1px 0; }
+      .ticket-hero.side{ display:flex; gap:14px; align-items:center; text-align:left; }
+      .ticket-hero.side .hero-text{ flex:1 1 52%; min-width:0; }
+      .ticket-hero.side .ticket-photo{ flex:1 1 44%; min-width:0; margin:0; }
+      .ticket-hero.side .ticket-win{ font-size:clamp(26px, 7vw, 34px); }
+      .ticket-hero.side .ticket-prize{ font-size:clamp(23px, 6.5vw, 30px); }
+      .ticket-hero.side .ticket-note{ font-size:13px; margin-top:8px; }
+      .ticket-hero.side .ticket-note::after{ content:""; display:block; width:52px; height:4px; background:var(--pink); margin-top:8px; border-radius:2px; }
+      .ticket-hero.side .ticket-photo.tilt img{ transform:rotate(-3deg); }
+      .ticket-mid{ padding:14px 18px 0; }
+      .mid-chips{ display:flex; gap:10px; }
+      .mid-chip{ flex:1; display:flex; align-items:center; gap:9px; background:#17171a; border:1.5px solid rgba(255,255,255,.25); border-radius:12px; padding:11px 12px; font-weight:700; font-size:13.5px; text-align:left; min-width:0; }
+      .mid-chip svg{ flex:none; width:26px; height:26px; stroke:#fff; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+      .mid-chip .div{ width:3px; align-self:stretch; background:var(--pink); border-radius:2px; flex:none; }
+      .mid-bar{ display:flex; align-items:center; gap:12px; background:#17171a; border:1.5px solid rgba(255,255,255,.25); border-radius:12px; padding:13px 14px; }
+      .mid-bar .mb-k{ color:var(--pink); font-weight:900; font-size:15px; letter-spacing:.04em; white-space:nowrap; }
+      .mid-bar .mb-div{ width:3px; align-self:stretch; background:rgba(255,255,255,.3); border-radius:2px; flex:none; }
+      .mid-bar .mb-v{ font-weight:800; font-size:16px; }
+      .mid-bar .mb-ic{ margin-left:auto; flex:none; width:38px; height:20px; border:2.5px solid #fff; border-radius:999px; }
+      .mid-cards{ display:flex; gap:10px; }
+      .mid-card{ flex:1; min-width:0; background:#17171a; border:1.5px solid rgba(255,255,255,.25); border-radius:12px; padding:16px 8px 11px; position:relative; }
+      .mid-card .mc-pill{ position:absolute; top:-11px; left:50%; transform:translateX(-50%); background:var(--pink); color:#fff; font-weight:900; font-size:9.5px; letter-spacing:.08em; padding:4px 10px 5px; border-radius:999px; white-space:nowrap; box-shadow:0 4px 10px rgba(255,46,146,.4); }
+      .mid-card .mc-photos{ display:flex; gap:6px; justify-content:center; align-items:center; }
+      .mid-card .mc-photos img{ width:48%; height:54px; object-fit:cover; border-radius:8px; }
+      .mid-card .mc-photos.trio img{ width:38%; }
+      .mid-card .mc-photos .mc-plus{ font-weight:900; font-size:20px; color:#fff; flex:none; }
+      .mid-card .mc-label{ font-weight:800; font-size:12.5px; margin-top:8px; }
+      .mid-card .mc-label i{ font-style:normal; color:rgba(255,255,255,.55); margin:0 4px; }
+      .mid-card .mc-bottom{ margin-top:8px; border:1.5px solid var(--pink); border-radius:9px; padding:6px 6px 7px; font-weight:900; font-size:12px; line-height:1.3; }
+      .mid-grid-title{ font-weight:900; font-size:17px; letter-spacing:.03em; }
+      .mid-grid-title.center{ text-align:center; }
+      .mid-grid-title.left{ text-align:left; border-left:4px solid var(--pink); padding-left:10px; }
+      .mid-grid-sub{ color:#ddd2dd; font-size:13px; margin-top:3px; }
+      .mid-grid{ display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:11px; }
+      .grid-chip{ display:flex; align-items:center; gap:9px; background:#17171a; border:1.5px solid rgba(255,255,255,.25); border-radius:12px; padding:8px 10px; text-align:left; min-width:0; }
+      .grid-chip img{ width:52px; height:44px; object-fit:cover; border-radius:7px; flex:none; }
+      .grid-chip .g-div{ width:3px; align-self:stretch; background:var(--pink); border-radius:2px; flex:none; }
+      .grid-chip span{ font-weight:800; font-size:13.5px; line-height:1.2; }
+      .grid-chip.mirror{ flex-direction:row-reverse; }
+      .grid-chip.mirror span{ border-bottom:3px solid var(--pink); padding-bottom:2px; }
+      .ticket-perf{ position:relative; border-top:3px dashed rgba(255,255,255,.45); margin:18px 0 0; }
+      .ticket-perf::before, .ticket-perf::after{ content:""; position:absolute; top:-13px; width:22px; height:22px; border-radius:50%; background:#030304; z-index:2; }
+      .ticket-perf::before{ left:-12px; }
+      .ticket-perf::after{ right:-12px; }
+      .ticket-stub{ padding:14px 18px 18px; }
+      .stub-title{ font-weight:900; font-size:16px; letter-spacing:.05em; }
+      .stub-row{ display:flex; gap:14px; align-items:center; margin-top:12px; text-align:left; }
+      .qr-box{ position:relative; width:140px; height:140px; flex:none; background:#fff; border-radius:12px; padding:8px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
       .qr-box img, .qr-box canvas{ display:block; max-width:100%; height:auto; }
       .qr-box canvas{ image-rendering:pixelated; }
       .qr-box.qr-ready{ animation:qrPop .45s cubic-bezier(.2,1.4,.4,1) both; }
       @keyframes qrPop{ from{ transform:scale(.92); opacity:.4; } to{ transform:scale(1); opacity:1; } }
-      .qr-logo{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:30px; height:30px; border-radius:50%; background:#0b0b0d; color:#fff; border:2px solid #fff; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:900; letter-spacing:.02em; z-index:2; box-shadow:0 3px 8px rgba(0,0,0,.3); }
+      .qr-logo{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:28px; height:28px; border-radius:50%; background:#0b0b0d; color:#fff; border:2px solid #fff; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:900; letter-spacing:.02em; z-index:2; box-shadow:0 3px 8px rgba(0,0,0,.3); }
       .qr-logo i{ color:var(--pink); font-style:normal; }
-      .qr-cap{ font-size:12.5px; color:#d3c8d3; margin-top:9px; font-weight:600; line-height:1.45; }
-      .qr-cap b{ color:#fff; }
-      .qr-folio-line{ margin-top:5px; font-size:11.5px; color:var(--gold); font-weight:800; letter-spacing:.12em; }
+      .stub-data{ flex:1; min-width:0; border-left:3px solid var(--pink); padding-left:13px; display:grid; gap:9px; }
+      .sd-row{ font-size:14px; line-height:1.35; }
+      .sd-row span{ color:#c9c9cf; font-weight:700; }
+      .sd-row b{ color:#fff; font-weight:800; }
+      .sd-row .nw{ white-space:nowrap; }
+      .sd-row b.folio{ background:var(--pink); color:#fff; padding:3px 10px; border-radius:999px; font-size:13px; letter-spacing:.04em; white-space:nowrap; }
+      .qr-cap{ font-size:13px; color:#d3c8d3; margin-top:12px; font-weight:600; line-height:1.45; }
       /* ---------- Mi boleto de hoy: acceso permanente tras agotar el giro ---------- */
       .btn-gold{ background:linear-gradient(180deg,#ffc966,#e79b1e); color:#2a1800; box-shadow:0 8px 22px rgba(255,182,72,.35), inset 0 1px 0 rgba(255,255,255,.55), inset 0 -2px 0 rgba(0,0,0,.18); }
       .btn-gold:hover{ filter:brightness(1.07); }
@@ -1387,41 +1415,42 @@
     </footer>
 
     <!-- Modal: boleto ganador -->
-    <div class="backdrop" id="ticketModal" hidden role="dialog" aria-modal="true" aria-labelledby="winTitle">
+    <div class="backdrop" id="ticketModal" hidden role="dialog" aria-modal="true" aria-label="Boleto ganador">
       <div class="modal-card">
-        <div class="win-head">
-          <div class="win-kicker">★ ¡FELICIDADES! ★</div>
-          <h2 id="winTitle">Ganaste un premio</h2>
-        </div>
+        <!-- Boleto rediseñado 2026-11-12 según el boceto de Axel:
+             encabezado, ¡GANASTE!, premio en dorado, foto, bloque
+             medio por premio (lo construye buildTicketMid), línea
+             perforada y talón con QR + datos estilo $100. -->
         <div class="ticket" id="ticketCard">
           <div class="ticket-inner">
-          <div class="ticket-band">
-            <div class="band-row">
+            <div class="ticket-band">
               <div class="t-wm">PIN<span class="k">K</span> CASE</div>
               <span class="t-type">BOLETO GANADOR · BUEN FIN 2026</span>
+              <div><span class="ticket-badge" id="tBadge" hidden>★ PREMIO MAYOR ★</span></div>
             </div>
-            <div><span class="ticket-badge" id="tBadge" hidden>★ PREMIO MAYOR ★</span></div>
-          </div>
-          <div class="ticket-body">
-            <div class="ticket-eyebrow">GANASTE</div>
-            <div class="ticket-prize" id="tPrize">—</div>
-            <div class="ticket-note" id="tNote">—</div>
-            <div class="ticket-rows">
-              <div class="row"><span>Nombre</span><b id="tName">—</b></div>
-              <div class="row"><span>Folio único</span><b class="folio" id="tFolio">—</b></div>
-              <div class="row"><span>Fecha del giro</span><b id="tDate">—</b></div>
-              <div class="row"><span>Vigencia</span><b>13–17 nov 2026 · Ixtlahuaca Centro</b></div>
+            <div class="ticket-hero" id="tHero">
+              <div class="hero-text">
+                <div class="ticket-win">¡GANASTE!</div>
+                <div class="ticket-prize" id="tPrize">—</div>
+                <div class="ticket-note" id="tNoteSide" hidden>—</div>
+              </div>
+              <div class="ticket-photo" id="tPhotoWrap"><img id="tPhoto" src="" alt="Foto del premio"><span class="ticket-seal" aria-hidden="true"><span>BOLETO</span><b>VÁLIDO</b><span>13–17 NOV</span></span></div>
+              <div class="ticket-note" id="tNote">—</div>
             </div>
-          </div>
-          <div class="qr-zone">
-            <div class="qr-title">TU CÓDIGO QR · LISTO PARA ESCANEAR</div>
-            <div class="qr-frame">
-              <span class="qr-corner tl"></span><span class="qr-corner tr"></span><span class="qr-corner bl"></span><span class="qr-corner br"></span>
-              <div class="qr-box" id="qrBox" aria-label="Código QR del boleto"></div>
+            <div class="ticket-mid" id="tMid"></div>
+            <div class="ticket-perf" aria-hidden="true"></div>
+            <div class="ticket-stub">
+              <div class="stub-title">TU BOLETO PARA CANJEAR</div>
+              <div class="stub-row">
+                <div class="qr-box" id="qrBox" aria-label="Código QR del boleto"></div>
+                <div class="stub-data">
+                  <div class="sd-row"><span>Nombre:</span> <b id="tName">—</b></div>
+                  <div class="sd-row"><span>Folio:</span> <b class="folio" id="tFolio">—</b></div>
+                  <div class="sd-row"><span>Vigencia:</span> <b><span class="nw">13–17 nov 2026</span><br>Ixtlahuaca Centro</b></div>
+                </div>
+              </div>
+              <div class="qr-cap" id="tCap">Muestra tu QR en tienda para canjear tu premio.</div>
             </div>
-            <div class="qr-cap"><b>Muestra este QR en tienda</b> y canjea tu premio. Si no se puede escanear, presenta tu folio.</div>
-            <div class="qr-folio-line" id="qrFolioLine">FOLIO —</div>
-          </div>
           </div>
         </div>
         <div class="modal-actions">
@@ -3169,7 +3198,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
             var quiet = 4, scale = 5, size = (count + quiet * 2) * scale;
             var canvas = document.createElement("canvas");
             canvas.width = size; canvas.height = size;
-            canvas.style.width = "152px"; canvas.style.height = "152px";
+            canvas.style.width = "124px"; canvas.style.height = "124px";
             canvas.style.imageRendering = "pixelated";
             canvas.setAttribute("role", "img");
             canvas.setAttribute("aria-label", "Código QR del boleto " + folio);
@@ -3196,7 +3225,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
           try{
             if(typeof window.QRCode !== "function") return false;
             box.innerHTML = "";
-            new window.QRCode(box, { text: payload, width: 152, height: 152, correctLevel: window.QRCode.CorrectLevel ? window.QRCode.CorrectLevel.H : 2 });
+            new window.QRCode(box, { text: payload, width: 124, height: 124, correctLevel: window.QRCode.CorrectLevel ? window.QRCode.CorrectLevel.H : 2 });
             return !!(box.querySelector("canvas") || box.querySelector("img") || box.querySelector("table"));
           }catch(e){ return false; }
         }
@@ -3209,17 +3238,108 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
           box.innerHTML = '<div style="font-weight:900;font-size:16px;text-align:center;padding:8px;line-height:1.3;">'+escapeHtml(folio)+'<div style="font-weight:600;font-size:11px;color:#55555f;margin-top:5px;">Muestra tu folio en tienda para canjear</div></div>';
         });
       }
+      /* ============ Diseño del boleto (rediseño 2026-11-12, boceto de Axel) ============
+         Cada premio define su foto, su bloque medio y su leyenda. El modal
+         (buildTicketMid) y la imagen descargada (drawTicketImage) usan la
+         misma tabla, para que las dos versiones se vean iguales. */
+      var TICKET_DESIGN = {
+        d200:  { photo: "assets/boleto-billete-200.jpg", tilt: true, mid: "cards200",
+                 caption: "Muestra tu QR en tienda para canjear tu premio." },
+        d100:  { photo: "assets/boleto-billete-100.jpg", tilt: true, split: ["$100", "DE DESCUENTO"],
+                 hideNote: true, mid: "grid", gridTitle: "ÚSALO EN TUS FAVORITOS",
+                 gridSub: "Aplica tu descuento en:", mirror: false,
+                 caption: "Muestra tu QR en tienda y disfruta tu descuento." },
+        d50:   { photo: "assets/boleto-billete-50.jpg", tilt: true, side: true, mid: "grid",
+                 gridTitle: "ÚSALO EN TUS FAVORITOS", gridSub: "", mirror: true,
+                 caption: "Muestra tu QR en tienda para canjear tu premio." },
+        cable: { photo: "assets/boleto-cable.jpg", mid: "bar",
+                 caption: "Muestra tu QR en tienda para canjear tu premio." },
+        mica:  { photo: "assets/boleto-mica.jpg", mid: "chips",
+                 caption: "Muestra tu QR en tienda para canjear tu premio." }
+      };
+      var TICKET_GRID = [
+        { img: "assets/boleto-funda.jpg", label: "Protectores" },
+        { img: "assets/boleto-mica-chip.jpg", label: "Micas" },
+        { img: "assets/boleto-cargador.jpg", label: "Cargadores" },
+        { img: "assets/boleto-bocina.jpg", label: "Bocinas" },
+        { img: "assets/boleto-reloj.jpg", label: "Smartwatch" },
+        { img: "assets/boleto-audifonos.jpg", label: "Y más accesorios" }
+      ];
+      /* Precarga las fotos del boleto para que el modal las muestre al instante. */
+      (function preloadTicketPhotos(){
+        var files = ["boleto-billete-200.jpg","boleto-billete-100.jpg","boleto-billete-50.jpg",
+          "boleto-cable.jpg","boleto-mica.jpg","boleto-funda.jpg","boleto-mica-chip.jpg",
+          "boleto-cargador.jpg","boleto-bocina.jpg","boleto-reloj.jpg","boleto-audifonos.jpg",
+          "boleto-bocina200.jpg","boleto-mica-v.jpg"];
+        for(var i = 0; i < files.length; i++){ var im = new Image(); im.src = "assets/" + files[i]; }
+      })();
+      /* Bloque medio del boleto según el premio (HTML del modal). */
+      function buildTicketMid(prizeId){
+        var d = TICKET_DESIGN[prizeId] || {};
+        if(d.mid === "chips"){
+          return '<div class="mid-chips">' +
+            '<div class="mid-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg><span class="div"></span><span>Cristal templado</span></div>' +
+            '<div class="mid-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7 6 3h12l2 4"/><path d="M5 7v13h14V7"/><path d="M9 20v-5h6v5"/><path d="M5 12h14"/></svg><span class="div"></span><span>Instalación en tienda</span></div>' +
+            '</div>';
+        }
+        if(d.mid === "bar"){
+          return '<div class="mid-bar"><span class="mb-k">TU PREMIO</span><span class="mb-div"></span><span class="mb-v">1 cable tipo C</span><span class="mb-ic" aria-hidden="true"></span></div>';
+        }
+        if(d.mid === "cards200"){
+          return '<div class="mid-cards">' +
+            '<div class="mid-card"><span class="mc-pill">APLICA EN</span>' +
+            '<div class="mc-photos"><img src="assets/boleto-bocina200.jpg" alt="Bocina"><img src="assets/boleto-reloj.jpg" alt="Smartwatch"></div>' +
+            '<div class="mc-label">Bocinas<i>|</i>Smartwatch</div>' +
+            '<div class="mc-bottom">$200 de descuento</div></div>' +
+            '<div class="mid-card"><span class="mc-pill">O CÁMBIALO POR</span>' +
+            '<div class="mc-photos trio"><img src="assets/boleto-billete-100.jpg" alt="Billete de $100"><span class="mc-plus">+</span><img src="assets/boleto-mica-v.jpg" alt="Mica"></div>' +
+            '<div class="mc-bottom">$100 de descuento<br>+ una mica gratis</div></div>' +
+            '</div>';
+        }
+        if(d.mid === "grid"){
+          var h = '<div class="mid-grid-title ' + (d.mirror ? 'left' : 'center') + '">' + escapeHtml(d.gridTitle) + '</div>';
+          if(d.gridSub) h += '<div class="mid-grid-sub">' + escapeHtml(d.gridSub) + '</div>';
+          h += '<div class="mid-grid">';
+          for(var i = 0; i < TICKET_GRID.length; i++){
+            var c = TICKET_GRID[i];
+            h += '<div class="grid-chip' + (d.mirror ? ' mirror' : '') + '"><img src="' + c.img + '" alt="' + escapeHtml(c.label) + '">' +
+              (d.mirror ? '' : '<span class="g-div"></span>') + '<span>' + escapeHtml(c.label) + '</span></div>';
+          }
+          return h + '</div>';
+        }
+        return "";
+      }
       function openTicket(ticket){
         state.lastTicket = ticket;
+        var d = TICKET_DESIGN[ticket.prizeId] || {};
         var isJack = (ticket.prizeId === "d100" || ticket.prizeId === "premio" || ticket.prizeId === "d50");
         var badge = $("tBadge"); if(badge) badge.hidden = !isJack;
-        $("tPrize").textContent = ticket.prizeLabel;
-        $("tNote").textContent = ticket.prizeNote || "";
+        /* Título: el $100 lleva el formato dividido ($100 | DE DESCUENTO);
+           los demás, la etiqueta del premio en mayúsculas. */
+        var prizeEl = $("tPrize");
+        if(d.split){
+          prizeEl.classList.add("split");
+          prizeEl.innerHTML = '<span class="sp-amt">' + escapeHtml(d.split[0]) + '</span><span class="sp-bar"></span><span class="sp-lbl">' + escapeHtml(d.split[1]).replace(" ", "<br>") + '</span>';
+        }else{
+          prizeEl.classList.remove("split");
+          prizeEl.textContent = ticket.prizeLabel.toUpperCase();
+        }
+        /* Nota: el $100 no la lleva (el grid es su alcance); el $50 la
+           lleva en la columna izquierda del encabezado lateral. */
+        var note = (d.hideNote ? "" : (ticket.prizeNote || ""));
+        $("tNote").textContent = note;
+        $("tNoteSide").textContent = note;
+        $("tNote").hidden = !!d.side || !note;
+        $("tNoteSide").hidden = !d.side || !note;
+        $("tHero").classList.toggle("side", !!d.side);
+        var photo = $("tPhoto");
+        photo.src = d.photo || "";
+        photo.alt = "Foto de " + ticket.prizeLabel;
+        $("tPhotoWrap").classList.toggle("tilt", !!d.tilt);
+        $("tMid").innerHTML = buildTicketMid(ticket.prizeId);
         $("tName").textContent = ticket.name;
         $("tFolio").textContent = ticket.folio;
-        $("tDate").textContent = fmtDateLong(ticket.date) + (ticket.time ? " · " + ticket.time.slice(0,5) + " h" : "");
-        var qfl = $("qrFolioLine"); if(qfl) qfl.textContent = "FOLIO " + ticket.folio + " · QR GENERADO AUTOMÁTICAMENTE";
-        $("winTitle").textContent = "¡" + ticket.name.split(" ")[0] + ", ganaste!";
+        $("tCap").textContent = d.caption || "Muestra tu QR en tienda para canjear tu premio.";
 
         /* QR con los datos del boleto: folio, nombre, premio y fecha.
            Al escanearlo en tienda, esos datos se validan contra el
@@ -3241,14 +3361,14 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         openModal("ticketModal");
       }
       /* ================= Descarga del boleto (imagen fiel a la pantalla) =================
-         Antes se fotografiaba el boleto con html2canvas, pero esa
-         librería no sabe pintar el borde degradado con máscara, los
-         brillos radiales ni las animaciones del boleto nuevo: la
-         imagen salía distinta a la de la página. Ahora el boleto se
-         DIBUJA directamente en un canvas 2D con el mismo diseño
-         oscuro (fondo negro, borde rojo/dorado, premio dorado y QR
-         real), y termina justo después del QR y su folio: sin la
-         parte final del código de barras, como pidió Axel. */
+         El boleto se DIBUJA directamente en un canvas 2D con el mismo
+         diseño del modal (fondo negro, premio dorado, foto del premio,
+         bloque medio por premio, línea perforada y talón con QR real).
+         Es asíncrono: carga las fotos del premio antes de dibujar. Se
+         pinta dos veces: la primera en un canvas de prueba para medir
+         la altura total, y la segunda en el canvas final. Fuera del
+         rectángulo del boleto el fondo queda transparente, y las
+         muescas de la perforación recortan el borde a los lados. */
       function rrPath(ctx, x, y, w, h, r){
         r = Math.min(r, w / 2, h / 2);
         ctx.beginPath();
@@ -3279,207 +3399,481 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         if(cur) lines.push(cur);
         return lines;
       }
-      function drawTicketImage(ticket){
-        var W = 920, CX = W / 2;
-        var isJack = (ticket.prizeId === "d100" || ticket.prizeId === "premio" || ticket.prizeId === "d50");
-        var dateText = fmtDateLong(ticket.date) + (ticket.time ? " · " + ticket.time.slice(0,5) + " h" : "");
-
-        /* Medir textos antes de fijar el alto total */
-        var meas = document.createElement("canvas").getContext("2d");
-        var prizeSize = fitFontSize(meas, ticket.prizeLabel, "400", '"Anton","Archivo",sans-serif', 96, 54, W - 170);
-        var prizeLines = [ticket.prizeLabel];
-        if(prizeSize <= 56){
-          meas.font = '400 78px "Anton","Archivo",sans-serif';
-          prizeLines = wrapLines(meas, ticket.prizeLabel, W - 170);
-          prizeSize = 78;
-        }
-        meas.font = '400 28px "Archivo",sans-serif';
-        var noteLines = ticket.prizeNote ? wrapLines(meas, ticket.prizeNote, W - 190) : [];
-
-        var bandH = isJack ? 306 : 258;
-        var bodyH = 46 + 26 + 12 + prizeLines.length * (prizeSize * 1.06) + 10 +
-                    noteLines.length * 38 + 22 + 214 + 18;
-        var qrH = 34 + 20 + 400 + 16 + 64 + 12 + 32 + 26;
-        /* Sin talón ni código de barras al final: la imagen cierra
-           con un margen limpio bajo la línea del folio del QR. */
-        var bottomPad = 34;
-        var H = bandH + bodyH + qrH + bottomPad;
-
-        var cv = document.createElement("canvas");
-        cv.width = W; cv.height = H;
-        var ctx = cv.getContext("2d");
-        ctx.fillStyle = "#0b090b"; ctx.fillRect(0, 0, W, H);
-        ctx.textBaseline = "alphabetic";
-
-        /* Marco degradado rojo/dorado, como el de la pantalla */
-        var frame = ctx.createLinearGradient(0, 0, W, H);
-        frame.addColorStop(0, "#ffb648"); frame.addColorStop(.32, "#e8112d");
-        frame.addColorStop(.55, "#17131a"); frame.addColorStop(.78, "#ffb648");
-        frame.addColorStop(1, "#ff2e92");
-        rrPath(ctx, 4, 4, W - 8, H - 8, 44); ctx.fillStyle = frame; ctx.fill();
-
-        /* Fondo oscuro interior con brillos */
-        rrPath(ctx, 10, 10, W - 20, H - 20, 38);
-        var bg = ctx.createLinearGradient(0, 0, 0, H);
-        bg.addColorStop(0, "#221a21"); bg.addColorStop(.55, "#120e13"); bg.addColorStop(1, "#191219");
-        ctx.fillStyle = bg; ctx.fill();
-        ctx.save(); rrPath(ctx, 10, 10, W - 20, H - 20, 38); ctx.clip();
-        var glow1 = ctx.createRadialGradient(CX, -70, 20, CX, -70, 460);
-        glow1.addColorStop(0, "rgba(255,182,72,.20)"); glow1.addColorStop(1, "rgba(255,182,72,0)");
-        ctx.fillStyle = glow1; ctx.fillRect(0, 0, W, 420);
-        var glow2 = ctx.createRadialGradient(W, H * .38, 20, W, H * .38, 420);
-        glow2.addColorStop(0, "rgba(232,17,45,.14)"); glow2.addColorStop(1, "rgba(232,17,45,0)");
-        ctx.fillStyle = glow2; ctx.fillRect(W - 420, H * .38 - 200, 420, 440);
-
-        /* Banda superior */
-        var band = ctx.createLinearGradient(0, 10, 0, 10 + bandH);
-        band.addColorStop(0, "#24131a"); band.addColorStop(1, "#070507");
-        ctx.fillStyle = band; ctx.fillRect(10, 10, W - 20, bandH);
-        var bandGlow = ctx.createRadialGradient(CX, -50, 10, CX, -50, 380);
-        bandGlow.addColorStop(0, "rgba(232,17,45,.5)"); bandGlow.addColorStop(1, "rgba(232,17,45,0)");
-        ctx.fillStyle = bandGlow; ctx.fillRect(0, 0, W, bandH);
-        ctx.fillStyle = "#ffb648"; ctx.fillRect(10, 10 + bandH - 5, W - 20, 5);
-
-        /* Wordmark PIN-K CASE: la K va en rosa, como el logo */
-        ctx.font = '900 56px "Archivo",sans-serif';
-        var wPin = ctx.measureText("PIN").width, wK = ctx.measureText("K").width, wCase = ctx.measureText(" CASE").width;
-        var wx = CX - (wPin + wK + wCase) / 2, wy = 96;
-        ctx.textAlign = "left"; ctx.fillStyle = "#ffffff";
-        ctx.fillText("PIN", wx, wy);
-        ctx.fillStyle = "#ff2e92"; ctx.fillText("K", wx + wPin, wy);
-        ctx.fillStyle = "#ffffff"; ctx.fillText(" CASE", wx + wPin + wK, wy);
-        ctx.textAlign = "center";
-        ctx.font = '700 20px "Archivo",sans-serif'; ctx.fillStyle = "#d9c9a8";
-        ctx.fillText("T E C N O L O G Í A   Q U E   T E   C O N E C T A", CX, 130);
-
-        /* Pastilla roja del tipo de boleto */
-        var typeText = "BOLETO GANADOR · BUEN FIN 2026";
-        ctx.font = '900 24px "Archivo",sans-serif';
-        var typeW = ctx.measureText(typeText).width + 56;
-        var pillGrad = ctx.createLinearGradient(0, 152, 0, 204);
-        pillGrad.addColorStop(0, "#ff3b47"); pillGrad.addColorStop(.55, "#e8112d"); pillGrad.addColorStop(1, "#8f0016");
-        rrPath(ctx, CX - typeW / 2, 152, typeW, 52, 26); ctx.fillStyle = pillGrad; ctx.fill();
-        ctx.fillStyle = "#ffffff"; ctx.fillText(typeText, CX, 187);
-
-        if(isJack){
-          var badgeText = "★ PREMIO MAYOR ★";
-          ctx.font = '900 22px "Archivo",sans-serif';
-          var badgeW = ctx.measureText(badgeText).width + 48;
-          var badgeGrad = ctx.createLinearGradient(0, 222, 0, 268);
-          badgeGrad.addColorStop(0, "#ffc966"); badgeGrad.addColorStop(1, "#e79b1e");
-          rrPath(ctx, CX - badgeW / 2, 222, badgeW, 46, 23); ctx.fillStyle = badgeGrad; ctx.fill();
-          ctx.fillStyle = "#3a2400"; ctx.fillText(badgeText, CX, 254);
-        }
-        ctx.restore();
-
-        /* Sello VÁLIDO, inclinado como en la pantalla */
+      /* Carga una foto del boleto; si falla, devuelve null y el dibujo
+         pone un rectángulo oscuro en su lugar (la descarga nunca falla). */
+      function loadTicketImage(src){
+        return new Promise(function(resolve){
+          var im = new Image();
+          im.onload = function(){ resolve(im); };
+          im.onerror = function(){ resolve(null); };
+          im.src = src;
+        });
+      }
+      /* Dibuja la imagen cubriendo el rectángulo (recorte central). */
+      function drawCover(ctx, im, x, y, w, h){
+        if(!im || !im.naturalWidth){ ctx.fillStyle = "#17171a"; ctx.fillRect(x, y, w, h); return; }
+        var s = Math.max(w / im.naturalWidth, h / im.naturalHeight);
+        var dw = im.naturalWidth * s, dh = im.naturalHeight * s;
+        ctx.drawImage(im, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+      }
+      function goldGrad(ctx, y0, y1){
+        var g = ctx.createLinearGradient(0, y0, 0, y1);
+        g.addColorStop(0, "#ffedb0"); g.addColorStop(.45, "#f7c948"); g.addColorStop(1, "#d99a16");
+        return g;
+      }
+      /* Sello circular "BOLETO VÁLIDO 13–17 NOV" sobre la esquina de la foto. */
+      function drawSeal(ctx, cx, cy, r){
         ctx.save();
-        ctx.translate(W - 128, 10 + bandH + 8); ctx.rotate(11 * Math.PI / 180);
-        ctx.beginPath(); ctx.arc(0, 0, 62, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(12,8,10,.92)"; ctx.fill();
+        ctx.translate(cx, cy); ctx.rotate(11 * Math.PI / 180);
+        ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(12,8,10,.94)"; ctx.fill();
         ctx.lineWidth = 3; ctx.strokeStyle = "#ffb648"; ctx.stroke();
-        ctx.fillStyle = "#ffd9a0"; ctx.textAlign = "center";
-        ctx.font = '900 15px "Archivo",sans-serif'; ctx.fillText("BOLETO", 0, -16);
-        ctx.font = '900 21px "Archivo",sans-serif'; ctx.fillText("VÁLIDO", 0, 8);
-        ctx.font = '900 15px "Archivo",sans-serif'; ctx.fillText("13–17 NOV", 0, 32);
+        ctx.beginPath(); ctx.arc(0, 0, r - 7, 0, Math.PI * 2);
+        ctx.lineWidth = 1; ctx.strokeStyle = "rgba(255,182,72,.6)"; ctx.stroke();
+        ctx.fillStyle = "#ffd9a0"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.font = '900 ' + Math.round(r * .22) + 'px "Archivo",sans-serif';
+        ctx.fillText("BOLETO", 0, -r * .34);
+        ctx.font = '900 ' + Math.round(r * .30) + 'px "Archivo",sans-serif';
+        ctx.fillText("VÁLIDO", 0, 0);
+        ctx.font = '900 ' + Math.round(r * .22) + 'px "Archivo",sans-serif';
+        ctx.fillText("13–17 NOV", 0, r * .34);
         ctx.restore();
-
-        /* Cuerpo: premio y nota */
-        var y = 10 + bandH + 46;
-        ctx.textAlign = "center";
-        ctx.font = '900 21px "Archivo",sans-serif'; ctx.fillStyle = "#ffb648";
-        ctx.fillText("G A N A S T E", CX, y); y += 12;
-        prizeLines.forEach(function(line){
-          y += prizeSize * 1.06;
-          ctx.font = '400 ' + prizeSize + 'px "Anton","Archivo",sans-serif';
-          ctx.fillStyle = "rgba(194,0,31,.55)";
-          ctx.fillText(line, CX, y + 5);
-          ctx.fillStyle = "#ffd9a0";
-          ctx.fillText(line, CX, y);
-        });
-        y += 12;
-        ctx.font = '400 28px "Archivo",sans-serif'; ctx.fillStyle = "#ddd2dd";
-        noteLines.forEach(function(line){ y += 38; ctx.fillText(line, CX, y); });
-
-        /* Panel de datos */
-        y += 22;
-        var panelX = 56, panelW = W - 112, panelY = y, panelH = 214;
-        rrPath(ctx, panelX, panelY, panelW, panelH, 26);
-        ctx.fillStyle = "rgba(255,255,255,.05)"; ctx.fill();
-        ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,182,72,.45)"; ctx.stroke();
-        var rows = [
-          { label: "NOMBRE", value: ticket.name, folio: false },
-          { label: "FOLIO ÚNICO", value: ticket.folio, folio: true },
-          { label: "FECHA DEL GIRO", value: dateText, folio: false },
-          { label: "VIGENCIA", value: "13–17 nov 2026 · Ixtlahuaca Centro", folio: false }
-        ];
-        rows.forEach(function(row, i){
-          var ry = panelY + 52 + i * 48;
-          ctx.textAlign = "left"; ctx.font = '700 21px "Archivo",sans-serif'; ctx.fillStyle = "#d8b26a";
-          ctx.fillText(row.label, panelX + 28, ry);
-          if(row.folio){
-            ctx.font = '800 26px "Archivo",sans-serif';
-            var fw = ctx.measureText(row.value).width + 34;
-            var fGrad = ctx.createLinearGradient(0, ry - 32, 0, ry + 10);
-            fGrad.addColorStop(0, "#ffc966"); fGrad.addColorStop(1, "#e79b1e");
-            rrPath(ctx, panelX + panelW - 28 - fw, ry - 33, fw, 44, 22); ctx.fillStyle = fGrad; ctx.fill();
-            ctx.textAlign = "center"; ctx.fillStyle = "#2a1800";
-            ctx.fillText(row.value, panelX + panelW - 28 - fw / 2, ry);
-          }else{
-            ctx.textAlign = "right"; ctx.fillStyle = "#ffffff";
-            fitFontSize(ctx, row.value, "800", '"Archivo",sans-serif', 28, 20, panelW - 300);
-            ctx.fillText(row.value, panelX + panelW - 28, ry);
-          }
-        });
-        y = panelY + panelH + 18;
-
-        /* Zona QR: se dibuja el QR real ya generado en la página */
-        ctx.textAlign = "center";
-        ctx.font = '900 23px "Archivo",sans-serif'; ctx.fillStyle = "#ffd9a0";
-        ctx.fillText("TU CÓDIGO QR · LISTO PARA ESCANEAR", CX, y + 24); y += 44;
-        var qrSize = 400, qrX = CX - qrSize / 2, qrY = y;
-        rrPath(ctx, qrX - 6, qrY - 6, qrSize + 12, qrSize + 12, 24);
-        ctx.fillStyle = "#ffb648"; ctx.fill();
-        rrPath(ctx, qrX, qrY, qrSize, qrSize, 18);
-        ctx.fillStyle = "#ffffff"; ctx.fill();
-        var qrSrc = $("qrBox") ? ($("qrBox").querySelector("canvas") || $("qrBox").querySelector("img")) : null;
-        ctx.save(); rrPath(ctx, qrX, qrY, qrSize, qrSize, 18); ctx.clip();
-        if(qrSrc){
-          ctx.imageSmoothingEnabled = false;
-          try{ ctx.drawImage(qrSrc, qrX + 26, qrY + 26, qrSize - 52, qrSize - 52); }catch(e){ qrSrc = null; }
-          ctx.imageSmoothingEnabled = true;
-        }
-        if(!qrSrc){
-          ctx.fillStyle = "#17131a"; ctx.font = '900 44px "Archivo",sans-serif';
-          ctx.fillText(ticket.folio, CX, qrY + qrSize / 2 + 16);
-        }
-        ctx.restore();
-        /* Esquinas rojas de escaneo y punto de marca al centro */
-        ctx.strokeStyle = "#e8112d"; ctx.lineWidth = 7;
-        var cLen = 52, cOff = 16;
-        [[qrX - cOff, qrY - cOff, 1, 1], [qrX + qrSize + cOff, qrY - cOff, -1, 1],
-         [qrX - cOff, qrY + qrSize + cOff, 1, -1], [qrX + qrSize + cOff, qrY + qrSize + cOff, -1, -1]].forEach(function(c){
-          ctx.beginPath(); ctx.moveTo(c[0] + cLen * c[2], c[1]); ctx.lineTo(c[0], c[1]); ctx.lineTo(c[0], c[1] + cLen * c[3]); ctx.stroke();
-        });
-        ctx.beginPath(); ctx.arc(CX, qrY + qrSize / 2, 34, 0, Math.PI * 2);
-        ctx.fillStyle = "#0b0b0d"; ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = "#ffffff"; ctx.stroke();
-        ctx.fillStyle = "#ffffff"; ctx.font = '900 17px "Archivo",sans-serif';
-        ctx.fillText("PIN", CX - 8, qrY + qrSize / 2 + 6);
+        ctx.textBaseline = "alphabetic";
+      }
+      /* Iconos de línea del bloque medio (capas y tienda), en blanco. */
+      function drawLayersIcon(ctx, x, y, s){
+        ctx.save(); ctx.strokeStyle = "#fff"; ctx.lineWidth = 3.4; ctx.lineJoin = "round"; ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(x + s / 2, y); ctx.lineTo(x + s, y + s * .28); ctx.lineTo(x + s / 2, y + s * .56); ctx.lineTo(x, y + s * .28); ctx.closePath();
+        ctx.moveTo(x + s * .12, y + s * .66); ctx.lineTo(x + s / 2, y + s * .86); ctx.lineTo(x + s * .88, y + s * .66);
+        ctx.moveTo(x + s * .12, y + s * .44); ctx.lineTo(x + s / 2, y + s * .64); ctx.lineTo(x + s * .88, y + s * .44);
+        ctx.stroke(); ctx.restore();
+      }
+      function drawStoreIcon(ctx, x, y, s){
+        ctx.save(); ctx.strokeStyle = "#fff"; ctx.lineWidth = 3.4; ctx.lineJoin = "round"; ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(x + s * .08, y + s * .30); ctx.lineTo(x + s * .20, y + s * .06); ctx.lineTo(x + s * .80, y + s * .06); ctx.lineTo(x + s * .92, y + s * .30);
+        ctx.moveTo(x + s * .14, y + s * .30); ctx.lineTo(x + s * .14, y + s * .94); ctx.lineTo(x + s * .86, y + s * .94); ctx.lineTo(x + s * .86, y + s * .30);
+        ctx.moveTo(x + s * .38, y + s * .94); ctx.lineTo(x + s * .38, y + s * .62); ctx.lineTo(x + s * .62, y + s * .62); ctx.lineTo(x + s * .62, y + s * .94);
+        ctx.moveTo(x + s * .14, y + s * .52); ctx.lineTo(x + s * .86, y + s * .52);
+        ctx.stroke(); ctx.restore();
+      }
+      /* Chip del bloque medio (mica): icono + divisor rosa + etiqueta. */
+      function drawMidChip(ctx, x, y, w, h, icon, label){
+        rrPath(ctx, x, y, w, h, 12);
+        ctx.fillStyle = "#17171a"; ctx.fill();
+        ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255,.25)"; ctx.stroke();
+        if(icon === "layers") drawLayersIcon(ctx, x + 24, y + h / 2 - 20, 40);
+        else drawStoreIcon(ctx, x + 24, y + h / 2 - 20, 40);
         ctx.fillStyle = "#ff2e92";
-        ctx.fillText("K", CX + 22, qrY + qrSize / 2 + 6);
-        y = qrY + qrSize + 16;
-        ctx.font = '600 25px "Archivo",sans-serif'; ctx.fillStyle = "#d3c8d3";
-        ctx.fillText("Muestra este QR en tienda para canjear tu premio.", CX, y + 28);
-        ctx.fillText("Se generó automáticamente con tu folio, nombre, premio y fecha.", CX, y + 60);
-        y += 72;
-        ctx.font = '800 23px "Archivo",sans-serif'; ctx.fillStyle = "#ffb648";
-        ctx.fillText("FOLIO " + ticket.folio + " · QR GENERADO AUTOMÁTICAMENTE", CX, y + 24);
-        y += 50;
-
-        /* Fin del boleto descargado: sin línea perforada, sin talón
-           y sin código de barras. La imagen termina aquí, limpia. */
-
-        return cv;
+        ctx.fillRect(x + 78, y + 18, 4, h - 36);
+        ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+        ctx.font = '700 24px "Archivo",sans-serif'; ctx.fillStyle = "#fff";
+        var ls = wrapLines(ctx, label, w - 118);
+        var ly = y + h / 2 - (ls.length - 1) * 15 + 9;
+        for(var i = 0; i < ls.length; i++) ctx.fillText(ls[i], x + 96, ly + i * 30);
+      }
+      /* Tarjeta del $200: pastilla superior, fotos, etiqueta y pastilla inferior. */
+      function drawPrizeCard(ctx, x, y, w, h, pill, photos, label, bottomLines, plus){
+        rrPath(ctx, x, y, w, h, 12);
+        ctx.fillStyle = "#17171a"; ctx.fill();
+        ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255,.25)"; ctx.stroke();
+        ctx.font = '900 20px "Archivo",sans-serif';
+        var pW = ctx.measureText(pill).width + 36;
+        rrPath(ctx, x + w / 2 - pW / 2, y - 20, pW, 40, 20);
+        ctx.fillStyle = "#ff2e92"; ctx.fill();
+        ctx.fillStyle = "#fff"; ctx.textAlign = "center";
+        ctx.fillText(pill, x + w / 2, y + 8);
+        var py = y + 32, ph = 110;
+        if(plus){
+          var iw = (w - 48 - 34) / 2;
+          rrPath(ctx, x + 16, py, iw, ph, 8); ctx.save(); ctx.clip();
+          drawCover(ctx, photos[0], x + 16, py, iw, ph); ctx.restore();
+          ctx.font = '900 36px "Archivo",sans-serif'; ctx.fillStyle = "#fff"; ctx.textAlign = "center";
+          ctx.fillText("+", x + 16 + iw + 17, py + ph / 2 + 13);
+          rrPath(ctx, x + 16 + iw + 34, py, iw, ph, 8); ctx.save(); ctx.clip();
+          drawCover(ctx, photos[1], x + 16 + iw + 34, py, iw, ph); ctx.restore();
+        }else{
+          var iw2 = (w - 48) / 2;
+          rrPath(ctx, x + 16, py, iw2, ph, 8); ctx.save(); ctx.clip();
+          drawCover(ctx, photos[0], x + 16, py, iw2, ph); ctx.restore();
+          rrPath(ctx, x + 16 + iw2 + 16, py, iw2, ph, 8); ctx.save(); ctx.clip();
+          drawCover(ctx, photos[1], x + 16 + iw2 + 16, py, iw2, ph); ctx.restore();
+        }
+        var by = py + ph + 30;
+        if(label){
+          ctx.font = '800 26px "Archivo",sans-serif'; ctx.fillStyle = "#fff"; ctx.textAlign = "center";
+          ctx.fillText(label, x + w / 2, by + 8);
+          by += 44;
+        }else{
+          by += 14;
+        }
+        var bh = bottomLines.length * 34 + 22;
+        rrPath(ctx, x + 16, by, w - 32, bh, 10);
+        ctx.lineWidth = 2; ctx.strokeStyle = "#ff2e92"; ctx.stroke();
+        ctx.font = '900 26px "Archivo",sans-serif'; ctx.fillStyle = "#fff"; ctx.textAlign = "center";
+        for(var i = 0; i < bottomLines.length; i++) ctx.fillText(bottomLines[i], x + w / 2, by + 32 + i * 34);
+      }
+      /* Pinta el QR del boleto módulo por módulo a escala entera dentro
+         del cuadrado blanco (x, y, size). Devuelve true si lo pintó.
+         Escala entera: cada módulo ocupa exactamente 3×3 px (2×2 si el
+         nombre es muy largo), sin mezcla de bordes. Dibujar el canvas
+         del modal escalado mezclaba los módulos y el código dejaba de
+         leerse (verificado con OpenCV el 2026-11-12). */
+      function paintQRModules(ctx, x, y, size, ticket){
+        try{
+          if(typeof window.QRCode !== "function") return false;
+          var payload = "BOLETO BUEN FIN - PINK CASE\n" +
+            "Folio: " + ticket.folio + "\n" +
+            "Nombre: " + ticket.name + "\n" +
+            "Premio: " + ticket.prizeLabel + "\n" +
+            "Fecha del giro: " + ticket.date + " " + (ticket.time || "") + "\n" +
+            "Canje: 13-17 nov 2026, Pink Case Ixtlahuaca Centro";
+          var scratch = document.createElement("div");
+          scratch.style.cssText = "position:absolute;left:-9999px;top:0;width:200px;height:200px;overflow:hidden;visibility:hidden;";
+          document.body.appendChild(scratch);
+          var model = null;
+          try{
+            var inst = new window.QRCode(scratch, { text: payload, width: 200, height: 200, correctLevel: window.QRCode.CorrectLevel ? window.QRCode.CorrectLevel.H : 2 });
+            model = inst && inst._oQRCode;
+          }catch(e){ model = null; }
+          if(scratch.parentNode) scratch.parentNode.removeChild(scratch);
+          if(!model || typeof model.getModuleCount !== "function" || typeof model.isDark !== "function") return false;
+          var count = model.getModuleCount();
+          if(!count || count < 21) return false;
+          var quiet = 4;
+          var scale = Math.floor((size - 16) / (count + quiet * 2));
+          if(scale < 2) return false;
+          if(scale > 3) scale = 3;
+          var total = (count + quiet * 2) * scale;
+          var ox = x + Math.round((size - total) / 2), oy = y + Math.round((size - total) / 2);
+          ctx.fillStyle = "#000000";
+          for(var r = 0; r < count; r++){
+            for(var c = 0; c < count; c++){
+              if(model.isDark(r, c)) ctx.fillRect(ox + (c + quiet) * scale, oy + (r + quiet) * scale, scale, scale);
+            }
+          }
+          return true;
+        }catch(e){ return false; }
+      }
+      function drawTicketImage(ticket){
+        var d = TICKET_DESIGN[ticket.prizeId] || {};
+        var isJack = (ticket.prizeId === "d100" || ticket.prizeId === "premio" || ticket.prizeId === "d50");
+        var W = 920, CX = W / 2, MX = 56, CW = W - MX * 2;
+        var note = (d.hideNote ? "" : (ticket.prizeNote || ""));
+        /* Fotos que necesita este premio (la principal + las del bloque medio). */
+        var need = [d.photo || ""];
+        if(d.mid === "cards200") need = need.concat(["assets/boleto-bocina200.jpg","assets/boleto-reloj.jpg","assets/boleto-billete-100.jpg","assets/boleto-mica-v.jpg"]);
+        if(d.mid === "grid") for(var gi = 0; gi < TICKET_GRID.length; gi++) need.push(TICKET_GRID[gi].img);
+        return Promise.all(need.map(loadTicketImage)).then(function(loaded){
+          var P = {};
+          for(var i = 0; i < need.length; i++) P[need[i]] = loaded[i];
+          var main = P[d.photo || ""];
+          var perfY = 0;
+          /* Pinta el boleto entero y devuelve su altura total. Se llama dos
+             veces: la primera en un canvas de prueba para medir H, y la
+             segunda en el canvas final (el fondo solo se pinta cuando H
+             ya se conoce). */
+          function paint(ctx, H){
+            var y = 6;
+            if(H){
+              rrPath(ctx, 6, 6, W - 12, H - 12, 44);
+              ctx.fillStyle = "#0a0a0c"; ctx.fill();
+              ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255,.28)"; ctx.stroke();
+            }
+            /* ---- Encabezado: marca + pastilla rosa + insignia ---- */
+            y += 30;
+            ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+            ctx.font = '900 56px "Archivo",sans-serif';
+            var w1 = ctx.measureText("PIN").width, w2 = ctx.measureText("K").width, w3 = ctx.measureText(" CASE").width;
+            var wx = CX - (w1 + w2 + w3) / 2;
+            ctx.fillStyle = "#fff"; ctx.fillText("PIN", wx, y + 56);
+            ctx.fillStyle = "#ff2e92"; ctx.fillText("K", wx + w1, y + 56);
+            ctx.fillStyle = "#fff"; ctx.fillText(" CASE", wx + w1 + w2, y + 56);
+            y += 56 + 18;
+            ctx.font = '900 24px "Archivo",sans-serif';
+            var typeW = ctx.measureText("BOLETO GANADOR · BUEN FIN 2026").width + 56;
+            rrPath(ctx, CX - typeW / 2, y, typeW, 52, 26);
+            ctx.fillStyle = "#ff2e92"; ctx.fill();
+            ctx.fillStyle = "#fff"; ctx.textAlign = "center";
+            ctx.fillText("BOLETO GANADOR · BUEN FIN 2026", CX, y + 35);
+            y += 52;
+            if(isJack){
+              y += 16;
+              ctx.font = '900 22px "Archivo",sans-serif';
+              var bW = ctx.measureText("★ PREMIO MAYOR ★").width + 44;
+              var bGrad = ctx.createLinearGradient(0, y, 0, y + 46);
+              bGrad.addColorStop(0, "#ffc966"); bGrad.addColorStop(1, "#e79b1e");
+              rrPath(ctx, CX - bW / 2, y, bW, 46, 23); ctx.fillStyle = bGrad; ctx.fill();
+              ctx.fillStyle = "#3a2400"; ctx.textAlign = "center";
+              ctx.fillText("★ PREMIO MAYOR ★", CX, y + 31);
+              y += 46;
+            }
+            y += 26;
+            if(d.side){
+              /* ---- $50: título a la izquierda, foto a la derecha ---- */
+              var lx = MX, lw = 396;
+              var rx = MX + 420, rw = CW - 420;
+              ctx.textAlign = "left";
+              ctx.font = '400 64px "Anton","Archivo",sans-serif';
+              ctx.fillStyle = "#fff";
+              ctx.fillText("¡GANASTE!", lx, y + 64);
+              var sy = y + 64 + 10;
+              var ssize = fitFontSize(ctx, "DESCUENTO", "400", '"Anton","Archivo",sans-serif', 78, 54, lw);
+              ctx.font = '400 ' + ssize + 'px "Anton","Archivo",sans-serif';
+              ctx.fillStyle = goldGrad(ctx, sy, sy + ssize * 2);
+              ctx.fillText("$50 DE", lx, sy + ssize);
+              ctx.fillText("DESCUENTO", lx, sy + ssize * 2);
+              sy += ssize * 2 + 14;
+              ctx.font = '600 26px "Archivo",sans-serif';
+              ctx.fillStyle = "#fff";
+              var slines = note ? wrapLines(ctx, note, lw) : [];
+              for(var si = 0; si < slines.length; si++) ctx.fillText(slines[si], lx, sy + 26 + si * 36);
+              sy += slines.length * 36;
+              ctx.fillStyle = "#ff2e92";
+              ctx.fillRect(lx, sy + 12, 96, 7);
+              sy += 12 + 7;
+              var sw = rw, sh = Math.round(rw / 2);
+              var spx = rx, spy = y + 10;
+              ctx.save();
+              ctx.translate(spx + sw / 2, spy + sh / 2); ctx.rotate(-5 * Math.PI / 180); ctx.translate(-(spx + sw / 2), -(spy + sh / 2));
+              rrPath(ctx, spx, spy, sw, sh, 20); ctx.save(); ctx.clip();
+              drawCover(ctx, main, spx, spy, sw, sh);
+              ctx.restore(); ctx.restore();
+              drawSeal(ctx, spx + sw - 14, spy + 14, 58);
+              y = Math.max(sy, spy + sh + 44) + 10;
+            }else{
+              /* ---- ¡GANASTE! + premio en dorado ---- */
+              ctx.textAlign = "center";
+              ctx.font = '400 84px "Anton","Archivo",sans-serif';
+              ctx.fillStyle = "#fff";
+              ctx.fillText("¡GANASTE!", CX, y + 84);
+              y += 84 + 6;
+              if(d.split){
+                /* $100: $100 grande + barra rosa + DE DESCUENTO. */
+                ctx.font = '400 150px "Anton","Archivo",sans-serif';
+                var amtW = ctx.measureText("$100").width;
+                ctx.font = '400 62px "Anton","Archivo",sans-serif';
+                var lblW = Math.max(ctx.measureText("DE").width, ctx.measureText("DESCUENTO").width);
+                var grpW = amtW + 20 + 6 + 20 + lblW;
+                var gx = CX - grpW / 2;
+                ctx.textAlign = "left";
+                ctx.font = '400 150px "Anton","Archivo",sans-serif';
+                ctx.fillStyle = goldGrad(ctx, y, y + 150);
+                ctx.fillText("$100", gx, y + 140);
+                ctx.fillStyle = "#ff2e92";
+                ctx.fillRect(gx + amtW + 20, y + 8, 6, 134);
+                ctx.font = '400 62px "Anton","Archivo",sans-serif';
+                ctx.fillStyle = "#fff";
+                ctx.fillText("DE", gx + amtW + 46, y + 66);
+                ctx.fillText("DESCUENTO", gx + amtW + 46, y + 134);
+                y += 150 + 6;
+              }else{
+                var size = fitFontSize(ctx, ticket.prizeLabel.toUpperCase(), "400", '"Anton","Archivo",sans-serif', 96, 54, CW);
+                ctx.font = '400 ' + size + 'px "Anton","Archivo",sans-serif';
+                ctx.fillStyle = goldGrad(ctx, y, y + size);
+                ctx.textAlign = "center";
+                ctx.fillText(ticket.prizeLabel.toUpperCase(), CX, y + size);
+                y += size + 6;
+              }
+              /* ---- Foto del premio (los billetes, inclinados) ---- */
+              y += 26 + 34; /* holgura para que el sello no toque el título */
+              var pw = 720, ph = 360;
+              if(main && main.naturalWidth){
+                var ps = Math.min(720 / main.naturalWidth, 380 / main.naturalHeight);
+                pw = Math.round(main.naturalWidth * ps); ph = Math.round(main.naturalHeight * ps);
+              }
+              var px = CX - pw / 2, py = y;
+              ctx.save();
+              if(d.tilt){ ctx.translate(CX, y + ph / 2); ctx.rotate(-5 * Math.PI / 180); ctx.translate(-CX, -(y + ph / 2)); }
+              rrPath(ctx, px, py, pw, ph, 24); ctx.save(); ctx.clip();
+              drawCover(ctx, main, px, py, pw, ph);
+              ctx.restore();
+              ctx.restore();
+              drawSeal(ctx, px + pw - 16, py + 16, 62);
+              y += ph + 26 + (d.tilt ? 34 : 0);
+              /* ---- Nota (alcance del premio) ---- */
+              if(note){
+                ctx.font = '600 28px "Archivo",sans-serif';
+                ctx.fillStyle = "#fff"; ctx.textAlign = "center";
+                var nlines = wrapLines(ctx, note, 730);
+                for(var ni = 0; ni < nlines.length; ni++) ctx.fillText(nlines[ni], CX, y + 28 + ni * 38);
+                y += nlines.length * 38 + 10;
+              }
+            }
+            /* ---- Bloque medio según el premio ---- */
+            y += 16;
+            if(d.mid === "chips"){
+              var chw = (CW - 16) / 2;
+              drawMidChip(ctx, MX, y, chw, 92, "layers", "Cristal templado");
+              drawMidChip(ctx, MX + chw + 16, y, chw, 92, "store", "Instalación en tienda");
+              y += 92 + 26;
+            }else if(d.mid === "bar"){
+              rrPath(ctx, MX, y, CW, 96, 12);
+              ctx.fillStyle = "#17171a"; ctx.fill();
+              ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255,.25)"; ctx.stroke();
+              ctx.textAlign = "left";
+              ctx.font = '900 28px "Archivo",sans-serif'; ctx.fillStyle = "#ff2e92";
+              ctx.fillText("TU PREMIO", MX + 24, y + 60);
+              var kw = ctx.measureText("TU PREMIO").width;
+              ctx.fillStyle = "rgba(255,255,255,.3)";
+              ctx.fillRect(MX + 24 + kw + 16, y + 24, 4, 48);
+              ctx.font = '800 30px "Archivo",sans-serif'; ctx.fillStyle = "#fff";
+              ctx.fillText("1 cable tipo C", MX + 24 + kw + 36, y + 61);
+              ctx.save(); ctx.lineWidth = 4; ctx.strokeStyle = "#fff";
+              rrPath(ctx, MX + CW - 24 - 64, y + 31, 64, 34, 17); ctx.stroke(); ctx.restore();
+              y += 96 + 26;
+            }else if(d.mid === "cards200"){
+              y += 24;
+              var cardW = (CW - 16) / 2, cardH = 296;
+              drawPrizeCard(ctx, MX, y, cardW, cardH, "APLICA EN",
+                [P["assets/boleto-bocina200.jpg"], P["assets/boleto-reloj.jpg"]],
+                "Bocinas | Smartwatch", ["$200 de descuento"], false);
+              drawPrizeCard(ctx, MX + cardW + 16, y, cardW, cardH, "O CÁMBIALO POR",
+                [P["assets/boleto-billete-100.jpg"], P["assets/boleto-mica-v.jpg"]],
+                "", ["$100 de descuento", "+ una mica gratis"], true);
+              y += cardH + 26;
+            }else if(d.mid === "grid"){
+              ctx.font = '900 34px "Archivo",sans-serif'; ctx.fillStyle = "#fff";
+              if(d.mirror){
+                ctx.fillStyle = "#ff2e92"; ctx.fillRect(MX, y, 5, 40);
+                ctx.fillStyle = "#fff"; ctx.textAlign = "left";
+                ctx.fillText(d.gridTitle, MX + 16, y + 32);
+                y += 48;
+              }else{
+                var tw = ctx.measureText(d.gridTitle).width;
+                ctx.textAlign = "center";
+                ctx.fillStyle = "#ff2e92";
+                ctx.fillRect(CX - tw / 2 - 76, y + 14, 60, 5);
+                ctx.fillRect(CX + tw / 2 + 16, y + 14, 60, 5);
+                ctx.fillStyle = "#fff";
+                ctx.fillText(d.gridTitle, CX, y + 32);
+                y += 48;
+                if(d.gridSub){
+                  ctx.font = '400 26px "Archivo",sans-serif'; ctx.fillStyle = "#ddd2dd";
+                  ctx.fillText(d.gridSub, CX, y + 26);
+                  y += 40;
+                }
+              }
+              var gW = (CW - 14) / 2, gH = 118;
+              for(var r = 0; r < 3; r++){
+                for(var c2 = 0; c2 < 2; c2++){
+                  var cell = TICKET_GRID[r * 2 + c2];
+                  var cx0 = MX + c2 * (gW + 14), cy0 = y + r * (gH + 14);
+                  rrPath(ctx, cx0, cy0, gW, gH, 12);
+                  ctx.fillStyle = "#17171a"; ctx.fill();
+                  ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255,.25)"; ctx.stroke();
+                  var thumb = P[cell.img];
+                  ctx.font = '800 26px "Archivo",sans-serif'; ctx.fillStyle = "#fff";
+                  ctx.textAlign = "left";
+                  if(!d.mirror){
+                    rrPath(ctx, cx0 + 14, cy0 + 12, 120, 94, 8); ctx.save(); ctx.clip();
+                    drawCover(ctx, thumb, cx0 + 14, cy0 + 12, 120, 94); ctx.restore();
+                    ctx.fillStyle = "#ff2e92";
+                    ctx.fillRect(cx0 + 148, cy0 + 22, 4, 74);
+                    var glines = wrapLines(ctx, cell.label, gW - 178);
+                    var gy = cy0 + gH / 2 - (glines.length - 1) * 17 + 9;
+                    ctx.fillStyle = "#fff";
+                    for(var gl = 0; gl < glines.length; gl++) ctx.fillText(glines[gl], cx0 + 166, gy + gl * 34);
+                  }else{
+                    rrPath(ctx, cx0 + gW - 134, cy0 + 12, 120, 94, 8); ctx.save(); ctx.clip();
+                    drawCover(ctx, thumb, cx0 + gW - 134, cy0 + 12, 120, 94); ctx.restore();
+                    var glines2 = wrapLines(ctx, cell.label, gW - 178);
+                    var gy2 = cy0 + gH / 2 - (glines2.length - 1) * 17 + 9;
+                    for(var gl2 = 0; gl2 < glines2.length; gl2++) ctx.fillText(glines2[gl2], cx0 + 16, gy2 + gl2 * 34);
+                    ctx.fillStyle = "#ff2e92";
+                    ctx.fillRect(cx0 + 16, gy2 + (glines2.length - 1) * 34 + 14, 64, 4);
+                  }
+                }
+              }
+              y += 3 * gH + 2 * 14 + 26;
+            }
+            /* ---- Línea perforada (las muescas se recortan al final) ---- */
+            y += 8;
+            perfY = y + 33;
+            ctx.save();
+            ctx.setLineDash([16, 12]); ctx.lineWidth = 3; ctx.strokeStyle = "rgba(255,255,255,.45)";
+            ctx.beginPath(); ctx.moveTo(6, perfY); ctx.lineTo(W - 6, perfY); ctx.stroke();
+            ctx.restore();
+            y += 66;
+            /* ---- Talón: título, QR + datos ---- */
+            ctx.textAlign = "center"; ctx.font = '900 30px "Archivo",sans-serif'; ctx.fillStyle = "#fff";
+            ctx.fillText("TU BOLETO PARA CANJEAR", CX, y + 30);
+            y += 30 + 22;
+            var qrSize = 280;
+            rrPath(ctx, MX, y, qrSize, qrSize, 16); ctx.fillStyle = "#fff"; ctx.fill();
+            var qrOk = paintQRModules(ctx, MX, y, qrSize, ticket);
+            if(!qrOk){
+              /* Respaldo: el canvas del modal, con suavizado (sin suavizado
+                 los módulos se mezclan y el código no se lee). */
+              var qrBox = $("qrBox");
+              var qrCv = qrBox ? qrBox.querySelector("canvas") : null;
+              if(qrCv){
+                ctx.save(); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+                ctx.drawImage(qrCv, MX + 16, y + 16, qrSize - 32, qrSize - 32);
+                ctx.restore();
+                qrOk = true;
+              }
+            }
+            if(qrOk){
+              var qcx = MX + qrSize / 2, qcy = y + qrSize / 2;
+              ctx.beginPath(); ctx.arc(qcx, qcy, 26, 0, Math.PI * 2);
+              ctx.fillStyle = "#0b0b0d"; ctx.fill();
+              ctx.lineWidth = 3; ctx.strokeStyle = "#fff"; ctx.stroke();
+              ctx.font = '900 18px "Archivo",sans-serif'; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+              ctx.fillStyle = "#fff"; ctx.fillText("PIN", qcx - 8, qcy);
+              ctx.fillStyle = "#ff2e92"; ctx.fillText("K", qcx + 13, qcy);
+              ctx.textBaseline = "alphabetic";
+            }else{
+              ctx.font = '900 22px "Archivo",sans-serif'; ctx.fillStyle = "#111"; ctx.textAlign = "center";
+              ctx.fillText(ticket.folio, MX + qrSize / 2, y + qrSize / 2 + 8);
+            }
+            var divX = MX + qrSize + 28;
+            ctx.fillStyle = "#ff2e92";
+            rrPath(ctx, divX, y + 8, 5, qrSize - 16, 2); ctx.fill();
+            var dx = divX + 24, dy = y + 34;
+            ctx.textAlign = "left";
+            ctx.font = '700 26px "Archivo",sans-serif'; ctx.fillStyle = "#c9c9cf";
+            ctx.fillText("Nombre:", dx, dy);
+            var nl = ctx.measureText("Nombre:").width;
+            var nameSize = fitFontSize(ctx, ticket.name, "800", '"Archivo",sans-serif', 28, 16, MX + CW - (dx + nl + 14));
+            ctx.font = '800 ' + nameSize + 'px "Archivo",sans-serif'; ctx.fillStyle = "#fff";
+            ctx.fillText(ticket.name, dx + nl + 14, dy);
+            dy += 56;
+            ctx.font = '700 26px "Archivo",sans-serif'; ctx.fillStyle = "#c9c9cf";
+            ctx.fillText("Folio:", dx, dy);
+            var fl = ctx.measureText("Folio:").width;
+            ctx.font = '800 26px "Archivo",sans-serif';
+            var fW = ctx.measureText(ticket.folio).width + 32;
+            rrPath(ctx, dx + fl + 14, dy - 26, fW, 40, 20); ctx.fillStyle = "#ff2e92"; ctx.fill();
+            ctx.fillStyle = "#fff"; ctx.fillText(ticket.folio, dx + fl + 30, dy + 3);
+            dy += 56;
+            ctx.font = '700 26px "Archivo",sans-serif'; ctx.fillStyle = "#c9c9cf";
+            ctx.fillText("Vigencia:", dx, dy);
+            var vl = ctx.measureText("Vigencia:").width;
+            ctx.font = '800 28px "Archivo",sans-serif'; ctx.fillStyle = "#fff";
+            ctx.fillText("13–17 nov 2026", dx + vl + 14, dy);
+            ctx.fillText("Ixtlahuaca Centro", dx + vl + 14, dy + 38);
+            y += qrSize;
+            ctx.textAlign = "center"; ctx.font = '600 25px "Archivo",sans-serif'; ctx.fillStyle = "#d3c8d3";
+            ctx.fillText(d.caption || "Muestra tu QR en tienda para canjear tu premio.", CX, y + 40);
+            y += 40;
+            return y + 30;
+          }
+          var dummy = document.createElement("canvas").getContext("2d");
+          var H = paint(dummy, 0);
+          var cv = document.createElement("canvas");
+          cv.width = W; cv.height = H;
+          var ctx = cv.getContext("2d");
+          paint(ctx, H);
+          /* Muescas de la perforación: recortan el borde a los lados. */
+          ctx.save();
+          ctx.globalCompositeOperation = "destination-out";
+          ctx.beginPath(); ctx.arc(6, perfY, 22, 0, Math.PI * 2); ctx.fill();
+          ctx.beginPath(); ctx.arc(W - 6, perfY, 22, 0, Math.PI * 2); ctx.fill();
+          ctx.restore();
+          return cv;
+        });
       }
       $("downloadBtn").addEventListener("click", function(){
         var ticket = state.lastTicket;
@@ -3489,16 +3883,15 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         }
         toast("Generando la imagen de tu boleto…");
         var render = function(){
-          try{
-            var canvas = drawTicketImage(ticket);
+          drawTicketImage(ticket).then(function(canvas){
             var a = document.createElement("a");
             a.download = "boleto-pink-case-" + ticket.folio + ".png";
             a.href = canvas.toDataURL("image/png");
             document.body.appendChild(a); a.click(); a.remove();
             toast("Boleto descargado. Ahora mándalo por WhatsApp con el botón 2 y adjunta esta imagen, tu boleto de descuento.");
-          }catch(e){
+          }).catch(function(){
             toast("No se pudo descargar: haz captura de pantalla a tu boleto.");
-          }
+          });
         };
         if(document.fonts && document.fonts.ready){ document.fonts.ready.then(render, render); }
         else render();
