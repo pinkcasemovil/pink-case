@@ -14,13 +14,13 @@
     <meta property="og:title" content="Ruleta Buen Fin — Pink Case | Gira y Gana" />
     <meta property="og:description" content="Gira la Ruleta Buen Fin de Pink Case y gana descuentos y premios. Un giro por día por nombre, boleto con QR al instante. Del 13 al 17 de noviembre, Ixtlahuaca Centro." />
     <meta property="og:url" content="https://pinkcasee.com/ruleta/" />
-    <meta property="og:image" content="https://pinkcasemovil.github.io/pink-case/ruleta/assets/flyer-ruleta.webp" />
+    <meta property="og:image" content="https://pinkcasemovil.github.io/pink-case/ruleta/assets/flyer-ruleta-v2.webp" />
     <meta property="og:image:width" content="900" />
     <meta property="og:image:height" content="1125" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Ruleta Buen Fin — Pink Case | Gira y Gana" />
     <meta name="twitter:description" content="Gira la Ruleta Buen Fin de Pink Case y gana descuentos y premios. Un giro por día por nombre, boleto con QR al instante. Del 13 al 17 de noviembre, Ixtlahuaca Centro." />
-    <meta name="twitter:image" content="https://pinkcasemovil.github.io/pink-case/ruleta/assets/flyer-ruleta.webp" />
+    <meta name="twitter:image" content="https://pinkcasemovil.github.io/pink-case/ruleta/assets/flyer-ruleta-v2.webp" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
@@ -666,7 +666,7 @@
       .mid-card .mc-label{ font-weight:800; font-size:12.5px; margin-top:8px; }
       .mid-card .mc-label i{ font-style:normal; color:rgba(255,255,255,.55); margin:0 4px; }
       .mid-card .mc-bottom{ margin-top:8px; border:1.5px solid var(--pink); border-radius:9px; padding:6px 6px 7px; font-weight:900; font-size:12px; line-height:1.3; }
-      .mid-grid-title{ font-weight:900; font-size:17px; letter-spacing:.03em; }
+      .mid-grid-title{ font-weight:900; font-size:15px; letter-spacing:.03em; }
       .mid-grid-title.center{ text-align:center; }
       .mid-grid-title.left{ text-align:left; border-left:4px solid var(--pink); padding-left:10px; }
       .mid-grid-sub{ color:#ddd2dd; font-size:13px; margin-top:3px; }
@@ -900,7 +900,6 @@
         transform:skewX(-16deg); transition:left .8s var(--ease-out); pointer-events:none;
       }
       .poster:hover{ transform:translateY(-4px); box-shadow:0 38px 74px rgba(0,0,0,.65), 0 18px 44px rgba(232,17,45,.18), inset 0 0 0 1px rgba(255,255,255,.08); }
-      .poster:hover img{ transform:scale(1.035); }
       .poster:hover::after{ left:125%; }
 
       /* ---------- Bases «En corto»: filas que responden ---------- */
@@ -1287,7 +1286,7 @@
         </div>
         <div class="duo">
           <div class="poster">
-            <img src="assets/flyer-ruleta.webp" alt="Flyer oficial de la Ruleta Buen Fin de Pink Case: ruleta con billetes de $200, $100 y $50 de descuento, smartwatch, cable tipo C y mica gratis, del 13 al 17 de noviembre en Ixtlahuaca Centro" loading="lazy" />
+            <img src="assets/flyer-ruleta-v2.webp" alt="Flyer oficial de la Ruleta Buen Fin de Pink Case: ruleta con billetes de $200, $100 y $50 de descuento, smartwatch, cable tipo C y mica gratis, del 13 al 17 de noviembre en Ixtlahuaca Centro" loading="lazy" />
           </div>
           <div class="bases">
             <h3>En corto — lo que debes saber</h3>
@@ -1572,7 +1571,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
            de «Lo que puedes ganar» (displayOnly). Decisión de Axel:
            que se vea como premio, sin que nadie lo gane. */
         { id:"smartwatch", big:"SMARTWATCH", small:"", bigSize:13, bigLen:72, bigY:-130, color:"gold", weight:0, label:"Smartwatch", note:"", chip:"", chipNote:"", displayOnly:true, img:"assets/smartwatch-v5.png", imgW:84, imgH:56, imgY:-198, wedge:"assets/gajo-smartwatch-v3.jpg" },
-        { id:"cable", big:"CABLE", small:"TIPO C", bigSize:16, bigLen:40, bigY:-158, smallSize:13, smallLen:40, smallY:-114, color:"red",   weight:80,  label:"Cable tipo C",   note:"Un cable tipo C para tu celular.", chip:"Cable tipo C", chipNote:"", img:"assets/cable-v5.png", imgW:68, imgH:44, imgY:-206, wedge:"assets/gajo-cable.png" },
+        { id:"cable", big:"CABLE", small:"TIPO C", bigSize:16, bigLen:40, bigY:-158, smallSize:13, smallLen:40, smallY:-114, color:"red",   weight:80,  label:"Cable tipo C",   note:"Un cable tipo C para tu celular.", chip:"Cable tipo C", chipNote:"", img:"assets/cable-v5.png", imgW:68, imgH:44, imgY:-206, wedge:"assets/gajo-cable-v2.png" },
         { id:"mica",  big:"MICA GRATIS",  small:"", bigSize:12, bigLen:60, bigY:-124, color:"black", weight:180, label:"Una mica gratis",   note:"Una mica de cristal templado para tu celular, instalada en tienda.", chip:"Una mica gratis", chipNote:"Instalación en tienda", img:"assets/mica-v5.png", imgW:56, imgH:76, imgY:-195, wedge:"assets/gajo-mica.png" },
         { id:"otra",  big:"GIRA", small:"OTRA VEZ", bigSize:16, bigLen:40, bigY:-158, smallSize:11, smallLen:40, smallY:-114, color:"red",   weight:50,  label:"Gira otra vez",   note:"", chip:"Gira otra vez", chipNote:"Un giro extra al momento", icon:"retry", wedge:"assets/gajo-otra.png" }
       ];
@@ -3246,11 +3245,11 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         d200:  { photo: "assets/boleto-billete-200.jpg", tilt: true, mid: "cards200",
                  caption: "Muestra tu QR en tienda para canjear tu premio." },
         d100:  { photo: "assets/boleto-billete-100.jpg", tilt: true, split: ["$100", "DE DESCUENTO"],
-                 hideNote: true, mid: "grid", gridTitle: "ÚSALO EN TUS FAVORITOS",
+                 hideNote: true, mid: "grid", gridTitle: "ÚSALO EN TUS ACCESORIOS FAVORITOS",
                  gridSub: "Aplica tu descuento en:", mirror: false,
                  caption: "Muestra tu QR en tienda y disfruta tu descuento." },
         d50:   { photo: "assets/boleto-billete-50.jpg", tilt: true, side: true, mid: "grid",
-                 gridTitle: "ÚSALO EN TUS FAVORITOS", gridSub: "", mirror: true,
+                 gridTitle: "ÚSALO EN TUS ACCESORIOS FAVORITOS", gridSub: "", mirror: true,
                  caption: "Muestra tu QR en tienda para canjear tu premio." },
         cable: { photo: "assets/boleto-cable.jpg", mid: "bar",
                  caption: "Muestra tu QR en tienda para canjear tu premio." },
@@ -3312,7 +3311,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       function openTicket(ticket){
         state.lastTicket = ticket;
         var d = TICKET_DESIGN[ticket.prizeId] || {};
-        var isJack = (ticket.prizeId === "d100" || ticket.prizeId === "premio" || ticket.prizeId === "d50");
+        var isJack = (ticket.prizeId === "d200");
         var badge = $("tBadge"); if(badge) badge.hidden = !isJack;
         /* Título: el $100 lleva el formato dividido ($100 | DE DESCUENTO);
            los demás, la etiqueta del premio en mayúsculas. */
@@ -3558,7 +3557,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       }
       function drawTicketImage(ticket){
         var d = TICKET_DESIGN[ticket.prizeId] || {};
-        var isJack = (ticket.prizeId === "d100" || ticket.prizeId === "premio" || ticket.prizeId === "d50");
+        var isJack = (ticket.prizeId === "d200");
         var W = 920, CX = W / 2, MX = 56, CW = W - MX * 2;
         var note = (d.hideNote ? "" : (ticket.prizeNote || ""));
         /* Fotos que necesita este premio (la principal + las del bloque medio). */
@@ -3734,7 +3733,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
                 "", ["$100 de descuento", "+ una mica gratis"], true);
               y += cardH + 26;
             }else if(d.mid === "grid"){
-              ctx.font = '900 34px "Archivo",sans-serif'; ctx.fillStyle = "#fff";
+              ctx.font = '900 30px "Archivo",sans-serif'; ctx.fillStyle = "#fff";
               if(d.mirror){
                 ctx.fillStyle = "#ff2e92"; ctx.fillRect(MX, y, 5, 40);
                 ctx.fillStyle = "#fff"; ctx.textAlign = "left";
@@ -4278,8 +4277,10 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
             scrollTrigger:{ trigger:sec, start:"top 95%", end:"top 60%", scrub:true } });
         });
 
-        /* 4) Póster y fotos de sucursal: parallax interno con scrub */
-        q(".poster img, .store .photo img").forEach(function(img){
+        /* 4) Fotos de sucursal: parallax interno con scrub (el póster
+           NO lleva parallax: la escala 1.14 lo recortaba y el flyer
+           debe verse completo, decisión de Axel 2026-11-12) */
+        q(".store .photo img").forEach(function(img){
           gsap.fromTo(img, { yPercent:-6, scale:1.14 }, { yPercent:6, scale:1.14, ease:"none",
             scrollTrigger:{ trigger:img.closest(".poster, .store") || img, start:"top bottom", end:"bottom top", scrub:true } });
         });
