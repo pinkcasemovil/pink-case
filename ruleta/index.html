@@ -1634,6 +1634,21 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         function p(n){ return (n<10?"0":"")+n; }
         return { date: todayStr(), time: p(d.getHours())+":"+p(d.getMinutes())+":"+p(d.getSeconds()) };
       }
+
+      /* ================= Vigencia del evento (control interno) ================= */
+      /* La ruleta solo gira del 11 al 17 de noviembre de 2026. Lo que ve el
+         cliente sigue diciendo 13–17 nov (flyer y textos de la página); el
+         control real de fechas vive aquí y en el servidor, para que nadie
+         gire fuera del evento aunque cambie el reloj de su celular. */
+      var EVENT_START = "2026-11-11";
+      var EVENT_END = "2026-11-17";
+      function inEventRange(iso){ return iso >= EVENT_START && iso <= EVENT_END; }
+      function eventState(){
+        var t = todayStr();
+        if(t < EVENT_START) return "before";
+        if(t > EVENT_END) return "after";
+        return "open";
+      }
       function fmtDateLong(iso){
         try{
           var d = new Date(iso+"T12:00:00");
@@ -2689,6 +2704,21 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
             mtCard.hidden = true;
           }
         }
+        /* Fuera de las fechas del evento no se gira. Quien ya tiene
+           boleto de hoy lo sigue viendo (su canje lo controla la
+           hoja); el resto ve la ruleta cerrada. */
+        var ev = eventState();
+        if(ev !== "open" && !alreadyWon){
+          hubBtn.classList.remove("ready");
+          spinBtn.classList.remove("ready");
+          spinBtn.disabled = true;
+          spinBtn.textContent = "RULETA CERRADA";
+          hubCta.textContent = "CERRADA";
+          setStatus(ev === "before"
+            ? "La ruleta abre el 13 de noviembre. Vuelve ese día para girar."
+            : "La ruleta terminó el 17 de noviembre. Gracias por participar.");
+          return;
+        }
         hubBtn.classList.toggle("ready", canSpin && !alreadyWon);
         spinBtn.classList.toggle("ready", canSpin && !alreadyWon);
         if(!state.player){
@@ -2941,6 +2971,13 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         }
         if(state.record && !state.record.retry){
           openTicket(state.lastTicket && state.lastTicket.folio === state.record.folio ? state.lastTicket : ticketFromRecord(state.record));
+          return;
+        }
+        /* Segunda línea del control de fechas: aunque el botón esté
+           desactivado, girar fuera del evento se rechaza aquí. */
+        if(eventState() !== "open"){
+          toast(eventState() === "before" ? "La ruleta abre el 13 de noviembre." : "La ruleta terminó el 17 de noviembre.");
+          refreshUI();
           return;
         }
         ensureAudio();
