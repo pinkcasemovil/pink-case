@@ -395,7 +395,7 @@
       /* Premios: cada tarjeta lleva el color de su gajo en la ruleta */
       .prizes{ display:grid; grid-template-columns:repeat(auto-fill, minmax(158px, 1fr)); gap:10px; }
       .prize-chip{
-        position:relative;
+        position:relative; min-width:0;
         display:flex; align-items:center; gap:10px;
         border-radius:13px; padding:12px 13px;
         font-weight:800; font-size:14.5px; line-height:1.25;
@@ -420,6 +420,22 @@
         box-shadow:0 10px 22px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.16);
       }
       .prize-chip.c-black small{ color:#bdb2c0; }
+      .prize-chip.c-gold{
+        background:linear-gradient(160deg, #ffe9a8 0%, #f7c948 52%, #c98f12 100%);
+        color:#3a2400; border:1px solid #ffe9a8;
+        box-shadow:0 10px 22px rgba(247,201,72,.3), inset 0 1px 0 rgba(255,255,255,.6);
+      }
+      .prize-chip.c-gold small{ color:#6b4a00; }
+      .prize-chip .thumb{
+        width:46px; height:46px; flex:none; border-radius:10px;
+        object-fit:cover; box-shadow:0 2px 8px rgba(0,0,0,.35);
+      }
+      .prize-chip .thumb-icon{
+        display:flex; align-items:center; justify-content:center;
+        background:rgba(0,0,0,.22); color:#fff;
+      }
+      .prize-chip .thumb-icon svg{ width:26px; height:26px; }
+      .prizes .prize-chip:last-child{ grid-column:1 / -1; }
       .prize-chip.jackpot{
         border-color:var(--gold);
         box-shadow:0 0 0 1.5px var(--gold), 0 12px 26px rgba(255,182,72,.22), inset 0 1px 0 rgba(255,255,255,.35);
@@ -961,6 +977,7 @@
       .prize-chip:hover::after{ left:130%; }
       .prize-chip .dot{ transition:transform .3s var(--ease-out); }
       .prize-chip:hover .dot{ transform:scale(1.3); }
+      .prize-chip:hover .thumb{ transform:scale(1.08); }
       .prize-chip.jackpot{ animation:jackpotGlow 2.8s ease-in-out infinite alternate; }
       @keyframes jackpotGlow{
         from{ box-shadow:0 0 0 1.5px var(--gold), 0 12px 26px rgba(255,182,72,.16), inset 0 1px 0 rgba(255,255,255,.35); }
@@ -1333,7 +1350,7 @@
           <span class="block-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H4a1 1 0 0 0-1 1c0 2 1.5 3.5 4 3.5M17 6h3a1 1 0 0 1 1 1c0 2-1.5 3.5-4 3.5"/></svg></span>
           <h2 id="premiosTitle">Lo que puedes ganar</h2>
         </div>
-        <p class="sub offset">6 premios. El de marco dorado es el mayor.</p>
+        <p class="sub offset">7 premios. El de marco dorado es el mayor.</p>
         <div class="prizes" id="prizeGrid"></div>
       </section>
 
@@ -1562,17 +1579,17 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
          smartwatch y más; $200 solo en bocinas y smartwatch; $50 en
          cualquier compra en tienda (ver «Restricciones»). */
       var SEGMENTS = [
-        { id:"d200",  big:"$200",         small:"DESCUENTO", bigSize:30, bigLen:52, bigY:-163, smallSize:9,  smallLen:40, smallY:-114, color:"white", weight:120, label:"$200 de descuento", note:"$200 de descuento en bocinas y smartwatch. O cámbialo por $100 de descuento y una mica gratis.", chip:"$200 de descuento", chipNote:"El premio mayor", img:"assets/billete-200.jpg", imgW:76, imgH:38, imgY:-214, wedge:"assets/gajo-d200.png" },
-        { id:"d100",  big:"$100",         small:"DESCUENTO", bigSize:30, bigLen:52, bigY:-163, smallSize:9,  smallLen:40, smallY:-114, color:"red",   weight:320, label:"$100 de descuento", note:"$100 de descuento en protectores, micas, cargadores, bocinas, smartwatch y más.", chip:"$100 de descuento", chipNote:"En protectores, micas y más", img:"assets/billete-100.jpg", imgW:76, imgH:38, imgY:-214, wedge:"assets/gajo-d100.png" },
-        { id:"d50",   big:"$50",          small:"DESCUENTO", bigSize:30, bigLen:52, bigY:-163, smallSize:9,  smallLen:40, smallY:-114, color:"white", weight:250, label:"$50 de descuento",  note:"$50 de descuento en tu compra en tienda.", chip:"$50 de descuento", chipNote:"", img:"assets/billete-50.jpg", imgW:76, imgH:38, imgY:-214, wedge:"assets/gajo-d50.png" },
-        /* Gajo DECORATIVO de smartwatch: se ve en la ruleta pero su
-           peso es 0, así que el sorteo ponderado NUNCA cae en él,
-           nunca genera boleto ni premio, y NO aparece en la lista
-           de «Lo que puedes ganar» (displayOnly). Decisión de Axel:
-           que se vea como premio, sin que nadie lo gane. */
-        { id:"smartwatch", big:"SMARTWATCH", small:"", bigSize:13, bigLen:72, bigY:-130, color:"gold", weight:0, label:"Smartwatch", note:"", chip:"", chipNote:"", displayOnly:true, img:"assets/smartwatch-v5.png", imgW:84, imgH:56, imgY:-198, wedge:"assets/gajo-smartwatch-v3.jpg" },
-        { id:"cable", big:"CABLE", small:"TIPO C", bigSize:16, bigLen:40, bigY:-158, smallSize:13, smallLen:40, smallY:-114, color:"red",   weight:80,  label:"Cable tipo C",   note:"Un cable tipo C para tu celular.", chip:"Cable tipo C", chipNote:"", img:"assets/cable-v5.png", imgW:68, imgH:44, imgY:-206, wedge:"assets/gajo-cable.png" },
-        { id:"mica",  big:"MICA GRATIS",  small:"", bigSize:12, bigLen:60, bigY:-124, color:"black", weight:180, label:"Una mica gratis",   note:"Una mica de cristal templado para tu celular, instalada en tienda.", chip:"Una mica gratis", chipNote:"Instalación en tienda", img:"assets/mica-v5.png", imgW:56, imgH:76, imgY:-195, wedge:"assets/gajo-mica.png" },
+        { id:"d200",  big:"$200",         small:"DESCUENTO", bigSize:30, bigLen:52, bigY:-163, smallSize:9,  smallLen:40, smallY:-114, color:"white", weight:120, label:"$200 de descuento", note:"$200 de descuento en bocinas y smartwatch. O cámbialo por $100 de descuento y una mica gratis.", chip:"$200 de descuento", chipNote:"El premio mayor", thumb:"assets/billete-200.jpg", img:"assets/billete-200.jpg", imgW:76, imgH:38, imgY:-214, wedge:"assets/gajo-d200.png" },
+        { id:"d100",  big:"$100",         small:"DESCUENTO", bigSize:30, bigLen:52, bigY:-163, smallSize:9,  smallLen:40, smallY:-114, color:"red",   weight:320, label:"$100 de descuento", note:"$100 de descuento en protectores, micas, cargadores, bocinas, smartwatch y más.", chip:"$100 de descuento", chipNote:"Protectores, micas y más", thumb:"assets/billete-100.jpg", img:"assets/billete-100.jpg", imgW:76, imgH:38, imgY:-214, wedge:"assets/gajo-d100.png" },
+        { id:"d50",   big:"$50",          small:"DESCUENTO", bigSize:30, bigLen:52, bigY:-163, smallSize:9,  smallLen:40, smallY:-114, color:"white", weight:250, label:"$50 de descuento",  note:"$50 de descuento en tu compra en tienda.", chip:"$50 de descuento", chipNote:"", thumb:"assets/billete-50.jpg", img:"assets/billete-50.jpg", imgW:76, imgH:38, imgY:-214, wedge:"assets/gajo-d50.png" },
+        /* Gajo DECORATIVO de smartwatch: se ve en la ruleta y en la
+           lista de «Lo que puedes ganar», pero su peso es 0, así
+           que el sorteo ponderado NUNCA cae en él, nunca genera
+           boleto ni premio. Decisión de Axel: que se vea como
+           premio ganable, sin que nadie lo gane. */
+        { id:"smartwatch", big:"SMARTWATCH", small:"", bigSize:13, bigLen:72, bigY:-130, color:"gold", weight:0, label:"Smartwatch", note:"", chip:"Smartwatch", chipNote:"El más deseado", displayOnly:true, thumb:"assets/smartwatch-v5.png", img:"assets/smartwatch-v5.png", imgW:84, imgH:56, imgY:-198, wedge:"assets/gajo-smartwatch-v3.jpg" },
+        { id:"cable", big:"CABLE", small:"TIPO C", bigSize:16, bigLen:40, bigY:-158, smallSize:13, smallLen:40, smallY:-114, color:"red",   weight:80,  label:"Cable tipo C",   note:"Un cable tipo C para tu celular.", chip:"Cable tipo C", chipNote:"", thumb:"assets/boleto-cable-v3.jpg", img:"assets/cable-v5.png", imgW:68, imgH:44, imgY:-206, wedge:"assets/gajo-cable.png" },
+        { id:"mica",  big:"MICA GRATIS",  small:"", bigSize:12, bigLen:60, bigY:-124, color:"black", weight:180, label:"Una mica gratis",   note:"Una mica de cristal templado para tu celular, instalada en tienda.", chip:"Una mica gratis", chipNote:"Instalación en tienda", thumb:"assets/boleto-mica.jpg", img:"assets/mica-v5.png", imgW:56, imgH:76, imgY:-195, wedge:"assets/gajo-mica.png" },
         { id:"otra",  big:"GIRA", small:"OTRA VEZ", bigSize:16, bigLen:40, bigY:-158, smallSize:11, smallLen:40, smallY:-114, color:"red",   weight:50,  label:"Gira otra vez",   note:"", chip:"Gira otra vez", chipNote:"Un giro extra al momento", icon:"retry", wedge:"assets/gajo-otra.png" }
       ];
       var TOTAL_WEIGHT = SEGMENTS.reduce(function(s,x){ return s+x.weight; }, 0);
@@ -1992,12 +2009,19 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       /* ================= Chips de premios ================= */
       function buildPrizeGrid(){
         var grid = $("prizeGrid");
+        /* Los 7 gajos aparecen, incluido el smartwatch: su peso es 0
+           (nunca se gana), pero se muestra como un premio más para
+           que la lista se vea completa. Cada chip lleva la foto de
+           su premio; «gira otra vez» no tiene foto y lleva el icono
+           de reintento. */
         SEGMENTS.forEach(function(seg){
-          if(seg.displayOnly) return; /* el smartwatch es solo decorativo: no es un premio ganable */
           var d = document.createElement("div");
           var isJackpot = /mayor/i.test(seg.chipNote || "");
           d.className = "prize-chip c-" + seg.color + (isJackpot ? " jackpot" : "");
-          var inner = '<span class="dot '+seg.color+'"></span><span>'+seg.chip;
+          var thumb = seg.thumb
+            ? '<img class="thumb" src="' + seg.thumb + '" alt="" loading="lazy" decoding="async" />'
+            : '<span class="thumb thumb-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></span>';
+          var inner = thumb + '<span>'+seg.chip;
           if(isJackpot) inner += '<span class="tag">PREMIO MAYOR</span>';
           if(seg.chipNote) inner += '<small>'+seg.chipNote+'</small>';
           inner += '</span>';
@@ -2275,10 +2299,14 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
               nombre: corto, claro y con la invitación a girar.
            2) Al ganar: Helio dice SOLO «¡Felicidades! ¡Te
               ganaste…!» con el premio EXACTO de ese giro.
-              Hay clip grabado para la mica (gano-mica) y para
-              «Gira otra vez» (gano-otra-vez); los demás premios
-              usan el clip genérico (gano.mp3) o el de premio
-              mayor (premio-mayor.mp3) si es el $200.
+              Cada premio ganable tiene su clip propio grabado
+              (gano-200, gano-100-pesos, gano-50-pesos,
+              gano-cable, gano-mica y gano-otra-vez); el clip
+              genérico (gano.mp3) queda solo como respaldo si
+              algún clip no carga. Los clips viejos de los
+              descuentos en % (gano-10/20/30/40/50/100), el
+              2×1 y el premio sorpresa ya NO se usan: esos
+              premios no existen desde el rediseño del flyer.
          Mientras la ruleta gira NO hay voz: solo suenan la
          música de juego y los clics de los gajos. Tampoco hay
          voz al avisar «ya giraste hoy»: ese aviso se lee en
@@ -2290,24 +2318,23 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
          y vuelve a subir al terminar la frase. */
       var NARR_CLIPS = {
         bienvenidaCorta: "assets/voz/bienvenida-corta.mp3",
-        gano100: "assets/voz/gano-100.mp3",
-        gano50: "assets/voz/gano-50.mp3",
-        gano40: "assets/voz/gano-40.mp3",
-        gano30: "assets/voz/gano-30.mp3",
-        gano20: "assets/voz/gano-20.mp3",
-        gano10: "assets/voz/gano-10.mp3",
+        gano200: "assets/voz/gano-200.mp3",
+        gano100pesos: "assets/voz/gano-100-pesos.mp3",
+        gano50pesos: "assets/voz/gano-50-pesos.mp3",
+        ganoCable: "assets/voz/gano-cable.mp3",
         ganoMica: "assets/voz/gano-mica.mp3",
-        gano2x1: "assets/voz/gano-2x1.mp3",
-        ganoPremio: "assets/voz/gano-premio.mp3",
         ganoOtra: "assets/voz/gano-otra-vez.mp3",
-        gano: "assets/voz/gano.mp3",
-        premioMayor: "assets/voz/premio-mayor.mp3"
+        gano: "assets/voz/gano.mp3"
       };
-      /* Clip de «¡Felicidades! ¡Te ganaste…!» por gajo: solo la mica
-         y «gira otra vez» tienen clip propio grabado; los premios
-         nuevos ($200, $100, $50 y cable) usan el clip genérico
-         (o el de premio mayor si es el $200). */
+      /* Clip de «¡Felicidades! ¡Te ganaste…!» por gajo: cada premio
+         ganable tiene su clip propio (con el monto en pesos, no en
+         %). El smartwatch no tiene clip: su peso es 0 y nunca se
+         gana, así que ese caso nunca suena. */
       var WIN_CLIP_BY_SEG = {
+        d200: "gano200",
+        d100: "gano100pesos",
+        d50: "gano50pesos",
+        cable: "ganoCable",
         mica: "ganoMica",
         otra: "ganoOtra"
       };
@@ -2679,7 +2706,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
          (y al de Premio Mayor si es premio mayor). */
       function narrateWin(seg, isJackpot){
         narratorClearTimers();
-        var key = (seg && WIN_CLIP_BY_SEG[seg.id]) || (isJackpot ? "premioMayor" : "gano");
+        var key = (seg && WIN_CLIP_BY_SEG[seg.id]) || "gano"; /* el $200 tiene su propio clip (gano200) */
         var t = setTimeout(function(){ narratorPlay(key); }, 650);
         narrator.timers.push(t);
       }
@@ -3251,7 +3278,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         d50:   { photo: "assets/boleto-billete-50.jpg", tilt: true, side: true, mid: "grid",
                  gridTitle: "ÚSALO EN TUS ACCESORIOS FAVORITOS", gridSub: "", mirror: true,
                  caption: "Muestra tu QR en tienda para canjear tu premio." },
-        cable: { photo: "assets/boleto-cable-v2.jpg", mid: "bar",
+        cable: { photo: "assets/boleto-cable-v3.jpg", mid: "bar",
                  caption: "Muestra tu QR en tienda para canjear tu premio." },
         mica:  { photo: "assets/boleto-mica.jpg", mid: "chips",
                  caption: "Muestra tu QR en tienda para canjear tu premio." }
@@ -3267,7 +3294,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       /* Precarga las fotos del boleto para que el modal las muestre al instante. */
       (function preloadTicketPhotos(){
         var files = ["boleto-billete-200.jpg","boleto-billete-100.jpg","boleto-billete-50.jpg",
-          "boleto-cable-v2.jpg","boleto-mica.jpg","boleto-funda.jpg","boleto-mica-chip.jpg",
+          "boleto-cable-v3.jpg","boleto-mica.jpg","boleto-funda.jpg","boleto-mica-chip.jpg",
           "boleto-cargador.jpg","boleto-bocina.jpg","boleto-reloj.jpg","boleto-audifonos.jpg",
           "boleto-bocina200.jpg","boleto-mica-v.jpg"];
         for(var i = 0; i < files.length; i++){ var im = new Image(); im.src = "assets/" + files[i]; }
