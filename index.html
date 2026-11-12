@@ -838,12 +838,27 @@
         let s = location.hash.slice(7).replace(/-/g, "+").replace(/_/g, "/");
         while (s.length % 4) s += "=";
         const payload = JSON.parse(decodeURIComponent(escape(atob(s))));
-        inquiryItems = (payload.items || []).map(([code, qty]) => ({ code, qty })).filter(i => byCode[i.code]);
-        folio = payload.f || newFolio();
+        /* Seguridad: la liga la puede armar cualquiera. El folio solo se
+           acepta con el formato real (PC- + 4 caracteres) y cada
+           artículo debe ser un producto real del catálogo, con su
+           cantidad forzada a entero entre 1 y 99. Lo demás se ignora. */
+        const folioOk = typeof payload.f === "string" && /^PC-[A-Z0-9]{4}$/.test(payload.f);
+        inquiryItems = (payload.items || [])
+          .map(([code, qty]) => ({ code, qty: parseInt(qty, 10) }))
+          .filter(i => Object.prototype.hasOwnProperty.call(byCode, i.code) && Number.isInteger(i.qty) && i.qty >= 1)
+          .map(i => ({ code: i.code, qty: Math.min(99, i.qty) }));
+        folio = folioOk ? payload.f : newFolio();
         const banner = document.getElementById("shared-banner");
         if (banner && inquiryItems.length) {
           banner.classList.remove("hidden");
-          banner.innerHTML = `🔎 <strong>Estás viendo una lista compartida</strong> · Folio ${folio} — esto es lo que el cliente quiere consultar: productos, cantidades y total.`;
+          /* El banner se construye como texto, no como HTML, para que
+             el contenido de la liga nunca se interprete como código. */
+          banner.textContent = "";
+          banner.append("🔎 ");
+          const bannerTitle = document.createElement("strong");
+          bannerTitle.textContent = "Estás viendo una lista compartida";
+          banner.append(bannerTitle);
+          banner.append(` · Folio ${folio} — esto es lo que el cliente quiere consultar: productos, cantidades y total.`);
         }
         return inquiryItems.length > 0;
       } catch (e) { return false; }
