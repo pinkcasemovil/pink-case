@@ -1534,18 +1534,18 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
          smartwatch y más; $200 solo en bocinas y smartwatch; $50 en
          cualquier compra en tienda (ver «Restricciones»). */
       var SEGMENTS = [
-        { id:"d200",  big:"$200",         small:"DESCUENTO", bigSize:30, bigLen:52, bigY:-163, smallSize:9,  smallLen:40, smallY:-114, color:"white", weight:120, label:"$200 de descuento", note:"$200 de descuento en bocinas y smartwatch. O cámbialo por $100 de descuento y una mica gratis.", chip:"$200 de descuento", chipNote:"El premio mayor", img:"assets/billete-200.jpg", imgW:76, imgH:38, imgY:-214 },
-        { id:"d100",  big:"$100",         small:"DESCUENTO", bigSize:30, bigLen:52, bigY:-163, smallSize:9,  smallLen:40, smallY:-114, color:"red",   weight:320, label:"$100 de descuento", note:"$100 de descuento en protectores, micas, cargadores, bocinas, smartwatch y más.", chip:"$100 de descuento", chipNote:"En protectores, micas y más", img:"assets/billete-100.jpg", imgW:76, imgH:38, imgY:-214 },
-        { id:"d50",   big:"$50",          small:"DESCUENTO", bigSize:30, bigLen:52, bigY:-163, smallSize:9,  smallLen:40, smallY:-114, color:"white", weight:250, label:"$50 de descuento",  note:"$50 de descuento en tu compra en tienda.", chip:"$50 de descuento", chipNote:"", img:"assets/billete-50.jpg", imgW:76, imgH:38, imgY:-214 },
+        { id:"d200",  big:"$200",         small:"DESCUENTO", bigSize:30, bigLen:52, bigY:-163, smallSize:9,  smallLen:40, smallY:-114, color:"white", weight:120, label:"$200 de descuento", note:"$200 de descuento en bocinas y smartwatch. O cámbialo por $100 de descuento y una mica gratis.", chip:"$200 de descuento", chipNote:"El premio mayor", img:"assets/billete-200.jpg", imgW:76, imgH:38, imgY:-214, wedge:"assets/gajo-d200.png" },
+        { id:"d100",  big:"$100",         small:"DESCUENTO", bigSize:30, bigLen:52, bigY:-163, smallSize:9,  smallLen:40, smallY:-114, color:"red",   weight:320, label:"$100 de descuento", note:"$100 de descuento en protectores, micas, cargadores, bocinas, smartwatch y más.", chip:"$100 de descuento", chipNote:"En protectores, micas y más", img:"assets/billete-100.jpg", imgW:76, imgH:38, imgY:-214, wedge:"assets/gajo-d100.png" },
+        { id:"d50",   big:"$50",          small:"DESCUENTO", bigSize:30, bigLen:52, bigY:-163, smallSize:9,  smallLen:40, smallY:-114, color:"white", weight:250, label:"$50 de descuento",  note:"$50 de descuento en tu compra en tienda.", chip:"$50 de descuento", chipNote:"", img:"assets/billete-50.jpg", imgW:76, imgH:38, imgY:-214, wedge:"assets/gajo-d50.png" },
         /* Gajo DECORATIVO de smartwatch: se ve en la ruleta pero su
            peso es 0, así que el sorteo ponderado NUNCA cae en él,
            nunca genera boleto ni premio, y NO aparece en la lista
            de «Lo que puedes ganar» (displayOnly). Decisión de Axel:
            que se vea como premio, sin que nadie lo gane. */
-        { id:"smartwatch", big:"SMARTWATCH", small:"", bigSize:13, bigLen:72, bigY:-130, color:"gold", weight:0, label:"Smartwatch", note:"", chip:"", chipNote:"", displayOnly:true, img:"assets/smartwatch-v5.png", imgW:84, imgH:56, imgY:-198 },
-        { id:"cable", big:"CABLE", small:"TIPO C", bigSize:16, bigLen:40, bigY:-158, smallSize:13, smallLen:40, smallY:-114, color:"red",   weight:80,  label:"Cable tipo C",   note:"Un cable tipo C para tu celular.", chip:"Cable tipo C", chipNote:"", img:"assets/cable-v5.png", imgW:68, imgH:44, imgY:-206 },
-        { id:"mica",  big:"MICA GRATIS",  small:"", bigSize:12, bigLen:60, bigY:-124, color:"black", weight:180, label:"Una mica gratis",   note:"Una mica de cristal templado para tu celular, instalada en tienda.", chip:"Una mica gratis", chipNote:"Instalación en tienda", img:"assets/mica-v5.png", imgW:56, imgH:76, imgY:-195 },
-        { id:"otra",  big:"GIRA", small:"OTRA VEZ", bigSize:16, bigLen:40, bigY:-158, smallSize:11, smallLen:40, smallY:-114, color:"red",   weight:50,  label:"Gira otra vez",   note:"", chip:"Gira otra vez", chipNote:"Un giro extra al momento", icon:"retry" }
+        { id:"smartwatch", big:"SMARTWATCH", small:"", bigSize:13, bigLen:72, bigY:-130, color:"gold", weight:0, label:"Smartwatch", note:"", chip:"", chipNote:"", displayOnly:true, img:"assets/smartwatch-v5.png", imgW:84, imgH:56, imgY:-198, wedge:"assets/gajo-smartwatch.jpg" },
+        { id:"cable", big:"CABLE", small:"TIPO C", bigSize:16, bigLen:40, bigY:-158, smallSize:13, smallLen:40, smallY:-114, color:"red",   weight:80,  label:"Cable tipo C",   note:"Un cable tipo C para tu celular.", chip:"Cable tipo C", chipNote:"", img:"assets/cable-v5.png", imgW:68, imgH:44, imgY:-206, wedge:"assets/gajo-cable.png" },
+        { id:"mica",  big:"MICA GRATIS",  small:"", bigSize:12, bigLen:60, bigY:-124, color:"black", weight:180, label:"Una mica gratis",   note:"Una mica de cristal templado para tu celular, instalada en tienda.", chip:"Una mica gratis", chipNote:"Instalación en tienda", img:"assets/mica-v5.png", imgW:56, imgH:76, imgY:-195, wedge:"assets/gajo-mica.png" },
+        { id:"otra",  big:"GIRA", small:"OTRA VEZ", bigSize:16, bigLen:40, bigY:-158, smallSize:11, smallLen:40, smallY:-114, color:"red",   weight:50,  label:"Gira otra vez",   note:"", chip:"Gira otra vez", chipNote:"Un giro extra al momento", icon:"retry", wedge:"assets/gajo-otra.png" }
       ];
       var TOTAL_WEIGHT = SEGMENTS.reduce(function(s,x){ return s+x.weight; }, 0);
       var SEG_ANGLE = 360 / SEGMENTS.length;
@@ -1835,6 +1835,8 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         return "M "+cx+" "+cy+" L "+p0[0].toFixed(2)+" "+p0[1].toFixed(2)+
                " A "+r+" "+r+" 0 "+large+" 1 "+p1[0].toFixed(2)+" "+p1[1].toFixed(2)+" Z";
       }
+      /* Ruleta v6: gajos con imagen de fondo (foto + texto en una
+         sola imagen por gajo, recortada con clipPath). */
       function buildWheel(){
         var NS = "http://www.w3.org/2000/svg";
         var svg = document.createElementNS(NS, "svg");
@@ -1866,7 +1868,6 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
            el gajo decorativo del smartwatch, con texto negro para que
            SMART / WATCH se lean con buen contraste sobre el dorado. */
         var fills = { black:"#16161a", white:"#ffffff", red:"#e8112d", gold:"#ffb648" };
-        var textColors = { black:"#ffffff", white:"#101013", red:"#ffffff", gold:"#1c1206" };
 
         SEGMENTS.forEach(function(seg, i){
           var a0 = i * SEG_ANGLE, a1 = a0 + SEG_ANGLE;
@@ -1881,91 +1882,33 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
           var g = document.createElementNS(NS, "g");
           g.setAttribute("transform", "rotate(" + mid + ")");
 
-          /* Imagen del premio (billete, reloj, cable o mica) en la
-             zona exterior del gajo, o el icono de flechas en
-             «Gira otra vez»: el texto baja hacia el centro.
-             La foto va DERECHA (sin girar con el gajo), como en
-             el flyer: el grupo interno deshace la rotación. */
-          var hasVisual = !!(seg.img || seg.icon);
-          if(seg.img){
-            var ig = document.createElementNS(NS, "g");
-            ig.setAttribute("transform", "translate(0," + seg.imgY + ") rotate(" + (-mid) + ")");
-            var im = document.createElementNS(NS, "image");
-            im.setAttribute("x", (-seg.imgW / 2).toFixed(1));
-            im.setAttribute("y", (-seg.imgH / 2).toFixed(1));
-            im.setAttribute("width", seg.imgW);
-            im.setAttribute("height", seg.imgH);
-            im.setAttribute("preserveAspectRatio", "xMidYMid slice");
-            im.setAttribute("href", seg.img);
-            im.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", seg.img);
-            ig.appendChild(im);
-            g.appendChild(ig);
-          }
-          if(seg.icon === "retry"){
-            /* Flecha circular (arco de 260° + punta): se dibuja con
-               trigonometría para que la punta siga la tangente. */
-            var rcx = 0, rcy = -208, rr = 24;
-            var ra0 = -60 * Math.PI / 180, ra1 = 200 * Math.PI / 180;
-            var rx0 = rcx + rr * Math.cos(ra0), ry0 = rcy + rr * Math.sin(ra0);
-            var rx1 = rcx + rr * Math.cos(ra1), ry1 = rcy + rr * Math.sin(ra1);
-            var rArc = document.createElementNS(NS, "path");
-            rArc.setAttribute("d", "M " + rx0.toFixed(1) + " " + ry0.toFixed(1) + " A " + rr + " " + rr + " 0 1 1 " + rx1.toFixed(1) + " " + ry1.toFixed(1));
-            rArc.setAttribute("fill", "none");
-            rArc.setAttribute("stroke", textColors[seg.color]);
-            rArc.setAttribute("stroke-width", "7");
-            rArc.setAttribute("stroke-linecap", "round");
-            g.appendChild(rArc);
-            var rtx = -Math.sin(ra1), rty = Math.cos(ra1);
-            var rnx = Math.cos(ra1), rny = Math.sin(ra1);
-            var rHead = document.createElementNS(NS, "polygon");
-            rHead.setAttribute("points",
-              (rx1 + rtx * 10).toFixed(1) + "," + (ry1 + rty * 10).toFixed(1) + " " +
-              (rx1 + rnx * 8 - rtx * 2).toFixed(1) + "," + (ry1 + rny * 8 - rty * 2).toFixed(1) + " " +
-              (rx1 - rnx * 8 - rtx * 2).toFixed(1) + "," + (ry1 - rny * 8 - rty * 2).toFixed(1));
-            rHead.setAttribute("fill", textColors[seg.color]);
-            g.appendChild(rHead);
-          }
+          /* v6: cada gajo es UNA sola imagen de fondo (foto + texto
+             ya integrados, estilo flyer), de 230x159 unidades, con
+             su borde superior en el aro (radio 238) y el inferior
+             en el centro (radio 79). El clipPath recorta la imagen
+             rectangular a la forma del gajo, en el marco local del
+             grupo (el gajo va de -SEG_ANGLE/2 a +SEG_ANGLE/2
+             alrededor del bisector). El relleno plano queda debajo
+             como respaldo si la imagen no carga. */
+          var clipId = "clipWedge" + i;
+          var clip = document.createElementNS(NS, "clipPath");
+          clip.setAttribute("id", clipId);
+          var clipPath = document.createElementNS(NS, "path");
+          clipPath.setAttribute("d", wedgePath(0, 0, 238, -SEG_ANGLE / 2 + .6, SEG_ANGLE / 2 - .6));
+          clip.appendChild(clipPath);
+          defs.appendChild(clip);
 
-          /* Opción B: DOS líneas radiales por gajo (grande +
-             chica), foto derecha arriba. El gajo mide 159 de
-             radio (79–238), así que la foto se achicó y la línea
-             chica va en letra 9–13. Dinero: foto 195..233, big
-             137..189, small 94..134. Cable/gira: igual, con foto
-             184..228. Reloj y mica quedan con UNA línea (el reloj
-             es una sola palabra y así su foto va más grande; la
-             foto de la mica es vertical y dos líneas no cabrían).
-             El aro dorado del centro llega a ~91: la línea chica
-             termina en 94. */
-          var big = document.createElementNS(NS, "text");
-          big.setAttribute("transform", "translate(0," + (seg.bigY || -135) + ") rotate(-90)");
-          big.setAttribute("textLength", seg.bigLen || "76");
-          big.setAttribute("lengthAdjust", "spacingAndGlyphs");
-          big.setAttribute("text-anchor", "middle");
-          big.setAttribute("dominant-baseline", "middle");
-          big.setAttribute("fill", textColors[seg.color]);
-          big.setAttribute("font-family", "Archivo, sans-serif");
-          big.setAttribute("font-weight", "900");
-          big.setAttribute("font-size", seg.bigSize);
-          big.setAttribute("letter-spacing", ".01em");
-          big.textContent = seg.big;
-          g.appendChild(big);
-
-          if(seg.small){
-            var small = document.createElementNS(NS, "text");
-            small.setAttribute("transform", "translate(0," + (seg.smallY || -116) + ") rotate(-90)");
-            small.setAttribute("font-size", seg.smallSize || 12);
-            small.setAttribute("textLength", seg.smallLen || "72");
-            small.setAttribute("lengthAdjust", "spacingAndGlyphs");
-            small.setAttribute("text-anchor", "middle");
-            small.setAttribute("dominant-baseline", "middle");
-            small.setAttribute("fill", textColors[seg.color]);
-            small.setAttribute("opacity", seg.color === "white" ? ".82" : ".96");
-            small.setAttribute("font-family", "Archivo, sans-serif");
-            small.setAttribute("font-weight", "800");
-            small.setAttribute("letter-spacing", ".02em");
-            small.textContent = seg.small;
-            g.appendChild(small);
-          }
+          var cg = document.createElementNS(NS, "g");
+          cg.setAttribute("clip-path", "url(#" + clipId + ")");
+          var wim = document.createElementNS(NS, "image");
+          wim.setAttribute("x", "-115");
+          wim.setAttribute("y", "-238");
+          wim.setAttribute("width", "230");
+          wim.setAttribute("height", "159");
+          wim.setAttribute("href", seg.wedge);
+          wim.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", seg.wedge);
+          cg.appendChild(wim);
+          g.appendChild(cg);
           svg.appendChild(g);
         });
 
