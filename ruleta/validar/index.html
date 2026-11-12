@@ -581,11 +581,10 @@
         var m = String(text).toUpperCase().match(/PC-[A-Z0-9]{6}/);
         return m ? m[0] : null;
       }
-      function fieldFromQR(text, label){
-        if(!text) return "";
-        var m = String(text).match(new RegExp(label + ":\\s*(.+)", "i"));
-        return m ? m[1].trim() : "";
-      }
+      /* Se eliminó la validación por el QR: el texto del QR lo escribe
+         quien imprime el boleto, así que nunca puede probar que el
+         premio sea real. Solo la hoja (o un registro guardado en este
+         celular) valida un boleto. */
       function showValResult(data){
         valCurrent = data;
         var rows = "";
@@ -650,12 +649,6 @@
             estado: rec.estado === "Canjeado" ? "Canjeado" : "Pendiente",
             canjeadoEl: rec.canjeadoEl || "", source: "este celular" };
         }
-        function fromQR(){
-          return { found: true, folio: folio, localKey: null,
-            nombre: fieldFromQR(qrText, "Nombre"), premio: fieldFromQR(qrText, "Premio"),
-            fecha: "", hora: "", estado: "Pendiente", canjeadoEl: "",
-            source: "el QR del boleto (sin confirmar en la hoja)" };
-        }
         if(remoteEnabled()){
           valResult.className = "val-result info";
           valResult.innerHTML = '<div class="vr-title">Buscando el folio en la hoja…</div>';
@@ -684,25 +677,26 @@
               }else if(q && q.ok !== false){
                 showValResult({ found: false, folio: folio });
               }else if(local){
+                /* El puente respondió un error: solo se acepta un
+                   registro guardado en este celular. El QR nunca
+                   valida por sí solo. */
                 showValResult(fromLocal());
-              }else if(qrText){
-                showValResult(fromQR());
               }else{
                 showValResult({ found: false, folio: folio });
               }
             })
             .catch(function(){
-              /* El puente no respondió: se valida con los registros
-                 de este celular y se avisa en pequeño. */
+              /* El puente no respondió: solo se acepta un registro
+                 guardado en este celular y se avisa en pequeño. Sin
+                 hoja no hay boleto válido: el QR no valida por sí
+                 solo, porque cualquiera puede imprimir uno falso. */
               noteCentralFail();
               if(local) showValResult(fromLocal());
-              else if(qrText) showValResult(fromQR());
               else showValResult({ found: false, folio: folio });
             });
           return;
         }
         if(local){ showValResult(fromLocal()); return; }
-        if(qrText){ showValResult(fromQR()); return; }
         showValResult({ found: false, folio: folio });
       }
       function canjearCurrent(){
