@@ -301,26 +301,30 @@
          CONEXIÓN CON GOOGLE SHEETS — el mismo puente de Apps Script
          que usa la ruleta pública (cuenta pinkcasemoovil@gmail.com,
          copia «Copia de Ruleta Buen Fin Pink Case - Giros»).
-         Esta página usa tres acciones del puente:
-           · ?action=login&user=<usuario>&pin=<pin>
+         Esta página usa tres acciones del puente, TODAS POR POST
+         con el cuerpo en JSON (el PIN y el token nunca van en la
+         URL, así no quedan en el historial ni en registros):
+           · { "action": "login", "user": <usuario>, "pin": <pin> }
                   → éxito { "ok": true, "token": "<token>" } (vigencia
                     8 horas); error { "ok": false, "error": "bad_login" }
                     sin decir qué campo falló. La verificación ocurre
                     en Google: el PIN vive en el puente, NUNCA en esta
                     página, y aquí solo se guarda el token devuelto.
-           · ?action=validar&folio=<folio>&token=<token>
+           · { "action": "validar", "folio": <folio>, "token": <token> }
                   → { "ok": true, "found": true|false, "nombre": …,
                       "premio": …, "fecha": …, "hora": …,
                       "estado": "Pendiente"|"Canjeado", … }
-           · ?action=canjear&folio=<folio>&token=<token>
+           · { "action": "canjear", "folio": <folio>, "token": <token> }
                   (marca ese boleto como Canjeado en «Giros»)
            Sin token, con token inválido o vencido, validar/canjear
            responden { "ok": false, "error": "unauthorized" } y esta
            página vuelve al inicio de sesión.
          Si el puente NO responde (sin internet, error o timeout de
          8 s), el validador sigue con los registros guardados en este
-         celular (los boletos que se generaron aquí) y con los datos
-         que trae el propio QR, y avisa en pequeño.
+         celular (los boletos que se generaron aquí) y avisa en
+         pequeño. El QR nunca valida por sí solo. Los canjes que no
+         lleguen a la hoja quedan en una cola de pendientes y se
+         reintentan solos al entrar de nuevo o al volver la conexión.
          ================================================================ */
       var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaLju4YnKKt5C55CTo4B4N01A0WacpsdVKw_QcWmu0D7GJjqYxNud2NaihwrVeDUjInw/exec"; /* Puente de Apps Script de la hoja «Giros» (desplegado 2026-11-08) */
 
@@ -403,25 +407,26 @@
       function remoteEnabled(){
         return typeof APPS_SCRIPT_URL === "string" && APPS_SCRIPT_URL.length > 10;
       }
-      function bridgeUrl(action, pairs){
-        var sep = APPS_SCRIPT_URL.indexOf("?") >= 0 ? "&" : "?";
-        var q = "action=" + encodeURIComponent(action);
-        (pairs || []).forEach(function(p){
-          q += "&" + p[0] + "=" + encodeURIComponent(p[1] == null ? "" : p[1]);
-        });
-        return APPS_SCRIPT_URL + sep + q;
-      }
-      function remoteFetch(url){
+      /* POST con el cuerpo en JSON: el PIN y el token viajan en el
+         cuerpo, nunca en la URL, así no quedan en el historial del
+         navegador ni en registros. Se usa text/plain (no
+         application/json) para que el navegador no dispare una
+         petición previa de CORS; el puente lee el cuerpo igual
+         (doPost) y acepta las mismas acciones que por GET. */
+      function remotePost(payload){
+        var body = JSON.stringify(payload || {});
+        var opts = { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: body };
         if(typeof AbortController === "function" && typeof fetch === "function"){
           var ctrl = new AbortController();
           var timer = setTimeout(function(){ try{ ctrl.abort(); }catch(e){ /* noop */ } }, 8000);
-          return fetch(url, { signal: ctrl.signal }).then(function(r){
+          opts.signal = ctrl.signal;
+          return fetch(APPS_SCRIPT_URL, opts).then(function(r){
             clearTimeout(timer); return r;
           }, function(err){
             clearTimeout(timer); throw err;
           });
         }
-        return fetch(url);
+        return fetch(APPS_SCRIPT_URL, opts);
       }
       function noteCentralFail(){
         var nv = $("valConnNote");
@@ -431,7 +436,7 @@
         var n = $("valConnNote");
         if(n) n.textContent = remoteEnabled()
           ? "Conectado a la hoja «Copia de Ruleta Buen Fin Pink Case - Giros»: la validación se hace contra la hoja y el canje queda marcado ahí."
-          : "Sin conexión a la hoja: el escáner valida los boletos guardados en este celular y los datos del QR.";
+          : "Sin conexión a la hoja: el escáner solo valida los boletos guardados en este celular.";
       })();
 
       /* ================= Lector de QR bajo demanda =================
@@ -507,6 +512,7 @@
       }
       (function initAdminLogin(){
         refreshAdminUI();
+        if(isAdminLoggedIn()) flushPendingCanjes();
         var form = $("adminLoginForm");
         if(form){
           form.addEventListener("submit", function(ev){
@@ -529,9 +535,10 @@
             if(submitBtn){ submitBtn.disabled = true; submitBtn.textContent = "Entrando…"; }
             if(err) err.hidden = true;
             /* La contraseña viaja SOLO en esta llamada al puente,
-               que la verifica en Google (action=login). De la
+               en el cuerpo de un POST (nunca en la URL), y el
+               puente la verifica en Google (action=login). De la
                respuesta solo se guarda el token. */
-            remoteFetch(bridgeUrl("login", [["user", user], ["pin", pass]]))
+            remotePost({ action: "login", user: user, pin: pass })
               .then(function(r){
                 if(!r.ok) throw new Error("http " + r.status);
                 return r.json();
@@ -544,6 +551,9 @@
                   if(submitBtn){ submitBtn.disabled = false; submitBtn.textContent = "Iniciar sesión"; }
                   refreshAdminUI();
                   toast("Sesión de administrador iniciada.");
+                  /* Al entrar, se reintentan los canjes que
+                     hubieran quedado pendientes sin conexión. */
+                  flushPendingCanjes();
                 }else{
                   loginFailed();
                 }
@@ -556,6 +566,11 @@
         var out1 = $("adminLogoutBtn"); if(out1) out1.addEventListener("click", adminLogout);
         var out2 = $("adminLogoutBtnPanel"); if(out2) out2.addEventListener("click", adminLogout);
       })();
+      /* Si se va la conexión y vuelve, los canjes pendientes
+         se reintentan solos, sin esperar a entrar de nuevo. */
+      if(typeof window !== "undefined" && window.addEventListener){
+        window.addEventListener("online", function(){ if(isAdminLoggedIn()) flushPendingCanjes(); });
+      }
 
       /* ================= Validar boleto — escáner del equipo en tienda =================
            · Cámara: lee el QR del boleto con getUserMedia +
@@ -563,9 +578,9 @@
              cámara no sale a ningún servidor).
            · Folio a mano: respaldo cuando no hay cámara.
            · Validación: busca el folio en la hoja «Giros» vía el
-             puente (action=validar); si el puente no responde,
-             valida con los registros de este celular y con los
-             datos que trae el propio QR.
+             puente (action=validar, por POST); si el puente no
+             responde, solo vale un registro guardado en este
+             celular. El QR nunca valida por sí solo.
            · Canje: «Marcar como canjeado» deja el folio como
              Canjeado en la hoja (action=canjear) y en este celular,
              para que el mismo boleto no se use dos veces. */
@@ -653,7 +668,7 @@
           valResult.className = "val-result info";
           valResult.innerHTML = '<div class="vr-title">Buscando el folio en la hoja…</div>';
           valResult.hidden = false;
-          remoteFetch(bridgeUrl("validar", [["folio", folio], ["token", getAdminToken()]]))
+          remotePost({ action: "validar", folio: folio, token: getAdminToken() })
             .then(function(r){
               if(!r.ok) throw new Error("http " + r.status);
               return r.json();
@@ -699,6 +714,81 @@
         if(local){ showValResult(fromLocal()); return; }
         showValResult({ found: false, folio: folio });
       }
+      /* ================= Canjes pendientes (sin conexión) =================
+         Cuando un canje no llega a la hoja (sin internet o el puente
+         no responde), el folio queda en una cola de pendientes en
+         este celular y se reintenta solo al entrar de nuevo o al
+         volver la conexión. La hoja termina enterándose del canje
+         aunque la tienda estuviera sin internet en ese momento. */
+      var CANJES_KEY = LS_KEY + "-canjes-pendientes";
+      function getPendingCanjes(){
+        try{ return JSON.parse(localStorage.getItem(CANJES_KEY)) || []; }catch(e){ return []; }
+      }
+      function setPendingCanjes(list){
+        try{
+          if(list.length){ localStorage.setItem(CANJES_KEY, JSON.stringify(list)); }
+          else { localStorage.removeItem(CANJES_KEY); }
+        }catch(e){ /* noop */ }
+      }
+      function queueCanje(folio){
+        var list = getPendingCanjes();
+        if(list.indexOf(folio) < 0){ list.push(folio); setPendingCanjes(list); }
+      }
+      function unqueueCanje(folio){
+        setPendingCanjes(getPendingCanjes().filter(function(f){ return f !== folio; }));
+      }
+      /* Envía un canje a la hoja. Devuelve true cuando la hoja ya lo
+         tiene (ok o already: en ambos casos está canjeado ahí) y
+         false cuando hay que reintentarlo después. */
+      function sendCanje(folio){
+        return remotePost({ action: "canjear", folio: folio, token: getAdminToken() })
+          .then(function(r){
+            if(!r.ok) throw new Error("http " + r.status);
+            return r.json().catch(function(){ return null; });
+          })
+          .then(function(q){
+            if(isUnauthorized(q)){
+              /* Sesión vencida: el canje se encola para reintentarlo
+                 al entrar de nuevo y se vuelve al inicio de sesión. */
+              queueCanje(folio);
+              expireAdminSession();
+              return false;
+            }
+            if(q && q.ok === true){ unqueueCanje(folio); return true; }
+            if(q && q.error === "already"){ unqueueCanje(folio); return true; }
+            if(q && q.error === "not_found"){
+              /* El giro aún no está en la hoja (p. ej. quedó en la
+                 cola del celular del cliente): se reintenta después. */
+              queueCanje(folio);
+              return false;
+            }
+            /* Otros errores del servidor (p. ej. fuera de fechas):
+               reintentarlo no ayuda, así que no se encola. */
+            return false;
+          })
+          .catch(function(){
+            queueCanje(folio);
+            noteCentralFail();
+            return false;
+          });
+      }
+      var flushingCanjes = false;
+      function flushPendingCanjes(){
+        if(!remoteEnabled() || !isAdminLoggedIn() || flushingCanjes) return;
+        var list = getPendingCanjes();
+        if(!list.length) return;
+        flushingCanjes = true;
+        var i = 0;
+        function next(){
+          if(i >= list.length){ flushingCanjes = false; return; }
+          var folio = list[i++];
+          Promise.resolve()
+            .then(function(){ return sendCanje(folio); })
+            .catch(function(){ /* se queda en cola para el próximo intento */ })
+            .then(function(){ next(); });
+        }
+        next();
+      }
       function canjearCurrent(){
         if(!valCurrent || !valCurrent.found || valCurrent.estado === "Canjeado") return;
         var now = nowParts();
@@ -713,19 +803,10 @@
         }
         if(remoteEnabled()){
           /* El canje también se marca en la hoja (action=canjear,
-             con el token de la sesión). Si el puente no responde,
-             el canje ya quedó marcado en este celular y solo se
-             avisa en pequeño. Si responde «unauthorized», la
-             sesión venció y se vuelve al inicio de sesión. */
-          remoteFetch(bridgeUrl("canjear", [["folio", valCurrent.folio], ["token", getAdminToken()]]))
-            .then(function(r){
-              if(!r.ok) throw new Error("http " + r.status);
-              return r.json().catch(function(){ return null; });
-            })
-            .then(function(q){
-              if(isUnauthorized(q)) expireAdminSession();
-            })
-            .catch(function(){ noteCentralFail(); });
+             por POST con el token de la sesión). Si el puente no
+             responde, sendCanje lo deja en la cola de pendientes
+             y se reintenta solo después. */
+          sendCanje(valCurrent.folio);
         }
         valCurrent.estado = "Canjeado";
         valCurrent.canjeadoEl = stamp;
