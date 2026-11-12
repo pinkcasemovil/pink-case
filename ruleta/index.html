@@ -1534,18 +1534,18 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
          smartwatch y más; $200 solo en bocinas y smartwatch; $50 en
          cualquier compra en tienda (ver «Restricciones»). */
       var SEGMENTS = [
-        { id:"d200",  big:"$200", small:"DE DESCUENTO", bigSize:30, smallSize:12, color:"white", weight:120, label:"$200 de descuento", note:"$200 de descuento en bocinas y smartwatch. O cámbialo por $100 de descuento y una mica gratis.", chip:"$200 de descuento", chipNote:"El premio mayor", img:"assets/billete-200.jpg", imgW:104, imgH:52, imgY:-202 },
-        { id:"d100",  big:"$100", small:"DE DESCUENTO", bigSize:30, smallSize:12, color:"red",   weight:320, label:"$100 de descuento", note:"$100 de descuento en protectores, micas, cargadores, bocinas, smartwatch y más.", chip:"$100 de descuento", chipNote:"En protectores, micas y más", img:"assets/billete-100.jpg", imgW:104, imgH:52, imgY:-202 },
-        { id:"d50",   big:"$50",  small:"DE DESCUENTO", bigSize:30, smallSize:12, color:"white", weight:250, label:"$50 de descuento",  note:"$50 de descuento en tu compra en tienda.", chip:"$50 de descuento", chipNote:"", img:"assets/billete-50.jpg", imgW:104, imgH:52, imgY:-202 },
+        { id:"d200",  big:"$200",         small:"", bigSize:36, bigLen:64, color:"white", weight:120, label:"$200 de descuento", note:"$200 de descuento en bocinas y smartwatch. O cámbialo por $100 de descuento y una mica gratis.", chip:"$200 de descuento", chipNote:"El premio mayor", img:"assets/billete-200.jpg", imgW:88, imgH:44, imgY:-210 },
+        { id:"d100",  big:"$100",         small:"", bigSize:36, bigLen:64, color:"red",   weight:320, label:"$100 de descuento", note:"$100 de descuento en protectores, micas, cargadores, bocinas, smartwatch y más.", chip:"$100 de descuento", chipNote:"En protectores, micas y más", img:"assets/billete-100.jpg", imgW:88, imgH:44, imgY:-210 },
+        { id:"d50",   big:"$50",          small:"", bigSize:36, bigLen:64, color:"white", weight:250, label:"$50 de descuento",  note:"$50 de descuento en tu compra en tienda.", chip:"$50 de descuento", chipNote:"", img:"assets/billete-50.jpg", imgW:88, imgH:44, imgY:-210 },
         /* Gajo DECORATIVO de smartwatch: se ve en la ruleta pero su
            peso es 0, así que el sorteo ponderado NUNCA cae en él,
            nunca genera boleto ni premio, y NO aparece en la lista
            de «Lo que puedes ganar» (displayOnly). Decisión de Axel:
            que se vea como premio, sin que nadie lo gane. */
-        { id:"smartwatch", big:"SMART", small:"WATCH", bigSize:22, smallSize:14, color:"gold", weight:0, label:"Smartwatch", note:"", chip:"", chipNote:"", displayOnly:true, img:"assets/scroll-smartwatch.webp", imgW:96, imgH:64, imgY:-196 },
-        { id:"cable", big:"CABLE", small:"TIPO C",      bigSize:26, smallSize:14, color:"red",   weight:80,  label:"Cable tipo C",   note:"Un cable tipo C para tu celular.", chip:"Cable tipo C", chipNote:"", img:"assets/cable-tipo-c.png", imgW:96, imgH:64, imgY:-196 },
-        { id:"mica",  big:"UNA MICA", small:"GRATIS",   bigSize:20, smallSize:14, color:"black", weight:180, label:"Una mica gratis",   note:"Una mica de cristal templado para tu celular, instalada en tienda.", chip:"Una mica gratis", chipNote:"Instalación en tienda", img:"assets/scroll-mica-normal.webp", imgW:96, imgH:64, imgY:-196 },
-        { id:"otra",  big:"GIRA", small:"OTRA VEZ",     bigSize:28, smallSize:14, color:"red",   weight:50,  label:"Gira otra vez",   note:"", chip:"Gira otra vez", chipNote:"Un giro extra al momento", icon:"retry" }
+        { id:"smartwatch", big:"SMARTWATCH", small:"", bigSize:15, bigLen:88, color:"gold", weight:0, label:"Smartwatch", note:"", chip:"", chipNote:"", displayOnly:true, img:"assets/scroll-smartwatch.webp", imgW:72, imgH:48, imgY:-208 },
+        { id:"cable", big:"CABLE TIPO C", small:"", bigSize:15, bigLen:88, color:"red",   weight:80,  label:"Cable tipo C",   note:"Un cable tipo C para tu celular.", chip:"Cable tipo C", chipNote:"", img:"assets/cable-tipo-c.png", imgW:72, imgH:48, imgY:-208 },
+        { id:"mica",  big:"MICA GRATIS",  small:"", bigSize:16, bigLen:84, color:"black", weight:180, label:"Una mica gratis",   note:"Una mica de cristal templado para tu celular, instalada en tienda.", chip:"Una mica gratis", chipNote:"Instalación en tienda", img:"assets/scroll-mica-normal.webp", imgW:72, imgH:48, imgY:-208 },
+        { id:"otra",  big:"GIRA OTRA VEZ", small:"", bigSize:15, bigLen:88, color:"red",   weight:50,  label:"Gira otra vez",   note:"", chip:"Gira otra vez", chipNote:"Un giro extra al momento", icon:"retry" }
       ];
       var TOTAL_WEIGHT = SEGMENTS.reduce(function(s,x){ return s+x.weight; }, 0);
       var SEG_ANGLE = 360 / SEGMENTS.length;
@@ -1904,7 +1904,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
           if(seg.icon === "retry"){
             /* Flecha circular (arco de 260° + punta): se dibuja con
                trigonometría para que la punta siga la tangente. */
-            var rcx = 0, rcy = -195, rr = 24;
+            var rcx = 0, rcy = -208, rr = 20;
             var ra0 = -60 * Math.PI / 180, ra1 = 200 * Math.PI / 180;
             var rx0 = rcx + rr * Math.cos(ra0), ry0 = rcy + rr * Math.sin(ra0);
             var rx1 = rcx + rr * Math.cos(ra1), ry1 = rcy + rr * Math.sin(ra1);
@@ -1926,20 +1926,17 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
             g.appendChild(rHead);
           }
 
-          /* Con foto, el texto va HORIZONTAL (derecho, como en el
-             flyer): se deshace la rotación del gajo. Grande en
-             radio 144 y chica en 112; con 7 gajos el semiancho
-             en el radio más cerrado (112) es 48 y las palabras
-             (máx. ~80 de ancho) no invaden al vecino. Sin foto,
-             el texto va radial como antes (grande en 197). */
+          /* UNA línea radial por gajo (centro 135), foto derecha
+             arriba: el gajo mide 159 de radio (79–238) y foto +
+             2 líneas no caben (necesitan ~190). La línea más
+             larga (88) va de radio 91 a 179: 5 de hueco con la
+             foto (184) y 12 con el centro (79). «DE DESCUENTO»
+             no va en la ruleta: está en los chips de abajo, en
+             el flyer y en el texto del boleto. */
           var big = document.createElementNS(NS, "text");
-          if(hasVisual){
-            big.setAttribute("transform", "translate(0,-144) rotate(" + (-mid) + ")");
-          }else{
-            big.setAttribute("transform", "translate(0,-197) rotate(-90)");
-            big.setAttribute("textLength", "76");
-            big.setAttribute("lengthAdjust", "spacingAndGlyphs");
-          }
+          big.setAttribute("transform", "translate(0,-135) rotate(-90)");
+          big.setAttribute("textLength", seg.bigLen || "76");
+          big.setAttribute("lengthAdjust", "spacingAndGlyphs");
           big.setAttribute("text-anchor", "middle");
           big.setAttribute("dominant-baseline", "middle");
           big.setAttribute("fill", textColors[seg.color]);
