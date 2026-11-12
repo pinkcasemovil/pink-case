@@ -1755,7 +1755,9 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       /* Guardar el giro del boleto en la pestaña «Giros»
          (action=registrar). Se dispara sin esperar la respuesta:
          el boleto se muestra igual. Si el puente no responde, el
-         registro queda en cola local y se reintenta al abrir. */
+         registro queda en cola local y se reintenta al abrir la
+         página o al volver la conexión; la cola solo se vacía
+         con la confirmación del servidor. */
       var PENDING_KEY = LS_KEY + "-pendientes";
       function queuePending(rec){
         try{
@@ -1785,13 +1787,42 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         if(!remoteEnabled()) return;
         sendRegistrar(rec, false);
       }
+      /* La cola solo se vacía con la confirmación del servidor: cada
+         giro se envía de uno en uno y se borra de la cola SOLO cuando
+         la hoja responde (ok o folio repetido: en ambos casos el giro
+         ya está guardado ahí). Si la red falla a la mitad, los giros
+         que faltan se quedan en cola para el próximo intento: cerrar
+         la página ya no los pierde. */
+      var flushingPending = false;
       function flushPending(){
-        if(!remoteEnabled()) return;
+        if(!remoteEnabled() || flushingPending) return;
         var q = [];
         try{ q = JSON.parse(localStorage.getItem(PENDING_KEY)) || []; }catch(e){ q = []; }
         if(!q.length) return;
-        try{ localStorage.removeItem(PENDING_KEY); }catch(e){ /* noop */ }
-        q.forEach(function(rec){ sendRegistrar(rec, true); });
+        flushingPending = true;
+        var i = 0;
+        function next(){
+          if(i >= q.length){ flushingPending = false; return; }
+          var rec = q[i++];
+          Promise.resolve()
+            .then(function(){ return sendRegistrar(rec, true); })
+            .then(function(ok){
+              if(ok){
+                /* Confirmado: se saca solo ese giro, leyendo la cola
+                   actual por si entró otro giro mientras tanto. */
+                try{
+                  var cur = JSON.parse(localStorage.getItem(PENDING_KEY)) || [];
+                  var rest = cur.filter(function(r){ return r.folio !== rec.folio; });
+                  if(rest.length){ localStorage.setItem(PENDING_KEY, JSON.stringify(rest)); }
+                  else { localStorage.removeItem(PENDING_KEY); }
+                }catch(e){ /* noop */ }
+              }
+              /* Si falló la red, el giro se queda en cola. */
+            })
+            .catch(function(){ /* sin red: el giro se queda en cola */ })
+            .then(function(){ next(); });
+        }
+        next();
       }
 
       /* ================= Construcción de la ruleta (SVG) ================= */
@@ -3692,6 +3723,11 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
            los registros que hubieran quedado en cola. */
         if(syncNote) syncNote.hidden = true;
         flushPending();
+      }
+      /* Si se va la conexión y vuelve, los giros en cola se
+         reintentan solos, sin esperar a recargar la página. */
+      if(typeof window !== "undefined" && window.addEventListener){
+        window.addEventListener("online", function(){ if(remoteEnabled()) flushPending(); });
       }
       refreshUI();
     })();
