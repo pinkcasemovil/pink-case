@@ -1534,18 +1534,18 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
          smartwatch y más; $200 solo en bocinas y smartwatch; $50 en
          cualquier compra en tienda (ver «Restricciones»). */
       var SEGMENTS = [
-        { id:"d200",  big:"$200",         small:"", bigSize:36, bigLen:60, bigY:-132, color:"white", weight:120, label:"$200 de descuento", note:"$200 de descuento en bocinas y smartwatch. O cámbialo por $100 de descuento y una mica gratis.", chip:"$200 de descuento", chipNote:"El premio mayor", img:"assets/billete-200.jpg", imgW:88, imgH:44, imgY:-210 },
-        { id:"d100",  big:"$100",         small:"", bigSize:36, bigLen:60, bigY:-132, color:"red",   weight:320, label:"$100 de descuento", note:"$100 de descuento en protectores, micas, cargadores, bocinas, smartwatch y más.", chip:"$100 de descuento", chipNote:"En protectores, micas y más", img:"assets/billete-100.jpg", imgW:88, imgH:44, imgY:-210 },
-        { id:"d50",   big:"$50",          small:"", bigSize:36, bigLen:60, bigY:-132, color:"white", weight:250, label:"$50 de descuento",  note:"$50 de descuento en tu compra en tienda.", chip:"$50 de descuento", chipNote:"", img:"assets/billete-50.jpg", imgW:88, imgH:44, imgY:-210 },
+        { id:"d200",  big:"$200",         small:"DESCUENTO", bigSize:30, bigLen:52, bigY:-163, smallSize:9,  smallLen:40, smallY:-114, color:"white", weight:120, label:"$200 de descuento", note:"$200 de descuento en bocinas y smartwatch. O cámbialo por $100 de descuento y una mica gratis.", chip:"$200 de descuento", chipNote:"El premio mayor", img:"assets/billete-200.jpg", imgW:76, imgH:38, imgY:-214 },
+        { id:"d100",  big:"$100",         small:"DESCUENTO", bigSize:30, bigLen:52, bigY:-163, smallSize:9,  smallLen:40, smallY:-114, color:"red",   weight:320, label:"$100 de descuento", note:"$100 de descuento en protectores, micas, cargadores, bocinas, smartwatch y más.", chip:"$100 de descuento", chipNote:"En protectores, micas y más", img:"assets/billete-100.jpg", imgW:76, imgH:38, imgY:-214 },
+        { id:"d50",   big:"$50",          small:"DESCUENTO", bigSize:30, bigLen:52, bigY:-163, smallSize:9,  smallLen:40, smallY:-114, color:"white", weight:250, label:"$50 de descuento",  note:"$50 de descuento en tu compra en tienda.", chip:"$50 de descuento", chipNote:"", img:"assets/billete-50.jpg", imgW:76, imgH:38, imgY:-214 },
         /* Gajo DECORATIVO de smartwatch: se ve en la ruleta pero su
            peso es 0, así que el sorteo ponderado NUNCA cae en él,
            nunca genera boleto ni premio, y NO aparece en la lista
            de «Lo que puedes ganar» (displayOnly). Decisión de Axel:
            que se vea como premio, sin que nadie lo gane. */
-        { id:"smartwatch", big:"SMARTWATCH", small:"", bigSize:15, bigLen:82, bigY:-138, color:"gold", weight:0, label:"Smartwatch", note:"", chip:"", chipNote:"", displayOnly:true, img:"assets/scroll-smartwatch.webp", imgW:68, imgH:44, imgY:-206 },
-        { id:"cable", big:"CABLE TIPO C", small:"", bigSize:15, bigLen:82, bigY:-138, color:"red",   weight:80,  label:"Cable tipo C",   note:"Un cable tipo C para tu celular.", chip:"Cable tipo C", chipNote:"", img:"assets/cable-tipo-c.png", imgW:68, imgH:44, imgY:-206 },
-        { id:"mica",  big:"MICA GRATIS",  small:"", bigSize:16, bigLen:82, bigY:-138, color:"black", weight:180, label:"Una mica gratis",   note:"Una mica de cristal templado para tu celular, instalada en tienda.", chip:"Una mica gratis", chipNote:"Instalación en tienda", img:"assets/scroll-mica-normal.webp", imgW:68, imgH:44, imgY:-206 },
-        { id:"otra",  big:"GIRA OTRA VEZ", small:"", bigSize:15, bigLen:82, bigY:-138, color:"red",   weight:50,  label:"Gira otra vez",   note:"", chip:"Gira otra vez", chipNote:"Un giro extra al momento", icon:"retry" }
+        { id:"smartwatch", big:"SMARTWATCH", small:"", bigSize:13, bigLen:72, bigY:-130, color:"gold", weight:0, label:"Smartwatch", note:"", chip:"", chipNote:"", displayOnly:true, img:"assets/smartwatch-v5.png", imgW:84, imgH:56, imgY:-198 },
+        { id:"cable", big:"CABLE", small:"TIPO C", bigSize:16, bigLen:40, bigY:-158, smallSize:13, smallLen:40, smallY:-114, color:"red",   weight:80,  label:"Cable tipo C",   note:"Un cable tipo C para tu celular.", chip:"Cable tipo C", chipNote:"", img:"assets/cable-v5.png", imgW:68, imgH:44, imgY:-206 },
+        { id:"mica",  big:"MICA GRATIS",  small:"", bigSize:12, bigLen:60, bigY:-124, color:"black", weight:180, label:"Una mica gratis",   note:"Una mica de cristal templado para tu celular, instalada en tienda.", chip:"Una mica gratis", chipNote:"Instalación en tienda", img:"assets/mica-v5.png", imgW:56, imgH:76, imgY:-195 },
+        { id:"otra",  big:"GIRA", small:"OTRA VEZ", bigSize:16, bigLen:40, bigY:-158, smallSize:11, smallLen:40, smallY:-114, color:"red",   weight:50,  label:"Gira otra vez",   note:"", chip:"Gira otra vez", chipNote:"Un giro extra al momento", icon:"retry" }
       ];
       var TOTAL_WEIGHT = SEGMENTS.reduce(function(s,x){ return s+x.weight; }, 0);
       var SEG_ANGLE = 360 / SEGMENTS.length;
@@ -1904,7 +1904,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
           if(seg.icon === "retry"){
             /* Flecha circular (arco de 260° + punta): se dibuja con
                trigonometría para que la punta siga la tangente. */
-            var rcx = 0, rcy = -208, rr = 20;
+            var rcx = 0, rcy = -208, rr = 24;
             var ra0 = -60 * Math.PI / 180, ra1 = 200 * Math.PI / 180;
             var rx0 = rcx + rr * Math.cos(ra0), ry0 = rcy + rr * Math.sin(ra0);
             var rx1 = rcx + rr * Math.cos(ra1), ry1 = rcy + rr * Math.sin(ra1);
@@ -1926,14 +1926,16 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
             g.appendChild(rHead);
           }
 
-          /* UNA línea radial por gajo, foto derecha arriba: el
-             gajo mide 159 de radio (79–238) y foto + 2 líneas no
-             caben (necesitan ~190). Dinero: centro 132, largo 60
-             (102..162, 26 de hueco con el billete). Líneas largas:
-             centro 138, largo 82 (97..179, 6 con el aro dorado del
-             centro ~91 y 5 con la foto). «DE DESCUENTO» no va en
-             la ruleta: está en los chips de abajo, en el flyer y
-             en el texto del boleto. */
+          /* Opción B: DOS líneas radiales por gajo (grande +
+             chica), foto derecha arriba. El gajo mide 159 de
+             radio (79–238), así que la foto se achicó y la línea
+             chica va en letra 9–13. Dinero: foto 195..233, big
+             137..189, small 94..134. Cable/gira: igual, con foto
+             184..228. Reloj y mica quedan con UNA línea (el reloj
+             es una sola palabra y así su foto va más grande; la
+             foto de la mica es vertical y dos líneas no cabrían).
+             El aro dorado del centro llega a ~91: la línea chica
+             termina en 94. */
           var big = document.createElementNS(NS, "text");
           big.setAttribute("transform", "translate(0," + (seg.bigY || -135) + ") rotate(-90)");
           big.setAttribute("textLength", seg.bigLen || "76");
@@ -1950,15 +1952,10 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
 
           if(seg.small){
             var small = document.createElementNS(NS, "text");
-            if(hasVisual){
-              small.setAttribute("transform", "translate(0,-112) rotate(" + (-mid) + ")");
-              small.setAttribute("font-size", seg.smallSize || 12);
-            }else{
-              small.setAttribute("transform", "translate(0,-116) rotate(-90)");
-              small.setAttribute("font-size", seg.id === "otra" ? 17 : 13);
-              small.setAttribute("textLength", "72");
-              small.setAttribute("lengthAdjust", "spacingAndGlyphs");
-            }
+            small.setAttribute("transform", "translate(0," + (seg.smallY || -116) + ") rotate(-90)");
+            small.setAttribute("font-size", seg.smallSize || 12);
+            small.setAttribute("textLength", seg.smallLen || "72");
+            small.setAttribute("lengthAdjust", "spacingAndGlyphs");
             small.setAttribute("text-anchor", "middle");
             small.setAttribute("dominant-baseline", "middle");
             small.setAttribute("fill", textColors[seg.color]);
