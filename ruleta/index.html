@@ -1138,7 +1138,7 @@
       <div class="hero reveal d1">
         <h1>RULETA <span class="fin">BUEN FIN</span></h1>
         <div><span class="pill-gana">¡GIRA Y GANA!</span></div>
-        <p class="lead">Hasta <b>100% de descuento</b> en ciertos productos, una mica gratis y premios sorpresa.<br />1 giro al día · Boleto con QR al instante.</p>
+        <p class="lead">Hasta <b>$200 de descuento</b>, un cable tipo C y una mica gratis.<br />1 giro al día · Boleto con QR al instante.</p>
         <div class="meta-row">
           <span class="meta-chip">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
@@ -1259,7 +1259,7 @@
         </div>
         <div class="duo">
           <div class="poster">
-            <img src="assets/flyer-ruleta.webp" alt="Flyer oficial de la Ruleta Buen Fin de Pink Case: Tadeo junto a la ruleta de premios, del 13 al 17 de noviembre en Ixtlahuaca Centro" loading="lazy" />
+            <img src="assets/flyer-ruleta.webp" alt="Flyer oficial de la Ruleta Buen Fin de Pink Case: ruleta con billetes de $200, $100 y $50 de descuento, smartwatch, cable tipo C y mica gratis, del 13 al 17 de noviembre en Ixtlahuaca Centro" loading="lazy" />
           </div>
           <div class="bases">
             <h3>En corto — lo que debes saber</h3>
@@ -1269,7 +1269,7 @@
               <li><b>Boleto personal</b> · Canjea con tu QR en tienda</li>
               <li><b>1 folio = 1 canje</b> · No se repite</li>
               <li><b>«Gira otra vez»</b> = otro giro al momento</li>
-              <li><b>100% de descuento</b> · Solo en ciertos productos</li>
+              <li><b>$200, $100 o $50</b> · De descuento en tu compra</li>
               <li><b>No acumulable</b> con otras promos</li>
             </ul>
           </div>
@@ -1306,7 +1306,7 @@
           <span class="block-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H4a1 1 0 0 0-1 1c0 2 1.5 3.5 4 3.5M17 6h3a1 1 0 0 1 1 1c0 2-1.5 3.5-4 3.5"/></svg></span>
           <h2 id="premiosTitle">Lo que puedes ganar</h2>
         </div>
-        <p class="sub offset">10 premios. Los de marco dorado son los mayores.</p>
+        <p class="sub offset">6 premios. Los de marco dorado son los mayores.</p>
         <div class="prizes" id="prizeGrid"></div>
       </section>
 
@@ -1367,9 +1367,11 @@
         </div>
         <div class="bases">
           <ul>
-            <li><b>100% de descuento:</b> solo en ciertos productos participantes. En tienda te decimos cuáles.</li>
+            <li><b>$200 de descuento:</b> aplica en bocinas y smartwatch. Se puede cambiar por $100 de descuento y una mica gratis.</li>
+            <li><b>$100 de descuento:</b> aplica en protectores, micas, cargadores, bocinas, smartwatch y más. En tienda te decimos en qué productos.</li>
+            <li><b>$50 de descuento:</b> en tu compra en tienda, un boleto por compra.</li>
             <li><b>Una mica gratis:</b> es 1 mica por boleto.</li>
-            <li><b>2 micas al precio de una:</b> pagas 1 mica y te llevas 2.</li>
+            <li><b>Cable tipo C:</b> 1 cable por boleto.</li>
             <li><b>1 folio = 1 canje</b> · Boleto personal, se canjea con tu QR.</li>
             <li><b>Solo del 13 al 17 de nov.</b>, en tienda · No acumulable con otras promos.</li>
           </ul>
@@ -1520,33 +1522,30 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaLju4YnKKt5C55CTo4B4N01A0WacpsdVKw_QcWmu0D7GJjqYxNud2NaihwrVeDUjInw/exec"; /* Puente de Apps Script de la hoja «Giros» (desplegado 2026-11-08) */
 
       /* ================= Datos de la ruleta (orden del flyer, desde arriba, sentido horario) ================= */
-      /* Probabilidades = pestaña «Premios» de la hoja (peso = % × 10):
-         10%→32 · 20%→23 · 30%→16 · 40%→9 · 50%→2 · Una mica gratis→6 ·
-         2 micas al precio de una→5 · Gira otra vez→4 · Premio sorpresa→2 · 100%→1
-         Ajuste suave elegido por Axel (2026-11-09, con 500 giros/día
-         previstos): bajaron la mica gratis (8→6), el 2×1 (7→5), el 50%
-         (3→2) y el 40% (10→9); subieron el 10% (28→32), el 20% (22→23)
-         y el 30% (15→16). El 100%, Gira otra vez y el Premio sorpresa
-         quedan igual, y el total sigue en 100. El 100% aplica SOLO en
-         ciertos productos participantes (ver el apartado «Restricciones»). */
+      /* Probabilidades = pestaña «Premios» de la hoja (peso = % × 10).
+         Nuevos premios del flyer del 2026-11-12 (Axel): los descuentos
+         en % (10–100), el 2×1 y el premio sorpresa ya no existen.
+         Orden de más a menos frecuente, para ~500 giros/día:
+         $100→32 (~160) · $50→25 (~125) · Una mica gratis→18 (~90) ·
+         $200→12 (~60) · Cable tipo C→8 (~40) · Gira otra vez→5 (~25) ·
+         Smartwatch→0 (decorativo, nunca se gana). Total = 100.
+         El $200 se puede cambiar por $100 de descuento + una mica gratis.
+         $100 aplica en protectores, micas, cargadores, bocinas,
+         smartwatch y más; $200 solo en bocinas y smartwatch; $50 en
+         cualquier compra en tienda (ver «Restricciones»). */
       var SEGMENTS = [
-        { id:"d100",  big:"100%", small:"DE DESCUENTO", bigSize:34, color:"black", weight:10,  label:"100% de descuento", note:"100% de descuento solo en ciertos productos participantes: en tienda te decimos cuáles.",  chip:"100% de descuento", chipNote:"El premio mayor · Solo en ciertos productos" },
-        { id:"d50",   big:"50%",  small:"DE DESCUENTO", bigSize:44, color:"white", weight:20,  label:"50% de descuento",  note:"La mitad de tu compra, por cuenta de la casa. Es de los premios más raros de la ruleta.", chip:"50% de descuento", chipNote:"Premio mayor" },
-        { id:"d40",   big:"40%",  small:"DE DESCUENTO", bigSize:44, color:"red",   weight:90,  label:"40% de descuento",  note:"Un descuentazo para estrenar este Buen Fin.", chip:"40% de descuento", chipNote:"" },
-        { id:"d30",   big:"30%",  small:"DE DESCUENTO", bigSize:44, color:"black", weight:160, label:"30% de descuento",  note:"Tu funda o accesorio, con un gran descuento.", chip:"30% de descuento", chipNote:"" },
-        { id:"d20",   big:"20%",  small:"DE DESCUENTO", bigSize:44, color:"white", weight:230, label:"20% de descuento",  note:"Un buen empujón para lo que traías en mente.", chip:"20% de descuento", chipNote:"" },
-        { id:"d10",   big:"10%",  small:"DE DESCUENTO", bigSize:44, color:"red",   weight:320, label:"10% de descuento",  note:"Todo suma: tu compra sale más barata.", chip:"10% de descuento", chipNote:"" },
-        { id:"mica",  big:"UNA MICA", small:"GRATIS",   bigSize:24, color:"black", weight:60, label:"Una mica gratis",   note:"Una mica de cristal templado para tu celular, instalada en tienda.", chip:"Una mica gratis", chipNote:"Instalación en tienda", fitBlock:true },
-        { id:"2x1",   big:"2×1",  small:"MICA",         bigSize:44, color:"white", weight:50, label:"2 micas al precio de una", note:"Ganaste 2 micas al precio de una: pagas una y te llevas dos.", chip:"2 micas al precio de una", chipNote:"2×1 en mica" },
-        { id:"otra",  big:"GIRA", small:"OTRA VEZ",     bigSize:34, color:"red",   weight:40, label:"Gira otra vez",   note:"", chip:"Gira otra vez", chipNote:"Un giro extra al momento" },
-        { id:"premio",big:"PREMIO", small:"",           bigSize:27, color:"white", weight:20,  label:"Premio sorpresa",  note:"Un premio especial de la tienda, solo para ti.", chip:"Premio sorpresa", chipNote:"Premio mayor" },
+        { id:"d200",  big:"$200", small:"DE DESCUENTO", bigSize:44, color:"white", weight:120, label:"$200 de descuento", note:"$200 de descuento en bocinas y smartwatch. O cámbialo por $100 de descuento y una mica gratis.", chip:"$200 de descuento", chipNote:"El premio mayor", img:"assets/billete-200.jpg", imgW:112, imgH:56 },
+        { id:"d100",  big:"$100", small:"DE DESCUENTO", bigSize:44, color:"red",   weight:320, label:"$100 de descuento", note:"$100 de descuento en protectores, micas, cargadores, bocinas, smartwatch y más.", chip:"$100 de descuento", chipNote:"En protectores, micas y más", img:"assets/billete-100.jpg", imgW:112, imgH:56 },
+        { id:"d50",   big:"$50",  small:"DE DESCUENTO", bigSize:44, color:"white", weight:250, label:"$50 de descuento",  note:"$50 de descuento en tu compra en tienda.", chip:"$50 de descuento", chipNote:"", img:"assets/billete-50.jpg", imgW:112, imgH:56 },
         /* Gajo DECORATIVO de smartwatch: se ve en la ruleta pero su
            peso es 0, así que el sorteo ponderado NUNCA cae en él,
            nunca genera boleto ni premio, y NO aparece en la lista
-           de «Lo que puedes ganar» (displayOnly). Las probabilidades
-           de los 10 premios reales no cambian: sus pesos son los
-           mismos y el total solo sumaría este 0. */
-        { id:"smartwatch", big:"SMART", small:"WATCH", bigSize:24, color:"gold", weight:0, label:"Smartwatch", note:"", chip:"", chipNote:"", displayOnly:true, fitBlock:true }
+           de «Lo que puedes ganar» (displayOnly). Decisión de Axel:
+           que se vea como premio, sin que nadie lo gane. */
+        { id:"smartwatch", big:"SMART", small:"WATCH", bigSize:24, color:"gold", weight:0, label:"Smartwatch", note:"", chip:"", chipNote:"", displayOnly:true, img:"assets/scroll-smartwatch.webp", imgW:96, imgH:64 },
+        { id:"cable", big:"CABLE", small:"TIPO C",      bigSize:30, color:"red",   weight:80,  label:"Cable tipo C",   note:"Un cable tipo C para tu celular.", chip:"Cable tipo C", chipNote:"", img:"assets/cable-tipo-c.png", imgW:96, imgH:64 },
+        { id:"mica",  big:"UNA MICA", small:"GRATIS",   bigSize:24, color:"black", weight:180, label:"Una mica gratis",   note:"Una mica de cristal templado para tu celular, instalada en tienda.", chip:"Una mica gratis", chipNote:"Instalación en tienda", img:"assets/scroll-mica-normal.webp", imgW:96, imgH:64 },
+        { id:"otra",  big:"GIRA", small:"OTRA VEZ",     bigSize:34, color:"red",   weight:50,  label:"Gira otra vez",   note:"", chip:"Gira otra vez", chipNote:"Un giro extra al momento", icon:"retry" }
       ];
       var TOTAL_WEIGHT = SEGMENTS.reduce(function(s,x){ return s+x.weight; }, 0);
       var SEG_ANGLE = 360 / SEGMENTS.length;
@@ -1841,7 +1840,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         var svg = document.createElementNS(NS, "svg");
         svg.setAttribute("viewBox", "-260 -260 520 520");
         svg.setAttribute("role", "img");
-        svg.setAttribute("aria-label", "Ruleta de premios del Buen Fin: descuentos del 10 al 100 por ciento, una mica gratis, 2 micas al precio de una, gira otra vez y premio sorpresa");
+        svg.setAttribute("aria-label", "Ruleta de premios del Buen Fin: descuentos de 200, 100 y 50 pesos, un cable tipo C, una mica gratis y gira otra vez");
 
         var defs = document.createElementNS(NS, "defs");
         defs.innerHTML =
@@ -1882,20 +1881,53 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
           var g = document.createElementNS(NS, "g");
           g.setAttribute("transform", "rotate(" + mid + ")");
 
-          /* Gajos con fitBlock (SMARTWATCH y UNA MICA GRATIS): sus dos
-             palabras van como un solo bloque centrado en la zona
-             libre del gajo, entre el centro de la ruleta (radio
-             visual ≈79) y el borde del gajo (radio 238): palabra
-             grande de radio 158 a 230 (centro 194, largo 72) y
-             palabra chica de 90 a 148 (centro 119, largo 58), con
-             10 de separación. Así ninguna letra se sale contra el
-             aro, ninguna queda tapada por el centro y ambas quedan
-             derechas sobre la bisectriz del gajo (x=0, ancla y
-             línea base al centro), sin invadir el gajo vecino:
-             su semialto máximo es 15 y el semiancho del gajo en el
-             radio más cerrado (90) ya es 26. */
+          /* Imagen del premio (billete, reloj, cable o mica) en la
+             zona exterior del gajo, o el icono de flechas en
+             «Gira otra vez»: el texto baja hacia el centro. */
+          var hasVisual = !!(seg.img || seg.icon);
+          if(seg.img){
+            var im = document.createElementNS(NS, "image");
+            im.setAttribute("x", (-seg.imgW / 2).toFixed(1));
+            im.setAttribute("y", "-232");
+            im.setAttribute("width", seg.imgW);
+            im.setAttribute("height", seg.imgH);
+            im.setAttribute("preserveAspectRatio", "xMidYMid slice");
+            im.setAttribute("href", seg.img);
+            im.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", seg.img);
+            g.appendChild(im);
+          }
+          if(seg.icon === "retry"){
+            /* Flecha circular (arco de 260° + punta): se dibuja con
+               trigonometría para que la punta siga la tangente. */
+            var rcx = 0, rcy = -195, rr = 24;
+            var ra0 = -60 * Math.PI / 180, ra1 = 200 * Math.PI / 180;
+            var rx0 = rcx + rr * Math.cos(ra0), ry0 = rcy + rr * Math.sin(ra0);
+            var rx1 = rcx + rr * Math.cos(ra1), ry1 = rcy + rr * Math.sin(ra1);
+            var rArc = document.createElementNS(NS, "path");
+            rArc.setAttribute("d", "M " + rx0.toFixed(1) + " " + ry0.toFixed(1) + " A " + rr + " " + rr + " 0 1 1 " + rx1.toFixed(1) + " " + ry1.toFixed(1));
+            rArc.setAttribute("fill", "none");
+            rArc.setAttribute("stroke", textColors[seg.color]);
+            rArc.setAttribute("stroke-width", "7");
+            rArc.setAttribute("stroke-linecap", "round");
+            g.appendChild(rArc);
+            var rtx = -Math.sin(ra1), rty = Math.cos(ra1);
+            var rnx = Math.cos(ra1), rny = Math.sin(ra1);
+            var rHead = document.createElementNS(NS, "polygon");
+            rHead.setAttribute("points",
+              (rx1 + rtx * 10).toFixed(1) + "," + (ry1 + rty * 10).toFixed(1) + " " +
+              (rx1 + rnx * 8 - rtx * 2).toFixed(1) + "," + (ry1 + rny * 8 - rty * 2).toFixed(1) + " " +
+              (rx1 - rnx * 8 - rtx * 2).toFixed(1) + "," + (ry1 - rny * 8 - rty * 2).toFixed(1));
+            rHead.setAttribute("fill", textColors[seg.color]);
+            g.appendChild(rHead);
+          }
+
+          /* Cada gajo lleva su imagen (o el icono de «gira otra vez»)
+             en la zona exterior (radio 168–232) y las dos palabras
+             debajo, hacia el centro (grande en 146, chica en 108):
+             con 7 gajos el semiancho en el radio más cerrado (108)
+             ya es 47 y el texto (largo 76) no invade al vecino. */
           var big = document.createElementNS(NS, "text");
-          big.setAttribute("transform", "translate(0," + (seg.fitBlock ? -194 : -197) + ") rotate(-90)");
+          big.setAttribute("transform", "translate(0," + (hasVisual ? -146 : -197) + ") rotate(-90)");
           big.setAttribute("text-anchor", "middle");
           big.setAttribute("dominant-baseline", "middle");
           big.setAttribute("fill", textColors[seg.color]);
@@ -1903,27 +1935,23 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
           big.setAttribute("font-weight", "900");
           big.setAttribute("font-size", seg.bigSize);
           big.setAttribute("letter-spacing", ".01em");
-          big.setAttribute("textLength", seg.fitBlock ? "72" : (seg.id === "premio" ? "86" : "76"));
+          big.setAttribute("textLength", "76");
           big.setAttribute("lengthAdjust", "spacingAndGlyphs");
           big.textContent = seg.big;
           g.appendChild(big);
 
           if(seg.small){
             var small = document.createElementNS(NS, "text");
-            small.setAttribute("transform", "translate(0," + (seg.fitBlock ? -119 : -116) + ") rotate(-90)");
+            small.setAttribute("transform", "translate(0," + (hasVisual ? -108 : -116) + ") rotate(-90)");
             small.setAttribute("text-anchor", "middle");
             small.setAttribute("dominant-baseline", "middle");
             small.setAttribute("fill", textColors[seg.color]);
             small.setAttribute("opacity", seg.color === "white" ? ".82" : ".96");
             small.setAttribute("font-family", "Archivo, sans-serif");
             small.setAttribute("font-weight", "800");
-            /* En los gajos fitBlock la segunda palabra (WATCH /
-               GRATIS) es corta: sube de 13 a 18 para leerse como
-               parte del mismo nombre, pareja con la palabra grande,
-               en vez de perderse chiquita junto al centro. */
-            small.setAttribute("font-size", seg.fitBlock ? 18 : (seg.id === "otra" ? 17 : 13));
+            small.setAttribute("font-size", seg.id === "otra" ? 17 : 13);
             small.setAttribute("letter-spacing", ".02em");
-            small.setAttribute("textLength", seg.fitBlock ? "58" : "72");
+            small.setAttribute("textLength", "72");
             small.setAttribute("lengthAdjust", "spacingAndGlyphs");
             small.textContent = seg.small;
             g.appendChild(small);
@@ -2266,11 +2294,10 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
               nombre: corto, claro y con la invitación a girar.
            2) Al ganar: Helio dice SOLO «¡Felicidades! ¡Te
               ganaste…!» con el premio EXACTO de ese giro.
-              Hay un clip grabado por cada premio de la ruleta
-              (gano-100, gano-50, …, gano-mica, gano-2x1,
-              gano-premio) y WIN_CLIP_BY_SEG elige el que toca
-              según el gajo ganador. «Gira otra vez» también
-              tiene el suyo (gano-otra-vez.mp3).
+              Hay clip grabado para la mica (gano-mica) y para
+              «Gira otra vez» (gano-otra-vez); los demás premios
+              usan el clip genérico (gano.mp3) o el de premio
+              mayor (premio-mayor.mp3) si es el $200.
          Mientras la ruleta gira NO hay voz: solo suenan la
          música de juego y los clics de los gajos. Tampoco hay
          voz al avisar «ya giraste hoy»: ese aviso se lee en
@@ -2295,17 +2322,12 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         gano: "assets/voz/gano.mp3",
         premioMayor: "assets/voz/premio-mayor.mp3"
       };
-      /* Clip de «¡Felicidades! ¡Te ganaste…!» por cada gajo */
+      /* Clip de «¡Felicidades! ¡Te ganaste…!» por gajo: solo la mica
+         y «gira otra vez» tienen clip propio grabado; los premios
+         nuevos ($200, $100, $50 y cable) usan el clip genérico
+         (o el de premio mayor si es el $200). */
       var WIN_CLIP_BY_SEG = {
-        d100: "gano100",
-        d50: "gano50",
-        d40: "gano40",
-        d30: "gano30",
-        d20: "gano20",
-        d10: "gano10",
         mica: "ganoMica",
-        "2x1": "gano2x1",
-        premio: "ganoPremio",
         otra: "ganoOtra"
       };
       var narrator = {
@@ -3127,7 +3149,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
           fecha: ticket.date, hora: ticket.time, nombre: ticket.name,
           folio: ticket.folio, premio: ticket.prizeLabel, estado: "Pendiente"
         });
-        var isJackpotWin = (seg.id === "d100" || seg.id === "premio" || seg.id === "d50");
+        var isJackpotWin = (seg.id === "d200");
         fanfare(isJackpotWin);
         celebrate(isJackpotWin);
         narrateWin(seg, isJackpotWin);
