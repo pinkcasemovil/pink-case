@@ -320,12 +320,11 @@
             <ol class="val-steps">
               <li><span class="vs-num">1</span><span>Toma <b>una foto de la nota junto con la funda vieja</b> del cliente, que se vean las dos en la misma foto.</span></li>
               <li><span class="vs-num">2</span><span>Escribe el <b>nombre del asesor</b> que atendió el trueque.</span></li>
-              <li><span class="vs-num">3</span><span>Toca <b>«Guardar trueque»</b>. La foto se comprime sola y queda guardada en la hoja.</span></li>
+              <li><span class="vs-num">3</span><span>Toca <b>«Guardar trueque»</b>.</span></li>
             </ol>
             <div class="tq-photo">
               <label class="btn btn-gold tq-photo-btn" for="tqPhotoInput">📷 Tomar foto</label>
               <input id="tqPhotoInput" type="file" accept="image/*" capture="environment" hidden />
-              <p class="hint">Se abre la cámara del celular. La foto se comprime antes de enviarse, pero se sigue viendo bien en la hoja.</p>
             </div>
             <div class="tq-preview" id="tqPreview" hidden>
               <img id="tqPreviewImg" alt="Vista previa de la foto del trueque" />
@@ -1168,18 +1167,14 @@
           r.readAsDataURL(blob);
         });
       }
-      function tqFormatKB(bytes){
-        return Math.max(1, Math.round(bytes / 1024)) + " KB";
-      }
       if(tqPhotoInput){
         tqPhotoInput.addEventListener("change", function(){
           tqHideError();
           if(tqResult) tqResult.hidden = true;
           var file = tqPhotoInput.files && tqPhotoInput.files[0];
           if(!file) return;
-          if(tqPhotoInfo) tqPhotoInfo.textContent = "Comprimiendo la foto…";
+          if(tqPhotoInfo) tqPhotoInfo.textContent = "Preparando la foto…";
           if(tqPreview) tqPreview.hidden = false;
-          var originalSize = file.size;
           tqCompress(file).then(function(r){
             return blobToDataURL(r.blob).then(function(dataUrl){
               tqPhotoBlob = r.blob;
@@ -1188,7 +1183,7 @@
               tqPreviewUrl = URL.createObjectURL(r.blob);
               if(tqPreviewImg) tqPreviewImg.src = tqPreviewUrl;
               if(tqPreview) tqPreview.hidden = false;
-              if(tqPhotoInfo) tqPhotoInfo.textContent = "Foto lista: " + r.width + "×" + r.height + " px · " + tqFormatKB(r.blob.size) + " (original " + tqFormatKB(originalSize) + ").";
+              if(tqPhotoInfo) tqPhotoInfo.textContent = "Foto lista.";
             });
           }).catch(function(){
             tqClearPhoto();
@@ -1250,7 +1245,7 @@
               }else if(q && q.error === "out_of_range"){
                 tqShowError("La promoción terminó: solo se guardan trueques del 11 al 17 de noviembre.");
               }else if(q && q.error === "foto_muy_grande"){
-                tqShowError("Esa foto pesa demasiado. Tómala de nuevo (la página la comprime sola).");
+                tqShowError("Esa foto pesa demasiado. Tómala de nuevo.");
               }else{
                 tqShowError("No se pudo guardar. Revisa tu conexión e inténtalo de nuevo (la foto sigue lista).");
               }
