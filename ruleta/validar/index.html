@@ -286,7 +286,7 @@
           <ol class="val-steps">
             <li><span class="vs-num">1</span><span>Toca <b>«Abrir cámara»</b> y apunta al <b>QR del boleto</b> del cliente, o escribe su <b>folio</b> a mano.</span></li>
             <li><span class="vs-num">2</span><span>La página te dice si el boleto es <b>válido</b>, qué ganó y si <b>ya se canjeó</b>.</span></li>
-            <li><span class="vs-num">3</span><span>Al entregar el premio, toca <b>«Marcar como canjeado»</b> para que ese folio no se pueda usar dos veces.</span></li>
+            <li><span class="vs-num">3</span><span>Al entregar el premio, escribe el <b>nombre del asesor</b> y toca <b>«Marcar como canjeado»</b> para que ese folio no se pueda usar dos veces.</span></li>
           </ol>
 
           <div class="scan-frame" id="scanFrame">
@@ -307,6 +307,11 @@
             <button type="submit" class="btn btn-gold">Validar</button>
           </form>
           <div class="val-result" id="valResult" hidden></div>
+          <div class="admin-field" id="valAsesorField" hidden>
+            <label for="valAsesorInput">Nombre del asesor</label>
+            <input id="valAsesorInput" type="text" maxlength="40" placeholder="Nombre del asesor que entrega el premio" autocomplete="off" />
+          </div>
+          <p class="form-error" id="valError" role="alert" hidden></p>
           <button type="button" class="btn btn-red" id="valCanjearBtn" hidden>Marcar como canjeado</button>
           <button type="button" class="btn btn-ghost val-next" id="valNextBtn" hidden>Validar otro boleto</button>
           <p class="hint" id="valConnNote"></p>
@@ -369,8 +374,10 @@
                   → { "ok": true, "found": true|false, "nombre": …,
                       "premio": …, "fecha": …, "hora": …,
                       "estado": "Pendiente"|"Canjeado", … }
-           · { "action": "canjear", "folio": <folio>, "token": <token> }
-                  (marca ese boleto como Canjeado en «Giros»)
+           · { "action": "canjear", "folio": <folio>, "token": <token>,
+               "nombre": <nombre del asesor que entrega el premio> }
+                  (marca ese boleto como Canjeado en «Giros» y guarda
+                  el asesor en la columna I)
            · { "action": "trueque", "token": <token>,
                "nombre": <nombre del asesor>, "foto": <foto JPEG en base64, ya comprimida> }
                   → { "ok": true, "id": <id del archivo en Drive>,
@@ -645,12 +652,17 @@
              celular. El QR nunca valida por sí solo.
            · Canje: «Marcar como canjeado» deja el folio como
              Canjeado en la hoja (action=canjear) y en este celular,
-             para que el mismo boleto no se use dos veces. */
+             para que el mismo boleto no se use dos veces. El asesor
+             que entrega el premio se escribe antes de marcarlo y
+             queda guardado en la hoja (columna Asesor) y en este
+             celular. */
       var valVideo = $("valVideo"), valCanvas = $("valCanvas"),
           valResult = $("valResult"), valFolioInput = $("valFolioInput"),
           valCamMsg = $("valCamMsg"), valFrame = $("scanFrame"),
           valStartBtn = $("valStartCamBtn"), valStopBtn = $("valStopCamBtn"),
-          valCanjearBtn = $("valCanjearBtn"), valNextBtn = $("valNextBtn");
+          valCanjearBtn = $("valCanjearBtn"), valNextBtn = $("valNextBtn"),
+          valAsesorField = $("valAsesorField"), valAsesorInput = $("valAsesorInput"),
+          valError = $("valError");
       var valStream = null, valRAF = 0, valScanning = false, valCurrent = null;
 
       function folioFromText(text){
@@ -662,6 +674,14 @@
          quien imprime el boleto, así que nunca puede probar que el
          premio sea real. Solo la hoja (o un registro guardado en este
          celular) valida un boleto. */
+      function valShowError(msg){
+        if(!valError) return;
+        valError.textContent = msg;
+        valError.hidden = false;
+      }
+      function valHideError(){
+        if(valError) valError.hidden = true;
+      }
       function showValResult(data){
         valCurrent = data;
         var rows = "";
@@ -678,6 +698,8 @@
               ? "Ese folio no está en la hoja de giros. Revisa que el boleto sea de esta Ruleta Buen Fin (13–17 nov 2026) y que el folio esté bien escrito."
               : "Ese folio no está guardado en este celular y la hoja no está conectada, así que no se puede confirmar. No entregues el premio con un folio que no se pueda validar.") + '</p>';
           valCanjearBtn.hidden = true;
+          if(valAsesorField) valAsesorField.hidden = true;
+          valHideError();
         }else if(data.estado === "Canjeado"){
           valResult.className = "val-result bad";
           valResult.innerHTML =
@@ -685,9 +707,12 @@
             '<div class="vr-rows">' +
               row("Folio", data.folio) + row("Nombre", data.nombre) + row("Premio", data.premio) +
               row("Canjeado el", data.canjeadoEl || "—") +
+              row("Canjeado por", data.asesor) +
             '</div>' +
             '<p class="vr-note">Un folio solo se canjea una vez. No entregues el premio de nuevo con este boleto.</p>';
           valCanjearBtn.hidden = true;
+          if(valAsesorField) valAsesorField.hidden = true;
+          valHideError();
         }else{
           valResult.className = "val-result ok";
           valResult.innerHTML =
@@ -698,8 +723,9 @@
               row("Estado", "Pendiente de canje") +
               row("Verificado en", data.source) +
             '</div>' +
-            '<p class="vr-note">Vigencia del canje: 13–17 nov 2026, en tienda. Entrega el premio y luego toca «Marcar como canjeado».</p>';
+            '<p class="vr-note">Vigencia del canje: 13–17 nov 2026, en tienda. Entrega el premio, escribe el nombre del asesor y luego toca «Marcar como canjeado».</p>';
           valCanjearBtn.hidden = false;
+          if(valAsesorField) valAsesorField.hidden = false;
         }
         valResult.hidden = false;
         valNextBtn.hidden = false;
@@ -709,6 +735,8 @@
         var folio = String(folioRaw || "").trim().toUpperCase();
         valCanjearBtn.hidden = true;
         valNextBtn.hidden = true;
+        if(valAsesorField) valAsesorField.hidden = true;
+        valHideError();
         if(!/^PC-[A-Z0-9]{6}$/.test(folio)){
           valCurrent = null;
           valResult.className = "val-result bad";
@@ -724,7 +752,8 @@
             nombre: rec.name || "", premio: rec.prizeLabel || "",
             fecha: rec.date || "", hora: rec.time || "",
             estado: rec.estado === "Canjeado" ? "Canjeado" : "Pendiente",
-            canjeadoEl: rec.canjeadoEl || "", source: "este celular" };
+            canjeadoEl: rec.canjeadoEl || "", asesor: rec.asesor || "",
+            source: "este celular" };
         }
         if(remoteEnabled()){
           valResult.className = "val-result info";
@@ -750,7 +779,9 @@
                   premio: q.premio || (local ? local.rec.prizeLabel : "") || "",
                   fecha: q.fecha || (local ? local.rec.date : "") || "", hora: q.hora || "",
                   estado: (q.estado === "Canjeado") ? "Canjeado" : "Pendiente",
-                  canjeadoEl: q.canjeadoEl || q.canjeado_el || "", source: "la base de datos" });
+                  canjeadoEl: q.canjeadoEl || q.canjeado_el || "",
+                  asesor: q.asesor || (local ? local.rec.asesor : "") || "",
+                  source: "la base de datos" });
               }else if(q && q.ok !== false){
                 showValResult({ found: false, folio: folio });
               }else if(local){
@@ -784,7 +815,17 @@
          aunque la tienda estuviera sin internet en ese momento. */
       var CANJES_KEY = LS_KEY + "-canjes-pendientes";
       function getPendingCanjes(){
-        try{ return JSON.parse(localStorage.getItem(CANJES_KEY)) || []; }catch(e){ return []; }
+        var list = [];
+        try{ list = JSON.parse(localStorage.getItem(CANJES_KEY)) || []; }catch(e){ list = []; }
+        /* Formato actual: [{f: folio, a: asesor}]. Las entradas viejas
+           (solo el folio, sin asesor) se normalizan con asesor vacío:
+           al reintentarse, el servidor las rechaza con missing_asesor
+           y se sacan de la cola (ese boleto se vuelve a canjear con
+           nombre si hace falta). */
+        return list.map(function(e){
+          if(typeof e === "string") return { f: e, a: "" };
+          return { f: String(e && e.f || ""), a: String(e && e.a || "") };
+        }).filter(function(e){ return !!e.f; });
       }
       function setPendingCanjes(list){
         try{
@@ -792,18 +833,23 @@
           else { localStorage.removeItem(CANJES_KEY); }
         }catch(e){ /* noop */ }
       }
-      function queueCanje(folio){
+      function queueCanje(folio, asesor){
         var list = getPendingCanjes();
-        if(list.indexOf(folio) < 0){ list.push(folio); setPendingCanjes(list); }
+        var found = false;
+        for(var i = 0; i < list.length; i++){
+          if(list[i].f === folio){ list[i].a = asesor || list[i].a || ""; found = true; }
+        }
+        if(!found){ list.push({ f: folio, a: asesor || "" }); }
+        setPendingCanjes(list);
       }
       function unqueueCanje(folio){
-        setPendingCanjes(getPendingCanjes().filter(function(f){ return f !== folio; }));
+        setPendingCanjes(getPendingCanjes().filter(function(e){ return e.f !== folio; }));
       }
       /* Envía un canje a la hoja. Devuelve true cuando la hoja ya lo
          tiene (ok o already: en ambos casos está canjeado ahí) y
          false cuando hay que reintentarlo después. */
-      function sendCanje(folio){
-        return remotePost({ action: "canjear", folio: folio, token: getAdminToken() })
+      function sendCanje(folio, asesor){
+        return remotePost({ action: "canjear", folio: folio, token: getAdminToken(), nombre: asesor || "" })
           .then(function(r){
             if(!r.ok) throw new Error("http " + r.status);
             return r.json().catch(function(){ return null; });
@@ -812,16 +858,24 @@
             if(isUnauthorized(q)){
               /* Sesión vencida: el canje se encola para reintentarlo
                  al entrar de nuevo y se vuelve al inicio de sesión. */
-              queueCanje(folio);
+              queueCanje(folio, asesor);
               expireAdminSession();
               return false;
             }
             if(q && q.ok === true){ unqueueCanje(folio); return true; }
             if(q && q.error === "already"){ unqueueCanje(folio); return true; }
+            if(q && q.error === "missing_asesor"){
+              /* Sin nombre del asesor el servidor nunca lo acepta:
+                 reintentarlo no ayuda, así que se saca de la cola.
+                 (Solo pasa con canjes encolados antes de este
+                 cambio; los nuevos siempre llevan el nombre.) */
+              unqueueCanje(folio);
+              return false;
+            }
             if(q && q.error === "not_found"){
               /* El giro aún no está en la hoja (p. ej. quedó en la
                  cola del celular del cliente): se reintenta después. */
-              queueCanje(folio);
+              queueCanje(folio, asesor);
               return false;
             }
             /* Otros errores del servidor (p. ej. fuera de fechas):
@@ -829,7 +883,7 @@
             return false;
           })
           .catch(function(){
-            queueCanje(folio);
+            queueCanje(folio, asesor);
             noteCentralFail();
             return false;
           });
@@ -843,9 +897,9 @@
         var i = 0;
         function next(){
           if(i >= list.length){ flushingCanjes = false; return; }
-          var folio = list[i++];
+          var entry = list[i++];
           Promise.resolve()
-            .then(function(){ return sendCanje(folio); })
+            .then(function(){ return sendCanje(entry.f, entry.a); })
             .catch(function(){ /* se queda en cola para el próximo intento */ })
             .then(function(){ next(); });
         }
@@ -853,6 +907,13 @@
       }
       function canjearCurrent(){
         if(!valCurrent || !valCurrent.found || valCurrent.estado === "Canjeado") return;
+        valHideError();
+        var asesor = valAsesorInput ? valAsesorInput.value.trim() : "";
+        if(!asesor){
+          valShowError("Escribe el nombre del asesor que entrega el premio.");
+          if(valAsesorInput) valAsesorInput.focus();
+          return;
+        }
         var now = nowParts();
         var stamp = now.date + " " + now.time;
         if(valCurrent.localKey){
@@ -860,27 +921,33 @@
           if(foundRec){
             foundRec.rec.estado = "Canjeado";
             foundRec.rec.canjeadoEl = stamp;
+            foundRec.rec.asesor = asesor;
             saveRecord(foundRec.key, foundRec.rec);
           }
         }
         if(remoteEnabled()){
           /* El canje también se marca en la hoja (action=canjear,
-             por POST con el token de la sesión). Si el puente no
-             responde, sendCanje lo deja en la cola de pendientes
-             y se reintenta solo después. */
-          sendCanje(valCurrent.folio);
+             por POST con el token de la sesión y el nombre del
+             asesor). Si el puente no responde, sendCanje lo deja
+             en la cola de pendientes y se reintenta solo después. */
+          sendCanje(valCurrent.folio, asesor);
         }
         valCurrent.estado = "Canjeado";
         valCurrent.canjeadoEl = stamp;
+        valCurrent.asesor = asesor;
         showValResult(valCurrent);
         toast("Boleto " + valCurrent.folio + " marcado como canjeado.");
       }
+      if(valAsesorInput) valAsesorInput.addEventListener("input", valHideError);
       if(valCanjearBtn) valCanjearBtn.addEventListener("click", canjearCurrent);
       if(valNextBtn) valNextBtn.addEventListener("click", function(){
         valCurrent = null;
         valResult.hidden = true;
         valCanjearBtn.hidden = true;
         valNextBtn.hidden = true;
+        if(valAsesorField) valAsesorField.hidden = true;
+        if(valAsesorInput) valAsesorInput.value = "";
+        valHideError();
         valFolioInput.value = "";
         valCamMsg.textContent = "";
         valFolioInput.focus();
