@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
     <link rel="icon" href="data:," />
-    <title>Validar boleto — Pink Case | Solo personal</title>
-    <meta name="description" content="Validador de boletos de la Ruleta Buen Fin de Pink Case. Página solo para el personal de tienda: escanea el QR o escribe el folio y marca el canje." />
+    <title>Panel de tienda — Pink Case | Solo personal</title>
+    <meta name="description" content="Panel del equipo de Pink Case: valida boletos de la Ruleta Buen Fin y registra los trueques de la promo de funda (foto de la nota con la funda vieja). Solo personal de tienda." />
     <meta name="robots" content="noindex, nofollow" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -193,6 +193,31 @@
       #valCanjearBtn{ margin-top:14px; width:100%; }
       .val-next{ width:100%; margin-top:12px; }
 
+      /* ---------- Pestañas del panel (Promo Ruleta / Promo Funda) ---------- */
+      .val-tabs{ display:flex; gap:8px; margin:0 0 18px; }
+      .val-tab{
+        flex:1; font:inherit; font-weight:800; font-size:15px; cursor:pointer;
+        border-radius:12px; padding:12px 10px;
+        background:rgba(255,255,255,.06); color:#e9e2ea; border:1px solid var(--line);
+        transition:filter .2s, background .2s;
+      }
+      .val-tab.active{
+        background:linear-gradient(180deg,#ffc966,#e79b1e); color:#2a1800;
+        border-color:rgba(255,182,72,.8);
+        box-shadow:0 8px 22px rgba(255,182,72,.3), inset 0 1px 0 rgba(255,255,255,.55);
+      }
+
+      /* ---------- Promo Funda (registro de trueques) ---------- */
+      .tq-photo{ text-align:center; margin:4px 0 16px; }
+      .tq-photo-btn{ display:inline-block; }
+      .tq-preview{ margin:0 0 16px; text-align:center; }
+      .tq-preview img{
+        display:block; width:100%; max-height:320px; object-fit:contain;
+        border-radius:14px; border:1px solid #453039; background:#000;
+      }
+      .tq-preview .tq-photo-info{ margin:10px 0 0; }
+      #tqSubmitBtn{ margin-top:6px; width:100%; }
+
       footer{
         position:relative; z-index:1; text-align:center;
         padding:30px 18px 36px; color:var(--mut); font-size:13.5px; line-height:1.7;
@@ -223,9 +248,9 @@
       </div>
 
       <div class="page-head">
-        <h1>Validar <span class="gold">boleto</span></h1>
+        <h1>Panel de <span class="gold">tienda</span></h1>
         <div><span class="staff-pill">SOLO PERSONAL · TIENDA</span></div>
-        <p class="lead">Escáner de boletos de la Ruleta Buen Fin. Aquí confirmas el boleto del cliente y lo marcas como canjeado al entregar su premio.</p>
+        <p class="lead">Validador de boletos de la Ruleta Buen Fin y registro de trueques de la promo de funda. Inicia sesión y elige el apartado que necesitas.</p>
       </div>
 
       <div class="validator-card">
@@ -233,7 +258,7 @@
              el escáner completo aparece tras iniciar sesión. -->
         <div id="adminLoginView">
           <h2 class="admin-title" id="adminLoginTitle">Acceso administrador</h2>
-          <p class="admin-sub">Solo para el equipo de Pink Case. Inicia sesión para abrir el escáner de boletos.</p>
+          <p class="admin-sub">Solo para el equipo de Pink Case. Inicia sesión para validar boletos y registrar trueques.</p>
           <form id="adminLoginForm" novalidate>
             <div class="admin-field">
               <label for="adminUserInput">Usuario</label>
@@ -253,6 +278,11 @@
             <span>Sesión de administrador activa</span>
             <button type="button" class="link-btn" id="adminLogoutBtn">Cerrar sesión</button>
           </div>
+          <div class="val-tabs" role="tablist" aria-label="Apartados del panel">
+            <button type="button" class="val-tab active" id="tabBtnRuleta" role="tab" aria-selected="true" aria-controls="tabRuleta">Promo Ruleta</button>
+            <button type="button" class="val-tab" id="tabBtnFunda" role="tab" aria-selected="false" aria-controls="tabFunda">Promo Funda</button>
+          </div>
+          <div id="tabRuleta" role="tabpanel" aria-labelledby="tabBtnRuleta">
           <ol class="val-steps">
             <li><span class="vs-num">1</span><span>Toca <b>«Abrir cámara»</b> y apunta al <b>QR del boleto</b> del cliente, o escribe su <b>folio</b> a mano.</span></li>
             <li><span class="vs-num">2</span><span>La página te dice si el boleto es <b>válido</b>, qué ganó y si <b>ya se canjeó</b>.</span></li>
@@ -280,6 +310,35 @@
           <button type="button" class="btn btn-red" id="valCanjearBtn" hidden>Marcar como canjeado</button>
           <button type="button" class="btn btn-ghost val-next" id="valNextBtn" hidden>Validar otro boleto</button>
           <p class="hint" id="valConnNote"></p>
+          </div>
+          <div id="tabFunda" role="tabpanel" aria-labelledby="tabBtnFunda" hidden>
+            <ol class="val-steps">
+              <li><span class="vs-num">1</span><span>Toma <b>una foto de la nota junto con la funda vieja</b> del cliente, que se vean las dos en la misma foto.</span></li>
+              <li><span class="vs-num">2</span><span>Si quieres, escribe el <b>nombre del cliente</b> y el <b>folio de la nota</b> para encontrar el registro después.</span></li>
+              <li><span class="vs-num">3</span><span>Toca <b>«Guardar trueque»</b>. La foto se comprime sola y queda guardada en la hoja.</span></li>
+            </ol>
+            <div class="tq-photo">
+              <label class="btn btn-gold tq-photo-btn" for="tqPhotoInput">📷 Tomar foto</label>
+              <input id="tqPhotoInput" type="file" accept="image/*" capture="environment" hidden />
+              <p class="hint">Se abre la cámara del celular. La foto se comprime antes de enviarse, pero se sigue viendo bien en la hoja.</p>
+            </div>
+            <div class="tq-preview" id="tqPreview" hidden>
+              <img id="tqPreviewImg" alt="Vista previa de la foto del trueque" />
+              <p class="hint tq-photo-info" id="tqPhotoInfo"></p>
+              <button type="button" class="link-btn" id="tqRetakeBtn">Tomar otra foto</button>
+            </div>
+            <div class="admin-field">
+              <label for="tqNombreInput">Nombre del cliente (opcional)</label>
+              <input id="tqNombreInput" type="text" maxlength="40" placeholder="Nombre del cliente" autocomplete="off" />
+            </div>
+            <div class="admin-field">
+              <label for="tqNotaInput">Folio de la nota (opcional)</label>
+              <input id="tqNotaInput" type="text" maxlength="30" placeholder="Ej. 1234" autocomplete="off" />
+            </div>
+            <p class="form-error" id="tqError" role="alert" hidden></p>
+            <button type="button" class="btn btn-red" id="tqSubmitBtn">Guardar trueque</button>
+            <div class="val-result" id="tqResult" hidden></div>
+          </div>
           <button type="button" class="btn btn-ghost" id="adminLogoutBtnPanel" style="width:100%; margin-top:12px; color:#ff8296;">Cerrar sesión</button>
         </div>
       </div>
@@ -288,7 +347,7 @@
     <footer>
       <div class="f-brand">PIN<span class="k">K</span> CASE</div>
       <div class="red-line" aria-hidden="true"></div>
-      <div>Validador de boletos · Ruleta Buen Fin · Del 13 al 17 de noviembre de 2026<br />Ixtlahuaca Centro, Estado de México</div>
+      <div>Panel de tienda · Ruleta Buen Fin y Promo Funda · Del 13 al 17 de noviembre de 2026<br />Ixtlahuaca Centro, Estado de México</div>
     </footer>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -301,7 +360,7 @@
          CONEXIÓN CON GOOGLE SHEETS — el mismo puente de Apps Script
          que usa la ruleta pública (cuenta pinkcasemoovil@gmail.com,
          copia «Copia de Ruleta Buen Fin Pink Case - Giros»).
-         Esta página usa tres acciones del puente, TODAS POR POST
+         Esta página usa cuatro acciones del puente, TODAS POR POST
          con el cuerpo en JSON (el PIN y el token nunca van en la
          URL, así no quedan en el historial ni en registros):
            · { "action": "login", "user": <usuario>, "pin": <pin> }
@@ -316,6 +375,14 @@
                       "estado": "Pendiente"|"Canjeado", … }
            · { "action": "canjear", "folio": <folio>, "token": <token> }
                   (marca ese boleto como Canjeado en «Giros»)
+           · { "action": "trueque", "token": <token>,
+               "nombre": <opcional>, "folio_nota": <opcional>,
+               "foto": <foto JPEG en base64, ya comprimida> }
+                  → { "ok": true, "id": <id del archivo en Drive>,
+                      "url": …, "fecha": …, "hora": …, "punto": … }
+                    (guarda la foto en Drive y el registro en la
+                    pestaña «Trueques» de la hoja; la foto se ve
+                    dentro de la hoja)
            Sin token, con token inválido o vencido, validar/canjear
            responden { "ok": false, "error": "unauthorized" } y esta
            página vuelve al inicio de sesión.
@@ -413,12 +480,12 @@
          application/json) para que el navegador no dispare una
          petición previa de CORS; el puente lee el cuerpo igual
          (doPost) y acepta las mismas acciones que por GET. */
-      function remotePost(payload){
+      function remotePost(payload, timeoutMs){
         var body = JSON.stringify(payload || {});
         var opts = { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: body };
         if(typeof AbortController === "function" && typeof fetch === "function"){
           var ctrl = new AbortController();
-          var timer = setTimeout(function(){ try{ ctrl.abort(); }catch(e){ /* noop */ } }, 8000);
+          var timer = setTimeout(function(){ try{ ctrl.abort(); }catch(e){ /* noop */ } }, timeoutMs || 8000);
           opts.signal = ctrl.signal;
           return fetch(APPS_SCRIPT_URL, opts).then(function(r){
             clearTimeout(timer); return r;
@@ -919,6 +986,220 @@
       document.addEventListener("visibilitychange", function(){
         if(document.hidden) stopValCamera();
       });
+
+      /* ================= Pestañas del panel =================
+         Tras iniciar sesión, el panel tiene dos apartados:
+         «Promo Ruleta» (el validador de boletos de siempre) y
+         «Promo Funda» (registro de trueques: foto de la nota
+         junto con la funda vieja). Al cambiar de apartado se
+         detiene la cámara del escáner, para no dejarla abierta
+         mientras se usa el otro apartado. */
+      var tabBtnRuleta = $("tabBtnRuleta"), tabBtnFunda = $("tabBtnFunda"),
+          tabRuleta = $("tabRuleta"), tabFunda = $("tabFunda");
+      function showValTab(which){
+        var ruleta = which !== "funda";
+        if(tabBtnRuleta){ tabBtnRuleta.classList.toggle("active", ruleta); tabBtnRuleta.setAttribute("aria-selected", ruleta ? "true" : "false"); }
+        if(tabBtnFunda){ tabBtnFunda.classList.toggle("active", !ruleta); tabBtnFunda.setAttribute("aria-selected", !ruleta ? "true" : "false"); }
+        if(tabRuleta) tabRuleta.hidden = !ruleta;
+        if(tabFunda) tabFunda.hidden = ruleta;
+        if(!ruleta) stopValCamera();
+      }
+      if(tabBtnRuleta) tabBtnRuleta.addEventListener("click", function(){ showValTab("ruleta"); });
+      if(tabBtnFunda) tabBtnFunda.addEventListener("click", function(){ showValTab("funda"); });
+
+      /* ================= Promo Funda — registro de trueques =================
+         El equipo toma UNA foto de la nota junto con la funda vieja
+         del cliente y la guarda en la hoja (pestaña «Trueques»):
+         la foto queda en Drive y se ve dentro de la hoja.
+         Compresor: antes de enviarse, la foto se reduce a 1280 px
+         en su lado más largo y se guarda como JPEG (calidad 82).
+         Una foto de celular de 3–5 MB queda en ~150–300 KB: sube
+         rápido hasta con mala señal y la nota se sigue leyendo
+         bien en la hoja (y a tamaño completo en el enlace de
+         Drive). La vista previa muestra la foto YA comprimida, o
+         sea exactamente lo que se va a guardar. La orientación
+         (foto vertical u horizontal) se corrige sola al comprimir.
+         El envío usa un tiempo de espera mayor (60 s) que validar:
+         guardar en Drive y en la hoja tarda unos segundos más. */
+      var TQ_MAX_SIDE = 1280, TQ_JPEG_QUALITY = 0.82, TQ_TIMEOUT_MS = 60000;
+      var tqPhotoInput = $("tqPhotoInput"), tqPreview = $("tqPreview"),
+          tqPreviewImg = $("tqPreviewImg"), tqPhotoInfo = $("tqPhotoInfo"),
+          tqRetakeBtn = $("tqRetakeBtn"), tqNombreInput = $("tqNombreInput"),
+          tqNotaInput = $("tqNotaInput"), tqError = $("tqError"),
+          tqSubmitBtn = $("tqSubmitBtn"), tqResult = $("tqResult");
+      var tqPhotoBlob = null, tqPhotoDataUrl = null, tqPreviewUrl = null;
+
+      function tqShowError(msg){
+        if(tqError){ tqError.textContent = msg; tqError.hidden = false; }
+      }
+      function tqHideError(){ if(tqError) tqError.hidden = true; }
+      function tqClearPhoto(){
+        tqPhotoBlob = null; tqPhotoDataUrl = null;
+        if(tqPreviewUrl){ try{ URL.revokeObjectURL(tqPreviewUrl); }catch(e){ /* noop */ } tqPreviewUrl = null; }
+        if(tqPreviewImg) tqPreviewImg.removeAttribute("src");
+        if(tqPreview) tqPreview.hidden = true;
+        if(tqPhotoInput) tqPhotoInput.value = "";
+      }
+      function tqResetForm(){
+        tqClearPhoto();
+        if(tqNombreInput) tqNombreInput.value = "";
+        if(tqNotaInput) tqNotaInput.value = "";
+        tqHideError();
+      }
+      /* Dibuja la imagen reducida en un canvas y la devuelve como
+         JPEG comprimido. */
+      function tqEncode(img, w, h){
+        return new Promise(function(resolve, reject){
+          try{
+            var scale = Math.min(1, TQ_MAX_SIDE / Math.max(w, h));
+            var cw = Math.max(1, Math.round(w * scale));
+            var ch = Math.max(1, Math.round(h * scale));
+            var canvas = document.createElement("canvas");
+            canvas.width = cw; canvas.height = ch;
+            var ctx = canvas.getContext("2d");
+            /* Fondo blanco: si la foto era PNG con transparencia,
+               el JPEG no la guarda y quedaría en negro. */
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, cw, ch);
+            ctx.drawImage(img, 0, 0, cw, ch);
+            canvas.toBlob(function(blob){
+              if(blob) resolve({ blob: blob, width: cw, height: ch });
+              else reject(new Error("compress"));
+            }, "image/jpeg", TQ_JPEG_QUALITY);
+          }catch(e){ reject(e); }
+        });
+      }
+      function tqCompress(file){
+        /* createImageBitmap con imageOrientation respeta la
+           orientación de la foto (vertical/horizontal) tal como
+           la tomó el celular; si el navegador no lo tiene, se usa
+           la ruta clásica con Image. */
+        if(typeof window.createImageBitmap === "function"){
+          return window.createImageBitmap(file, { imageOrientation: "from-image" })
+            .then(function(bmp){
+              return tqEncode(bmp, bmp.width, bmp.height).then(function(r){
+                try{ bmp.close(); }catch(e){ /* noop */ }
+                return r;
+              });
+            })
+            .catch(function(){ return tqCompressViaImage(file); });
+        }
+        return tqCompressViaImage(file);
+      }
+      function tqCompressViaImage(file){
+        return new Promise(function(resolve, reject){
+          var url = URL.createObjectURL(file);
+          var img = new Image();
+          img.onload = function(){
+            tqEncode(img, img.naturalWidth, img.naturalHeight)
+              .then(function(r){ URL.revokeObjectURL(url); resolve(r); })
+              .catch(function(e){ URL.revokeObjectURL(url); reject(e); });
+          };
+          img.onerror = function(){ URL.revokeObjectURL(url); reject(new Error("decode")); };
+          img.src = url;
+        });
+      }
+      function blobToDataURL(blob){
+        return new Promise(function(resolve, reject){
+          var r = new FileReader();
+          r.onload = function(){ resolve(r.result); };
+          r.onerror = function(){ reject(new Error("read")); };
+          r.readAsDataURL(blob);
+        });
+      }
+      function tqFormatKB(bytes){
+        return Math.max(1, Math.round(bytes / 1024)) + " KB";
+      }
+      if(tqPhotoInput){
+        tqPhotoInput.addEventListener("change", function(){
+          tqHideError();
+          if(tqResult) tqResult.hidden = true;
+          var file = tqPhotoInput.files && tqPhotoInput.files[0];
+          if(!file) return;
+          if(tqPhotoInfo) tqPhotoInfo.textContent = "Comprimiendo la foto…";
+          if(tqPreview) tqPreview.hidden = false;
+          var originalSize = file.size;
+          tqCompress(file).then(function(r){
+            return blobToDataURL(r.blob).then(function(dataUrl){
+              tqPhotoBlob = r.blob;
+              tqPhotoDataUrl = dataUrl;
+              if(tqPreviewUrl){ try{ URL.revokeObjectURL(tqPreviewUrl); }catch(e){ /* noop */ } }
+              tqPreviewUrl = URL.createObjectURL(r.blob);
+              if(tqPreviewImg) tqPreviewImg.src = tqPreviewUrl;
+              if(tqPreview) tqPreview.hidden = false;
+              if(tqPhotoInfo) tqPhotoInfo.textContent = "Foto lista: " + r.width + "×" + r.height + " px · " + tqFormatKB(r.blob.size) + " (original " + tqFormatKB(originalSize) + ").";
+            });
+          }).catch(function(){
+            tqClearPhoto();
+            tqShowError("No se pudo leer esa foto. Tómala de nuevo.");
+          });
+        });
+      }
+      if(tqRetakeBtn) tqRetakeBtn.addEventListener("click", function(){
+        tqClearPhoto();
+        if(tqPhotoInput) tqPhotoInput.click();
+      });
+      if(tqSubmitBtn){
+        tqSubmitBtn.addEventListener("click", function(){
+          if(!isAdminLoggedIn()){ refreshAdminUI(); return; }
+          tqHideError();
+          if(tqResult) tqResult.hidden = true;
+          if(!tqPhotoBlob || !tqPhotoDataUrl){
+            tqShowError("Primero toma la foto de la nota junto con la funda vieja.");
+            return;
+          }
+          tqSubmitBtn.disabled = true;
+          tqSubmitBtn.textContent = "Guardando…";
+          var nombre = tqNombreInput ? tqNombreInput.value.trim() : "";
+          var folioNota = tqNotaInput ? tqNotaInput.value.trim() : "";
+          remotePost({
+            action: "trueque",
+            token: getAdminToken(),
+            nombre: nombre,
+            folio_nota: folioNota,
+            foto: tqPhotoDataUrl
+          }, TQ_TIMEOUT_MS)
+            .then(function(r){
+              if(!r.ok) throw new Error("http " + r.status);
+              return r.json();
+            })
+            .then(function(q){
+              if(isUnauthorized(q)){ expireAdminSession(); return; }
+              if(q && q.ok === true){
+                var punto = q.punto ? String(q.punto).toUpperCase() : "";
+                tqResult.className = "val-result ok";
+                tqResult.innerHTML =
+                  '<div class="vr-title">✓ Trueque guardado</div>' +
+                  '<div class="vr-rows">' +
+                    (nombre ? '<div class="vr-row"><span>Cliente</span><b>' + escapeHtml(nombre) + '</b></div>' : "") +
+                    (folioNota ? '<div class="vr-row"><span>Folio de la nota</span><b>' + escapeHtml(folioNota) + '</b></div>' : "") +
+                    '<div class="vr-row"><span>Punto</span><b>' + escapeHtml(punto) + '</b></div>' +
+                    '<div class="vr-row"><span>Fecha</span><b>' + escapeHtml((q.fecha || todayStr()) + (q.hora ? " · " + String(q.hora).slice(0,5) + " h" : "")) + '</b></div>' +
+                  '</div>' +
+                  '<p class="vr-note">La foto quedó guardada en la hoja (pestaña «Trueques») y en Drive.</p>';
+                tqResult.hidden = false;
+                tqResetForm();
+                toast("Trueque guardado en la hoja.");
+              }else if(q && q.error === "out_of_range"){
+                tqShowError("La promoción terminó: solo se guardan trueques del 11 al 17 de noviembre.");
+              }else if(q && q.error === "foto_muy_grande"){
+                tqShowError("Esa foto pesa demasiado. Tómala de nuevo (la página la comprime sola).");
+              }else{
+                tqShowError("No se pudo guardar. Revisa tu conexión e inténtalo de nuevo (la foto sigue lista).");
+              }
+            })
+            .catch(function(){
+              tqShowError("No se pudo guardar. Revisa tu conexión e inténtalo de nuevo (la foto sigue lista).");
+            })
+            .then(function(){
+              /* .then final (sin .finally, para navegadores viejos):
+                 el botón vuelve a estar disponible, con la foto
+                 intacta si falló el envío. */
+              tqSubmitBtn.disabled = false;
+              tqSubmitBtn.textContent = "Guardar trueque";
+            });
+        });
+      }
     })();
     </script>
   </body>
