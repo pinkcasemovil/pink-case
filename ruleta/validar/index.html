@@ -403,7 +403,7 @@
         return null;
       }
 
-      /* ================= Puente con la hoja de Google Sheets ================= */
+      /* ================= Puente con la base de datos ================= */
       function remoteEnabled(){
         return typeof APPS_SCRIPT_URL === "string" && APPS_SCRIPT_URL.length > 10;
       }
@@ -430,7 +430,7 @@
       }
       function noteCentralFail(){
         var nv = $("valConnNote");
-        if(nv) nv.textContent = "El registro central (la hoja de Google Sheets) no respondió: se usaron los registros de este celular. Revisa la conexión e inténtalo de nuevo cuando puedas.";
+        if(nv) nv.textContent = "El registro central (la base de datos) no respondió: se usaron los registros de este celular. Revisa la conexión e inténtalo de nuevo cuando puedas.";
       }
       (function setValidatorNote(){
         var n = $("valConnNote");
@@ -688,7 +688,7 @@
                   premio: q.premio || (local ? local.rec.prizeLabel : "") || "",
                   fecha: q.fecha || (local ? local.rec.date : "") || "", hora: q.hora || "",
                   estado: (q.estado === "Canjeado") ? "Canjeado" : "Pendiente",
-                  canjeadoEl: q.canjeadoEl || q.canjeado_el || "", source: "la hoja de Google Sheets" });
+                  canjeadoEl: q.canjeadoEl || q.canjeado_el || "", source: "la base de datos" });
               }else if(q && q.ok !== false){
                 showValResult({ found: false, folio: folio });
               }else if(local){
