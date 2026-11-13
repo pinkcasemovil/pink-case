@@ -3070,7 +3070,14 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         var turns = 360 * (6 + Math.floor(Math.random() * 2));
         var start = state.rotation;
         var end = start + turns + delta;
-        var duration = REDUCED ? 1000 : 6400;
+        /* Duración FIJA en todos los dispositivos: 6,4 s. Antes era
+           de 1 s cuando el teléfono tenía «Reducir movimiento»
+           activado (prefers-reduced-motion), y el giro se veía como
+           un parpadeo: las mismas 6-7 vueltas comprimidas en 1 s.
+           El giro ES el juego, así que dura igual para todos; el
+           ajuste de movimiento reducido sigue aplicándose a lo
+           decorativo (flotación, halo, apariciones), no al giro. */
+        var duration = 6400;
         var t0 = null, lastSeg = Math.floor(start / SEG_ANGLE), spinDone = false;
 
         function easeOut(t){ return 1 - Math.pow(1 - t, 5); }
