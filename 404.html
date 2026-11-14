@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Enlace no encontrado · PINK CASE</title>
+<style>
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html, body{ min-height:100%; }
+  body{
+    background:#000; color:#f5f0f2;
+    font-family:-apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    display:flex; align-items:center; justify-content:center;
+    padding:28px 18px; text-align:center;
+  }
+  .card{ width:100%; max-width:520px; }
+  .brand{ font-size:15px; font-weight:800; letter-spacing:.28em; color:#fff; }
+  .brand b{ color:#e8112d; font-weight:800; }
+  .code{
+    font-size:clamp(84px, 24vw, 132px); font-weight:900; line-height:1;
+    letter-spacing:.02em; margin:26px 0 6px;
+    background:linear-gradient(180deg,#ffedb0,#f7c948 45%,#d99a16);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  h1{ font-size:clamp(22px, 6vw, 28px); line-height:1.2; font-weight:800; }
+  p{ color:#b9b0b6; font-size:16px; line-height:1.55; margin-top:12px; }
+  p .bad{ color:#f5f0f2; font-weight:700; word-break:break-all; }
+  .suggest{
+    display:none; margin:22px auto 0; max-width:440px;
+    border:1px solid rgba(255,182,72,.45); border-radius:14px;
+    background:linear-gradient(180deg, rgba(255,182,72,.12), rgba(255,182,72,.04));
+    padding:16px 18px;
+  }
+  .suggest.show{ display:block; }
+  .suggest .q{ font-size:14px; letter-spacing:.08em; color:#ffd97a; font-weight:800; }
+  .suggest .where{ font-size:19px; font-weight:800; margin-top:4px; }
+  .btn{
+    display:inline-block; margin-top:14px; padding:13px 26px; border-radius:999px;
+    font-size:16px; font-weight:800; text-decoration:none; line-height:1.2;
+  }
+  .btn-red{ color:#fff; background:linear-gradient(180deg,#ff3b47,#e8112d 55%,#9c0018); box-shadow:0 8px 22px rgba(232,17,45,.4); }
+  .btn-gold{ color:#2a1800; background:linear-gradient(180deg,#ffc966,#e79b1e); box-shadow:0 8px 22px rgba(255,182,72,.3); }
+  .btn-ghost{ color:#f5f0f2; border:1.5px solid #4a3d42; background:transparent; }
+  .actions{ margin-top:26px; display:flex; flex-wrap:wrap; gap:12px; justify-content:center; }
+  .actions .btn{ margin-top:0; }
+  .help{ margin-top:26px; font-size:14px; color:#8f858c; }
+  .help a{ color:#f7c948; font-weight:700; }
+  .foot{ margin-top:30px; font-size:12px; letter-spacing:.14em; color:#6d6369; }
+</style>
+</head>
+<body>
+  <main class="card">
+    <div class="brand">PIN<b>K</b> CASE</div>
+    <div class="code">404</div>
+    <h1>Ese enlace no existe</h1>
+    <p>Puede que el enlace esté mal escrito o que la página ya no exista.<br>
+    Estás en <span class="bad" id="badPath"></span></p>
+
+    <div class="suggest" id="suggestBox">
+      <div class="q">¿QUERÍAS DECIR…?</div>
+      <div class="where" id="suggestWhere"></div>
+      <a class="btn btn-gold" id="suggestBtn" href="/">Ir ahora</a>
+    </div>
+
+    <div class="actions">
+      <a class="btn btn-red" href="/ruleta/">Ir a la ruleta</a>
+      <a class="btn btn-ghost" href="/">Ir a la tienda</a>
+    </div>
+
+    <p class="help">¿Necesitas ayuda? <a href="https://wa.me/527121654968">Escríbenos por WhatsApp</a></p>
+    <div class="foot">PINK CASE · IXTLAHUACA CENTRO</div>
+  </main>
+<script>
+(function(){
+  /* GitHub Pages sirve esta página para cualquier ruta que no
+     existe. Si lo que se escribió se parece a una ruta real
+     (una o dos letras de diferencia), se sugiere la correcta:
+     /ruletaa, /ruelta o /rouleta → la ruleta; /tienda, /catalogo
+     o /inicio → la tienda. La distancia se mide con Levenshtein
+     sobre el primer tramo de la ruta. El panel de tienda
+     (/ruleta/validar/) es interno y nunca se sugiere aquí. */
+  var path = window.location.pathname || "/";
+  document.getElementById("badPath").textContent = path;
+
+  var DESTINOS = [
+    { slugs: ["ruleta"], href: "/ruleta/", nombre: "La ruleta Buen Fin" },
+    { slugs: ["tienda", "catalogo", "inicio", "home", "productos"], href: "/", nombre: "La tienda" }
+  ];
+
+  function levenshtein(a, b){
+    var m = a.length, n = b.length, i, j;
+    if(m === 0) return n;
+    if(n === 0) return m;
+    var prev = [], cur = [];
+    for(j = 0; j <= n; j++) prev[j] = j;
+    for(i = 1; i <= m; i++){
+      cur[0] = i;
+      for(j = 1; j <= n; j++){
+        cur[j] = Math.min(
+          prev[j] + 1,
+          cur[j - 1] + 1,
+          prev[j - 1] + (a.charAt(i - 1) === b.charAt(j - 1) ? 0 : 1)
+        );
+      }
+      prev = cur; cur = [];
+    }
+    return prev[n];
+  }
+
+  var seg = path.replace(/^\/+|\/+$/g, "").split("/")[0] || "";
+  seg = seg.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z]/g, "");
+  if(seg.length < 4) return; /* tramos muy cortos dan falsos positivos */
+
+  var mejor = null, mejorDist = 99;
+  DESTINOS.forEach(function(d){
+    d.slugs.forEach(function(s){
+      var dist = levenshtein(seg, s);
+      if(dist < mejorDist){ mejorDist = dist; mejor = d; }
+    });
+  });
+  if(!mejor || mejorDist > 2) return;
+
+  document.getElementById("suggestWhere").textContent = mejor.nombre;
+  document.getElementById("suggestBtn").setAttribute("href", mejor.href);
+  document.getElementById("suggestBox").classList.add("show");
+})();
+</script>
+</body>
+</html>
