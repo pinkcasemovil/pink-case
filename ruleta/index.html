@@ -1421,8 +1421,8 @@
             <li><span class="base-thumb"><img src="assets/billete-200.jpg" alt="" loading="lazy" decoding="async" /></span><span><b>$200 de descuento:</b> aplica en bocinas y smartwatch. Se puede cambiar por $100 de descuento y una mica gratis.</span></li>
             <li><span class="base-thumb"><img src="assets/billete-100.jpg" alt="" loading="lazy" decoding="async" /></span><span><b>$100 de descuento:</b> aplica en protectores, micas, cargadores, bocinas, smartwatch y más. Acércate a la sucursal de tu preferencia y con gusto te mostramos los productos participantes.</span></li>
             <li><span class="base-thumb"><img src="assets/billete-50.jpg" alt="" loading="lazy" decoding="async" /></span><span><b>$50 de descuento:</b> en tu compra en tienda, un boleto por compra.</span></li>
-            <li><span class="base-thumb"><img src="assets/boleto-mica.jpg" alt="" loading="lazy" decoding="async" /></span><span><b>Una mica gratis:</b> es 1 mica por boleto.</span></li>
-            <li><span class="base-thumb"><img src="assets/boleto-cable-v3.jpg" alt="" loading="lazy" decoding="async" /></span><span><b>Cable tipo C:</b> 1 cable por boleto.</span></li>
+            <li><span class="base-thumb"><img src="assets/boleto-mica.webp" alt="" loading="lazy" decoding="async" /></span><span><b>Una mica gratis:</b> es 1 mica por boleto.</span></li>
+            <li><span class="base-thumb"><img src="assets/boleto-cable-v3.webp" alt="" loading="lazy" decoding="async" /></span><span><b>Cable tipo C:</b> 1 cable por boleto.</span></li>
             <li><span class="base-thumb base-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM21 14v.01M14 21v.01M21 21v.01M18 18v.01"/></svg></span><span><b>1 folio = 1 canje</b> · Boleto personal, se canjea con tu QR.</span></li>
             <li><span class="base-thumb base-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/><path d="m9 16 2 2 4-4"/></svg></span><span><b>Solo del 13 al 17 de nov.</b>, en tienda · No acumulable con otras promos.</span></li>
           </ul>
@@ -1594,8 +1594,8 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
            boleto ni premio. Decisión de Axel: que se vea como
            premio ganable, sin que nadie lo gane. */
         { id:"smartwatch", color:"gold", weight:0, label:"Smartwatch", note:"", chip:"Smartwatch", chipNote:"El premio mayor", thumb:"assets/smartwatch-v5.png", wedge:"assets/gajo-smartwatch-v3.webp" },
-        { id:"cable", color:"red",   weight:120,  label:"Cable tipo C",   note:"Un cable tipo C para tu celular.", chip:"Cable tipo C", chipNote:"", thumb:"assets/boleto-cable-v3.jpg", wedge:"assets/gajo-cable.webp" },
-        { id:"mica", color:"black", weight:180, label:"Una mica gratis",   note:"Una mica de cristal templado para tu celular, instalada en tienda.", chip:"Una mica gratis", chipNote:"Instalación en tienda", thumb:"assets/boleto-mica.jpg", wedge:"assets/gajo-mica.webp" },
+        { id:"cable", color:"red",   weight:120,  label:"Cable tipo C",   note:"Un cable tipo C para tu celular.", chip:"Cable tipo C", chipNote:"", thumb:"assets/boleto-cable-v3.webp", wedge:"assets/gajo-cable.webp" },
+        { id:"mica", color:"black", weight:180, label:"Una mica gratis",   note:"Una mica de cristal templado para tu celular, instalada en tienda.", chip:"Una mica gratis", chipNote:"Instalación en tienda", thumb:"assets/boleto-mica.webp", wedge:"assets/gajo-mica.webp" },
         { id:"otra", color:"red",   weight:50,  label:"Gira otra vez",   note:"", chip:"Gira otra vez", chipNote:"Un giro extra al momento", wedge:"assets/gajo-otra.webp" }
       ];
       var TOTAL_WEIGHT = SEGMENTS.reduce(function(s,x){ return s+x.weight; }, 0);
@@ -2098,14 +2098,18 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       function playClick(){ ensureAudio(); blip(920, .06, "triangle", .055, 0); blip(1420, .05, "sine", .04, .03); }
       function playPop(){ blip(420, .12, "sine", .06, 0, 880); blip(1180, .08, "triangle", .035, .05); }
       function playSpinStart(){ noiseBurst(.65,.10,0,420,2800); blip(220,.55,"sawtooth",.028,0,880); blip(440,.5,"triangle",.04,.05,1320); }
-      /* Clic de gajo + nota musical: suena distinto a la música de fondo */
+      /* Clic de gajo + nota musical: suena distinto a la música de fondo.
+         Volúmenes subidos el 14 nov 2026 (antes .026/.022): en los
+         altavoces de los teléfonos la cumbia de fondo tapaba los
+         clics. Con el fondo bajado a .15 durante el giro (abajo),
+         los clics quedan claramente por encima. */
       function tickSound(progress){
         tickIdx++;
         var scale = [1046.5, 1174.66, 1318.51, 1567.98, 1760, 1567.98, 1318.51, 1174.66];
         var note = scale[tickIdx % scale.length];
         var pitch = 1750 - (progress ? progress*650 : 0);
-        blip(pitch, .03, "square", .026, 0);
-        blip(note, .07, "sine", .022, 0);
+        blip(pitch, .03, "square", .05, 0);
+        blip(note, .07, "sine", .045, 0);
       }
       /* Música mientras se juega: arpegio alegre + pulso. El tempo
          lo marca tickSpinMusic() con el RELOJ del giro (ms reales
@@ -2114,7 +2118,10 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
          rápido y en uno lento. */
       function startSpinMusic(){
         stopSpinMusic(); spinMusicStep = 0; spinMusicNextAt = 0;
-        duckBgm(.32); /* la música de fondo baja para que luzca el giro */
+        /* El fondo baja a .15 (antes .32): con .32 la cumbia
+           quedaba en .07 y tapaba los clics y el arpegio en los
+           teléfonos. Ahora queda en .03 y el giro manda. */
+        duckBgm(.15);
       }
       function tickSpinMusic(progress, elapsedMs){
         if(!state.sound || !actx) return;
@@ -2126,8 +2133,8 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         spinMusicStep++;
         var arp = [523.25, 659.25, 783.99, 1046.5, 783.99, 659.25];
         var f = arp[spinMusicStep % arp.length];
-        blip(f, .14, "triangle", .032, 0);
-        blip(f/2, .16, "sine", .028, 0);
+        blip(f, .14, "triangle", .05, 0);
+        blip(f/2, .16, "sine", .045, 0);
         if(spinMusicStep % 4 === 0) noiseBurst(.05, .018, 0, 900, 1400);
       }
       function stopSpinMusic(){
@@ -2141,7 +2148,12 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       }
       function fanfare(isJackpot){
         duckBgm(.25); /* la fanfarria manda: el fondo baja y regresa solo */
-        setTimeout(function(){ if(!state.spinning) duckBgm(1); }, 2100);
+        /* La vuelta del fondo espera a que Helio termine: la voz del
+           premio arranca a los 650 ms y dura ~3-4 s, así que
+           restaurar a los 2100 ms la dejaba hablando encima de la
+           cumbia a todo volumen. Si Helio está hablando, no se
+           restaura aquí: lo hace su evento "ended" al terminar. */
+        setTimeout(function(){ if(!state.spinning && !narrator.speaking) duckBgm(1); }, 2100);
         /* Melodía + armonía en dos capas */
         var mel = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5, 1318.51];
         mel.forEach(function(n,i){ blip(n,.24,"triangle",.062,i*.11); blip(n/2,.24,"sine",.038,i*.11); });
@@ -2258,6 +2270,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       bgmEl.preload = "none";
       try{ bgmEl.volume = BGM_BASE_VOL; }catch(e){ /* noop */ }
       var bgmFadeTimer = null;
+      var bgmPhotoWait = 0, bgmRetryPending = false;
       function bgmFadeTo(target, ms){
         if(bgmFadeTimer){ clearInterval(bgmFadeTimer); bgmFadeTimer = null; }
         var from = 0;
@@ -2272,11 +2285,21 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       }
       function startBgm(){
         if(state.bgmMuted) return;
-        /* Con la página oculta o cerrada la música NUNCA arranca:
-           ningún temporizador (bienvenida, reintentos) puede
-           encenderla mientras la página no está a la vista. */
-        if(document.hidden) return;
         if(bgm.playing) return;
+        /* La música nunca arranca con la página oculta. Y en
+           conexiones lentas espera a las fotos del boleto (ver
+           preloadTicketPhotos): la cumbia (360 KB) competía con
+           ellas y el boleto salía sin foto ~10 s. En conexiones
+           normales la espera es de menos de 1 s; si las fotos
+           se atoran, la música arranca de todos modos a los 20 s. */
+        var waitPhotos = !ticketPhotosReady && bgmPhotoWait < 20;
+        if(document.hidden || waitPhotos){
+          if(!bgmRetryPending){
+            bgmRetryPending = true;
+            setTimeout(function(){ bgmRetryPending = false; if(waitPhotos) bgmPhotoWait++; startBgm(); }, 1000);
+          }
+          return;
+        }
         bgm.playing = true; bgm.everStarted = true;
         try{ bgmEl.preload = "auto"; }catch(e){ /* noop */ }
         bgmFadeTo(BGM_BASE_VOL, 700);
@@ -2358,7 +2381,9 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
           a.addEventListener("play", function(){
             narrator.speaking = true;
             if(narratorCardEl) narratorCardEl.classList.add("speaking");
-            duckBgm(.35);
+            /* La voz manda: el fondo baja a .18 (antes .35, que
+               incluso lo SUBÍA respecto al .25 de la fanfarria). */
+            duckBgm(.18);
           });
           a.addEventListener("ended", function(){
             narrator.speaking = false;
@@ -3283,41 +3308,66 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
          (buildTicketMid) y la imagen descargada (drawTicketImage) usan la
          misma tabla, para que las dos versiones se vean iguales. */
       var TICKET_DESIGN = {
-        d200:  { photo: "assets/boleto-billete-200.jpg", tilt: true, mid: "cards200",
+        d200:  { photo: "assets/boleto-billete-200.webp", tilt: true, mid: "cards200",
                  caption: "Muestra tu QR en tienda para canjear tu premio." },
-        d100:  { photo: "assets/boleto-billete-100.jpg", tilt: true, split: ["$100", "DE DESCUENTO"],
+        d100:  { photo: "assets/boleto-billete-100.webp", tilt: true, split: ["$100", "DE DESCUENTO"],
                  hideNote: true, mid: "grid", gridTitle: "ÚSALO EN TUS ACCESORIOS FAVORITOS",
                  gridSub: "Aplica tu descuento en:", mirror: false,
                  caption: "Muestra tu QR en tienda y disfruta tu descuento." },
-        d50:   { photo: "assets/boleto-billete-50.jpg", tilt: true, side: true, mid: "grid",
+        d50:   { photo: "assets/boleto-billete-50.webp", tilt: true, side: true, mid: "grid",
                  gridTitle: "ÚSALO EN TUS ACCESORIOS FAVORITOS", gridSub: "", mirror: true,
                  caption: "Muestra tu QR en tienda para canjear tu premio." },
-        cable: { photo: "assets/boleto-cable-v3.jpg", mid: "bar",
+        cable: { photo: "assets/boleto-cable-v3.webp", mid: "bar",
                  caption: "Muestra tu QR en tienda para canjear tu premio." },
-        mica:  { photo: "assets/boleto-mica.jpg", mid: "chips",
+        mica:  { photo: "assets/boleto-mica.webp", mid: "chips",
                  caption: "Muestra tu QR en tienda para canjear tu premio." }
       };
       var TICKET_GRID = [
-        { img: "assets/boleto-funda.jpg", label: "Protectores" },
-        { img: "assets/boleto-mica-chip.jpg", label: "Micas" },
-        { img: "assets/boleto-cargador.jpg", label: "Cargadores" },
-        { img: "assets/boleto-bocina.jpg", label: "Bocinas" },
-        { img: "assets/boleto-reloj.jpg", label: "Smartwatch" },
-        { img: "assets/boleto-audifonos.jpg", label: "Y más accesorios" }
+        { img: "assets/boleto-funda.webp", label: "Protectores" },
+        { img: "assets/boleto-mica-chip.webp", label: "Micas" },
+        { img: "assets/boleto-cargador.webp", label: "Cargadores" },
+        { img: "assets/boleto-bocina.webp", label: "Bocinas" },
+        { img: "assets/boleto-reloj.webp", label: "Smartwatch" },
+        { img: "assets/boleto-audifonos.webp", label: "Y más accesorios" }
       ];
-      /* Fotos del boleto: se descargan al registrarse (setPlayer) y,
-         como respaldo, al arrancar el giro — nunca al abrir la página,
-         porque son 372 KB que solo usa quien ya ganó. El giro dura
-         6,4 s, tiempo de sobra para que lleguen antes del boleto. */
+      /* Fotos del boleto (270 KB en WebP): se empiezan a bajar en
+         cuanto la página ya pintó (tiempo libre, ver Arranque) y,
+         como respaldo, al registrarse y al arrancar el giro. Antes
+         se bajaban solo al registrarse y el comentario decía que
+         los 6,4 s del giro eran «tiempo de sobra»: en conexiones
+         lentas de tienda era falso, el boleto salía sin foto y la
+         foto tardaba ~10 s en aparecer (medido con 3G lento el
+         14 nov 2026). Por eso van en dos fases (ver abajo) y la
+         música de fondo espera a la primera (ver startBgm). */
       var ticketPhotosPreloaded = false;
+      var ticketPhotosReady = false, ticketPhotosSettled = 0, ticketPhotosTotal = 0;
       function preloadTicketPhotos(){
         if(ticketPhotosPreloaded) return;
         ticketPhotosPreloaded = true;
-        var files = ["boleto-billete-200.jpg","boleto-billete-100.jpg","boleto-billete-50.jpg",
-          "boleto-cable-v3.jpg","boleto-mica.jpg","boleto-funda.jpg","boleto-mica-chip.jpg",
-          "boleto-cargador.jpg","boleto-bocina.jpg","boleto-reloj.jpg","boleto-audifonos.jpg",
-          "boleto-bocina200.jpg","boleto-mica-v.jpg"];
-        for(var i = 0; i < files.length; i++){ var im = new Image(); im.src = "assets/" + files[i]; }
+        /* DOS FASES: primero las 5 fotos principales (las que salen
+           grandes en el boleto) y después las 8 del bloque medio.
+           La música de fondo espera solo a la fase 1. */
+        var mains = ["boleto-billete-200.webp","boleto-billete-100.webp","boleto-billete-50.webp",
+          "boleto-cable-v3.webp","boleto-mica.webp"];
+        var rest = ["boleto-funda.webp","boleto-mica-chip.webp",
+          "boleto-cargador.webp","boleto-bocina.webp","boleto-reloj.webp","boleto-audifonos.webp",
+          "boleto-bocina200.webp","boleto-mica-v.webp"];
+        ticketPhotosTotal = mains.length;
+        function settled(){
+          ticketPhotosSettled++;
+          if(ticketPhotosSettled >= ticketPhotosTotal){
+            ticketPhotosReady = true;
+            loadFiles(rest, false);
+          }
+        }
+        function loadFiles(files, track){
+          for(var i = 0; i < files.length; i++){
+            var im = new Image();
+            if(track){ im.onload = settled; im.onerror = settled; }
+            im.src = "assets/" + files[i];
+          }
+        }
+        loadFiles(mains, true);
       }
       /* Bloque medio del boleto según el premio (HTML del modal). */
       function buildTicketMid(prizeId){
@@ -3334,11 +3384,11 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         if(d.mid === "cards200"){
           return '<div class="mid-cards">' +
             '<div class="mid-card"><span class="mc-pill">APLICA EN</span>' +
-            '<div class="mc-photos"><img src="assets/boleto-bocina200.jpg" alt="Bocina"><img src="assets/boleto-reloj.jpg" alt="Smartwatch"></div>' +
+            '<div class="mc-photos"><img src="assets/boleto-bocina200.webp" alt="Bocina"><img src="assets/boleto-reloj.webp" alt="Smartwatch"></div>' +
             '<div class="mc-label">Bocinas<i>|</i>Smartwatch</div>' +
             '<div class="mc-bottom">$200 de descuento</div></div>' +
             '<div class="mid-card"><span class="mc-pill">O CÁMBIALO POR</span>' +
-            '<div class="mc-photos trio"><img src="assets/boleto-billete-100.jpg" alt="Billete de $100"><span class="mc-plus">+</span><img src="assets/boleto-mica-v.jpg" alt="Mica"></div>' +
+            '<div class="mc-photos trio"><img src="assets/boleto-billete-100.webp" alt="Billete de $100"><span class="mc-plus">+</span><img src="assets/boleto-mica-v.webp" alt="Mica"></div>' +
             '<div class="mc-bottom">$100 de descuento<br>+ una mica gratis</div></div>' +
             '</div>';
         }
@@ -3606,7 +3656,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         var note = (d.hideNote ? "" : (ticket.prizeNote || ""));
         /* Fotos que necesita este premio (la principal + las del bloque medio). */
         var need = [d.photo || ""];
-        if(d.mid === "cards200") need = need.concat(["assets/boleto-bocina200.jpg","assets/boleto-reloj.jpg","assets/boleto-billete-100.jpg","assets/boleto-mica-v.jpg"]);
+        if(d.mid === "cards200") need = need.concat(["assets/boleto-bocina200.webp","assets/boleto-reloj.webp","assets/boleto-billete-100.webp","assets/boleto-mica-v.webp"]);
         if(d.mid === "grid") for(var gi = 0; gi < TICKET_GRID.length; gi++) need.push(TICKET_GRID[gi].img);
         return Promise.all(need.map(loadTicketImage)).then(function(loaded){
           var P = {};
@@ -3759,10 +3809,10 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
               y += 24;
               var cardW = (CW - 16) / 2, cardH = 296;
               drawPrizeCard(ctx, MX, y, cardW, cardH, "APLICA EN",
-                [P["assets/boleto-bocina200.jpg"], P["assets/boleto-reloj.jpg"]],
+                [P["assets/boleto-bocina200.webp"], P["assets/boleto-reloj.webp"]],
                 "Bocinas | Smartwatch", ["$200 de descuento"], false);
               drawPrizeCard(ctx, MX + cardW + 16, y, cardW, cardH, "O CÁMBIALO POR",
-                [P["assets/boleto-billete-100.jpg"], P["assets/boleto-mica-v.jpg"]],
+                [P["assets/boleto-billete-100.webp"], P["assets/boleto-mica-v.webp"]],
                 "", ["$100 de descuento", "+ una mica gratis"], true);
               y += cardH + 26;
             }else if(d.mid === "grid"){
@@ -4158,6 +4208,12 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
          se intenta de inmediato y, si el navegador lo bloquea
          hasta el primer toque, queda armado para ese momento. */
       tryWelcomeSound();
+      /* Las fotos del boleto se empiezan a bajar en cuanto la
+         página ya pintó (tiempo libre del navegador), no al
+         registrarse: así llegan antes del giro aunque la
+         conexión sea lenta (ver preloadTicketPhotos). */
+      if(window.requestIdleCallback){ window.requestIdleCallback(function(){ preloadTicketPhotos(); }, { timeout: 2500 }); }
+      else{ setTimeout(preloadTicketPhotos, 1200); }
       if(remoteEnabled()){
         /* Con el puente conectado sobra el aviso y se reintentan
            los registros que hubieran quedado en cola. */
