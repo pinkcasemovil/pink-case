@@ -4422,28 +4422,13 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         if(halo) gsap.to(halo, { rotate:120, ease:"none",
           scrollTrigger:{ trigger:".wheel-zone", start:"top bottom", end:"bottom top", scrub:true } });
 
-        /* 6) Franja de fotos (sin recuadro): la palabra de fondo
-              cruza y la franja entra suave con el scroll, en scrub */
-        var bg = document.getElementById("showcaseBg");
-        if(bg) gsap.fromTo(bg, { xPercent:-7 }, { xPercent:7, ease:"none",
-          scrollTrigger:{ trigger:"#showcasePin", start:"top bottom", end:"bottom top", scrub:true } });
-        var cView = document.getElementById("carouselViewport");
-        if(cView) gsap.fromTo(cView, { y:26, opacity:.35 }, { y:0, opacity:1, ease:"none",
-          scrollTrigger:{ trigger:"#showcasePin", start:"top 92%", end:"top 45%", scrub:true } });
-
-        /* El carrusel se inclina según la velocidad del scroll (sigue infinito) */
-        var shift = document.getElementById("carouselShift");
-        if(shift){
-          var skewSetter = gsap.quickTo(shift, "skewX", { duration:.35, ease:"power3" });
-          var clampSkew = gsap.utils.clamp(-7, 7);
-          ScrollTrigger.create({
-            onUpdate: function(self){ skewSetter(clampSkew(self.getVelocity() / -260)); }
-          });
-          ScrollTrigger.create({
-            trigger:"#showcasePin", start:"top bottom", end:"bottom top",
-            onLeave: function(){ skewSetter(0); }, onLeaveBack: function(){ skewSetter(0); }
-          });
-        }
+        /* 6) Franja de fotos: SOLO el desfile infinito (marquee CSS
+           en .carousel-track). La palabra de fondo que cruzaba, la
+           entrada con scroll y la inclinación por velocidad se
+           quitaron el 14 nov 2026 por pedido de Axel: quería el
+           carrusel más fluido, sin efectos ligados al scroll. La
+           palabra PINK CASE queda fija de fondo y la franja
+           visible siempre; el desfile no se toca. */
 
         /* 7) Pie: su línea crece con el último tramo de scroll */
         var fLine = document.querySelector("footer .red-line");
