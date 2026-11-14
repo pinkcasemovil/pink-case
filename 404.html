@@ -41,7 +41,6 @@
   }
   .btn-red{ color:#fff; background:linear-gradient(180deg,#ff3b47,#e8112d 55%,#9c0018); box-shadow:0 8px 22px rgba(232,17,45,.4); }
   .btn-gold{ color:#2a1800; background:linear-gradient(180deg,#ffc966,#e79b1e); box-shadow:0 8px 22px rgba(255,182,72,.3); }
-  .btn-ghost{ color:#f5f0f2; border:1.5px solid #4a3d42; background:transparent; }
   .actions{ margin-top:26px; display:flex; flex-wrap:wrap; gap:12px; justify-content:center; }
   .actions .btn{ margin-top:0; }
   .help{ margin-top:26px; font-size:14px; color:#8f858c; }
@@ -64,8 +63,7 @@
     </div>
 
     <div class="actions">
-      <a class="btn btn-red" href="/ruleta/">Ir a la ruleta</a>
-      <a class="btn btn-ghost" href="/">Ir a la tienda</a>
+      <a class="btn btn-red" href="/">Ir a la tienda</a>
     </div>
 
     <p class="help">¿Necesitas ayuda? <a href="https://wa.me/527121654968">Escríbenos por WhatsApp</a></p>
@@ -74,17 +72,16 @@
 <script>
 (function(){
   /* GitHub Pages sirve esta página para cualquier ruta que no
-     existe. Si lo que se escribió se parece a una ruta real
-     (una o dos letras de diferencia), se sugiere la correcta:
-     /ruletaa, /ruelta o /rouleta → la ruleta; /tienda, /catalogo
-     o /inicio → la tienda. La distancia se mide con Levenshtein
-     sobre el primer tramo de la ruta. El panel de tienda
-     (/ruleta/validar/) es interno y nunca se sugiere aquí. */
+     existe. Si lo que se escribió se parece a la tienda (una o
+     dos letras de diferencia), se sugiere la correcta: /tienda,
+     /tiendaa, /catalogo o /inicio → la tienda. La distancia se
+     mide con Levenshtein sobre el primer tramo de la ruta.
+     De momento la única salida es la tienda: la ruleta no se
+     ofrece aquí (decisión de Axel, 13 nov 2026). */
   var path = window.location.pathname || "/";
   document.getElementById("badPath").textContent = path;
 
   var DESTINOS = [
-    { slugs: ["ruleta"], href: "/ruleta/", nombre: "La ruleta Buen Fin" },
     { slugs: ["tienda", "catalogo", "inicio", "home", "productos"], href: "/", nombre: "La tienda" }
   ];
 
