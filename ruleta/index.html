@@ -2257,8 +2257,15 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
          hasta que el cliente la silencie con el botón flotante
          de la bocina (ese botón SOLO controla esta música).
          Al girar la ruleta y al ganar, el fondo baja solo
-         (ducking) y vuelve a subir cuando termina el efecto. */
-      var BGM_BASE_VOL = .22;
+         (ducking) y vuelve a subir cuando termina el efecto.
+         El volumen se controla por WebAudio (GainNode), NO con
+         la propiedad volume del elemento: en iPhone el volumen
+         de un <audio> no se puede cambiar desde JS (el sistema
+         lo deja siempre en 1.0), así que el ducking no hacía
+         nada en iPhone y la cumbia sonaba a todo volumen por
+         encima de los clics y de la voz. Con el GainNode el
+         volumen sí obedece en iPhone y en Android. */
+      var BGM_BASE_VOL = .14; /* bajado de .22 el 14 nov 2026: en teléfonos la cumbia tapaba los efectos y la voz */
       var bgmBtnEl = $("bgmBtn");
       var bgm = { playing: false, everStarted: false };
       var bgmEl = new Audio();
@@ -2269,17 +2276,47 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
          cuando el navegador además permite que suene. */
       bgmEl.preload = "none";
       try{ bgmEl.volume = BGM_BASE_VOL; }catch(e){ /* noop */ }
+      var bgmGain = null, bgmGraphTried = false;
+      /* Conecta la cumbia al grafo WebAudio una sola vez (un
+         elemento solo admite un MediaElementSource): la señal
+         va elemento → GainNode → salida, y el volumen se mueve
+         con el GainNode. Si WebAudio no está disponible, se
+         queda en falso y el volumen sigue por el elemento
+         (en Android funciona; en iPhone suena sin ducking,
+         como antes, pero al menos suena). */
+      function bgmEnsureGraph(){
+        if(bgmGain || bgmGraphTried) return !!bgmGain;
+        bgmGraphTried = true;
+        try{
+          ensureAudio();
+          if(!actx) return false;
+          var src = actx.createMediaElementSource(bgmEl);
+          bgmGain = actx.createGain();
+          bgmGain.gain.value = BGM_BASE_VOL;
+          src.connect(bgmGain);
+          bgmGain.connect(actx.destination);
+          try{ bgmEl.volume = 1; }catch(e){ /* noop */ }
+          return true;
+        }catch(e){ bgmGain = null; return false; }
+      }
+      function bgmSetVol(v){
+        if(bgmGain){ try{ bgmGain.gain.value = v; }catch(e){ /* noop */ } }
+        else { try{ bgmEl.volume = v; }catch(e){ /* noop */ } }
+      }
+      function bgmGetVol(){
+        if(bgmGain){ try{ return bgmGain.gain.value; }catch(e){ return BGM_BASE_VOL; } }
+        try{ return bgmEl.volume; }catch(e){ return BGM_BASE_VOL; }
+      }
       var bgmFadeTimer = null;
       var bgmPhotoWait = 0, bgmRetryPending = false;
       function bgmFadeTo(target, ms){
         if(bgmFadeTimer){ clearInterval(bgmFadeTimer); bgmFadeTimer = null; }
-        var from = 0;
-        try{ from = bgmEl.volume; }catch(e){ return; }
-        if(Math.abs(target - from) < .01){ try{ bgmEl.volume = target; }catch(e){ /* noop */ } return; }
+        var from = bgmGetVol();
+        if(Math.abs(target - from) < .01){ bgmSetVol(target); return; }
         var steps = Math.max(1, Math.round((ms || 300) / 40)), i = 0;
         bgmFadeTimer = setInterval(function(){
           i++;
-          try{ bgmEl.volume = Math.min(1, Math.max(0, from + (target - from) * (i / steps))); }catch(e){ /* noop */ }
+          bgmSetVol(Math.min(1, Math.max(0, from + (target - from) * (i / steps))));
           if(i >= steps){ clearInterval(bgmFadeTimer); bgmFadeTimer = null; }
         }, 40);
       }
@@ -2302,6 +2339,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         }
         bgm.playing = true; bgm.everStarted = true;
         try{ bgmEl.preload = "auto"; }catch(e){ /* noop */ }
+        bgmEnsureGraph(); /* el volumen va por el GainNode (ver arriba); sin grafo, por el elemento */
         bgmFadeTo(BGM_BASE_VOL, 700);
         var p = null;
         try{ p = bgmEl.play(); }catch(e){ p = null; }
@@ -2513,7 +2551,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       welcomeAudioEl.preload = "none";
       welcomeAudioEl.src = NARR_CLIPS.bienvenidaCorta;
       narrator.cache["bienvenidaCorta"] = welcomeAudioEl;
-      welcomeAudioEl.addEventListener("play", function(){ narrator.speaking = true; duckBgm(.35); });
+      welcomeAudioEl.addEventListener("play", function(){ narrator.speaking = true; duckBgm(.18); });
       /* La marca de «ya sonó» SOLO se pone cuando el audio está
          sonando de verdad (evento «playing») y nunca durante el
          cebado silencioso: marcarla antes de intentarlo era lo
@@ -2607,9 +2645,17 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         document.addEventListener(evt, primeWelcomeAudio, { passive: true });
       });
       function startBgmAfterWelcome(){
-        if(welcomeBgmStarted) return;
-        welcomeBgmStarted = true;
-        startBgm();
+        if(!welcomeBgmStarted){
+          welcomeBgmStarted = true;
+          startBgm();
+        }
+        /* La bienvenida baja el fondo (.22 antes de hablar, .18
+           al arrancar) y hay que subirlo al terminar: antes
+           ningún evento lo hacía y el fondo se quedaba bajado
+           para siempre si la música ya sonaba. Si la voz todavía
+           suena (arrancó tarde por reintentos), no se restaura
+           aquí: lo hace el "ended" de la bienvenida. */
+        if(!state.spinning && !welcomePlaying) duckBgm(1);
       }
       function playWelcomeChime(){
         var now = Date.now();
@@ -2641,7 +2687,10 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
             speechSynthesis.cancel();
             speechSynthesis.speak(u);
             welcomeVoiceAt = Date.now();
-            setTimeout(startBgmAfterWelcome, 1600);
+            /* La música entra cuando la frase termina (~3 s),
+               no a la mitad: antes entraba a los 1600 ms y se
+               encimaba con la voz del sistema. */
+            setTimeout(startBgmAfterWelcome, 3200);
             return;
           }
         }catch(e){ /* sin voz del sistema disponible */ }
@@ -3147,8 +3196,10 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         /* Red de seguridad por reloj: si el navegador detiene
            requestAnimationFrame (pestaña en segundo plano o un
            teléfono al límite), el giro termina a su hora exacta
-           de todos modos, en el mismo gajo sorteado. */
-        setTimeout(finishNow, duration + 600);
+           de todos modos, en el mismo gajo sorteado. El margen
+           es de 250 ms (antes 600): en teléfonos lentos la
+           ruleta se veía parada un rato sin que saliera nada. */
+        setTimeout(finishNow, duration + 250);
       }
 
       function finishSpin(seg){
@@ -3201,7 +3252,12 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         celebrate(isJackpotWin);
         narrateWin(seg);
         refreshUI();
-        setTimeout(function(){ openTicket(ticket); }, REDUCED ? 60 : 420);
+        /* El boleto sale casi de inmediato (120 ms, antes 420):
+           la fanfarria y la voz ya arrancaron y no hay nada que
+           esperar; en teléfonos lentos esos 420 ms, sumados al
+           retraso en detectar el fin del giro, se sentían como
+           que el boleto tardaba en salir. */
+        setTimeout(function(){ openTicket(ticket); }, REDUCED ? 60 : 120);
       }
 
       /* ================= Boleto ================= */
