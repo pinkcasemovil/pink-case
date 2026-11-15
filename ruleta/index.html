@@ -1066,6 +1066,19 @@
         .store:active, .step:active, .prize-chip:active{ transform:translateY(-2px); }
       }
 
+      /* En pantallas táctiles: menos trabajo al bajar.
+         - El botón de música deja el desenfoque de fondo: es fijo
+           y el navegador lo volvía a difuminar en cada cuadro del
+           scroll. El fondo degradado ya es casi opaco, así que se
+           ve igual.
+         - Cada sección se pinta solo cuando se acerca a la
+           pantalla (content-visibility), así bajar no repinta
+           toda la página. La altura estimada evita saltos. */
+      @media (pointer:coarse){
+        .sound-fab{ backdrop-filter:none; -webkit-backdrop-filter:none; }
+        section.block{ content-visibility:auto; contain-intrinsic-size:auto 700px; }
+      }
+
       @media (prefers-reduced-motion: reduce){
         .wheel-float, .wheel-halo, .pill-gana::after, .hub.ready, .btn-spin.ready, .ticket-inner::after, .qr-box::after, .qr-box.qr-ready, .modal-card, .store-modal-card{ animation:none !important; }
         .name-card::before, .stage-wrap, .stage-wrap::before, .sound-fab:not(.muted), .prize-chip.jackpot{ animation:none !important; }
@@ -1122,7 +1135,6 @@
         font-family:"Anton","Archivo",sans-serif;
         font-size:clamp(64px, 15vw, 170px); letter-spacing:.04em; white-space:nowrap;
         color:rgba(255,255,255,.06); user-select:none; pointer-events:none;
-        will-change:transform;
       }
       /* --- Carrusel infinito, sin marco --- */
       .carousel-viewport{
@@ -1130,7 +1142,7 @@
         -webkit-mask-image:linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
         mask-image:linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
       }
-      .carousel-shift{ will-change:transform; }
+      .carousel-shift{ }
       .carousel-track{
         display:flex; gap:22px; width:max-content; padding:0 11px;
         align-items:flex-start;
@@ -1310,7 +1322,7 @@
         </div>
         <div class="duo">
           <div class="poster">
-            <img src="assets/flyer-ruleta-v2.webp" alt="Flyer oficial de la Ruleta Buen Fin de Pink Case: ruleta con billetes de $200, $100 y $50 de descuento, smartwatch, cable tipo C y mica gratis, del 13 al 17 de noviembre en Ixtlahuaca Centro" loading="lazy" />
+            <img src="assets/flyer-ruleta-v2.webp" alt="Flyer oficial de la Ruleta Buen Fin de Pink Case: ruleta con billetes de $200, $100 y $50 de descuento, smartwatch, cable tipo C y mica gratis, del 13 al 17 de noviembre en Ixtlahuaca Centro" loading="lazy"  decoding="async" />
           </div>
           <div class="bases">
             <h3>En corto — lo que debes saber</h3>
@@ -1456,7 +1468,7 @@
                 <div class="ticket-prize" id="tPrize">—</div>
                 <div class="ticket-note" id="tNoteSide" hidden>—</div>
               </div>
-              <div class="ticket-photo" id="tPhotoWrap"><img id="tPhoto" src="" alt="Foto del premio"><span class="ticket-seal" aria-hidden="true"><span>BOLETO</span><b>VÁLIDO</b><span>13–17 NOV</span></span></div>
+              <div class="ticket-photo" id="tPhotoWrap"><img id="tPhoto" src="" alt="Foto del premio" decoding="async"><span class="ticket-seal" aria-hidden="true"><span>BOLETO</span><b>VÁLIDO</b><span>13–17 NOV</span></span></div>
               <div class="ticket-note" id="tNote">—</div>
             </div>
             <div class="ticket-mid" id="tMid"></div>
@@ -3419,6 +3431,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         function loadFiles(files, track){
           for(var i = 0; i < files.length; i++){
             var im = new Image();
+            im.decoding = "async";
             if(track){ im.onload = settled; im.onerror = settled; }
             im.src = "assets/" + files[i];
           }
@@ -3440,11 +3453,11 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         if(d.mid === "cards200"){
           return '<div class="mid-cards">' +
             '<div class="mid-card"><span class="mc-pill">APLICA EN</span>' +
-            '<div class="mc-photos"><img src="assets/boleto-bocina200.webp" alt="Bocina"><img src="assets/boleto-reloj.webp" alt="Smartwatch"></div>' +
+            '<div class="mc-photos"><img src="assets/boleto-bocina200.webp" alt="Bocina" decoding="async"><img src="assets/boleto-reloj.webp" alt="Smartwatch" decoding="async"></div>' +
             '<div class="mc-label">Bocinas<i>|</i>Smartwatch</div>' +
             '<div class="mc-bottom">$200 de descuento</div></div>' +
             '<div class="mid-card"><span class="mc-pill">O CÁMBIALO POR</span>' +
-            '<div class="mc-photos trio"><img src="assets/boleto-billete-100.webp" alt="Billete de $100"><span class="mc-plus">+</span><img src="assets/boleto-mica-v.webp" alt="Mica"></div>' +
+            '<div class="mc-photos trio"><img src="assets/boleto-billete-100.webp" alt="Billete de $100" decoding="async"><span class="mc-plus">+</span><img src="assets/boleto-mica-v.webp" alt="Mica" decoding="async"></div>' +
             '<div class="mc-bottom">$100 de descuento<br>+ una mica gratis</div></div>' +
             '</div>';
         }
@@ -3454,7 +3467,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
           h += '<div class="mid-grid">';
           for(var i = 0; i < TICKET_GRID.length; i++){
             var c = TICKET_GRID[i];
-            h += '<div class="grid-chip' + (d.mirror ? ' mirror' : '') + '"><img src="' + c.img + '" alt="' + escapeHtml(c.label) + '">' +
+            h += '<div class="grid-chip' + (d.mirror ? ' mirror' : '') + '"><img src="' + c.img + '" alt="' + escapeHtml(c.label) + '" decoding="async">' +
               (d.mirror ? '' : '<span class="g-div"></span>') + '<span>' + escapeHtml(c.label) + '</span></div>';
           }
           return h + '</div>';
@@ -3554,6 +3567,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       function loadTicketImage(src){
         return new Promise(function(resolve){
           var im = new Image();
+          im.decoding = "async";
           im.onload = function(){ resolve(im); };
           im.onerror = function(){ resolve(null); };
           im.src = src;
@@ -4405,19 +4419,30 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
 
       var bar = document.getElementById("scrollProgressBar");
       var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var coarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
 
-      /* Respaldo sin GSAP: la barra superior sigue al scroll */
-      if(!window.gsap || !window.ScrollTrigger){
+      /* Respaldo sin GSAP: la barra superior sigue al scroll.
+         En pantallas táctiles también entra aquí aunque GSAP esté
+         cargado: el scrub se apaga por rendimiento (ver el
+         cargador de abajo). */
+      if(!window.gsap || !window.ScrollTrigger || coarse){
         if(bar && !reduced){
           /* El alto total se mide solo al cargar y al cambiar el
              tamaño de la ventana: el handler de scroll ya no lee
              el layout en cada evento, solo aplica el transform. */
           var maxScroll = 0;
+          var lastMeasure = 0;
           var measureBar = function(){
             var h = document.documentElement;
             maxScroll = h.scrollHeight - h.clientHeight;
+            lastMeasure = Date.now();
           };
           var onScroll = function(){
+            /* En pantallas táctiles las secciones se pintan al
+               acercarse (content-visibility) y el alto total
+               cambia al bajar: se vuelve a medir como máximo una
+               vez cada 800 ms, para que la barra no retroceda. */
+            if(Date.now() - lastMeasure > 800) measureBar();
             var pr = maxScroll > 0 ? (document.documentElement.scrollTop || window.scrollY || 0) / maxScroll : 0;
             bar.style.transform = "scaleX(" + Math.min(1, Math.max(0, pr)).toFixed(4) + ")";
           };
@@ -4507,7 +4532,13 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       "use strict";
       function run(){ if(typeof window.__initScrollFx === "function") window.__initScrollFx(); }
       var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if(reduced){ run(); return; }
+      /* En pantallas táctiles no se descarga GSAP: medido con CPU 6x
+         más lenta (como un Android gama media), las animaciones por
+         scroll duplicaban los tirones al bajar (p95 de 33 a 67 ms por
+         cuadro, 43 tareas largas en vez de 17). La página se ve
+         completa igual; solo la barra superior sigue al scroll. */
+      var coarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+      if(reduced || coarse){ run(); return; }
       var started = false;
       function loadGsap(){
         if(started) return;
