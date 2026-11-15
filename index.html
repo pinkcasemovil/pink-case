@@ -885,6 +885,10 @@
 .border-l{border-left-width:1px}
 .border-white\/30{border-color:rgb(255 255 255/.3)}
 .border-white\/20{border-color:rgb(255 255 255/.2)}
+.isabel-panel{background-color:#222223}
+.isabel-row{background-color:#2b2b2e}
+.hover\:border-white\/30:hover{border-color:rgb(255 255 255/.3)}
+.text-white\/60{color:rgb(255 255 255/.6)}
 .w-4{width:1rem}
 .h-4{height:1rem}
 .p-1\.5{padding:.375rem}
@@ -2220,21 +2224,21 @@
 
 <div class="hidden fixed inset-0 z-50" id="isabel-menu">
 <div class="absolute inset-0 bg-black/60" onclick="closeIsabelMenu()"></div>
-<div class="absolute inset-x-4 bottom-4 sm:left-auto sm:right-6 sm:bottom-6 sm:w-[400px] rounded-3xl bg-surface-1 border border-pink-500/30 p-5 shadow-2xl">
+<div class="absolute inset-x-4 bottom-4 sm:left-auto sm:right-6 sm:bottom-6 sm:w-[400px] rounded-3xl isabel-panel border border-white/20 p-5 shadow-2xl">
 <div class="flex items-center gap-3">
-<img alt="Isabel, asesora de Pink Case" class="w-11 h-11 rounded-full object-cover border-2 border-pink-primary/60 shrink-0" src="assets/isabel-mostrador-v2-640.webp" style="object-position: center 18%;"/>
+<img alt="Isabel, asesora de Pink Case" class="w-11 h-11 rounded-full object-cover border border-white/20 shrink-0" src="assets/isabel-mostrador-v2-640.webp" style="object-position: center 18%;"/>
 <div class="flex flex-col">
 <span class="font-archivo font-bold text-white text-sm">Isabel • Te ayudamos</span>
-<span class="font-archivo text-xs text-text-muted">¿Qué te gustaría? Elige una opción:</span>
+<span class="font-archivo text-xs text-white/60">¿Qué te gustaría? Elige una opción:</span>
 </div>
-<button class="ml-auto w-7 h-7 rounded-full bg-surface-3 border border-white/15 text-white text-sm leading-none flex items-center justify-center shrink-0" onclick="closeIsabelMenu()" title="Cerrar" type="button">×</button>
+<button class="ml-auto w-7 h-7 rounded-full isabel-row border border-white/15 text-white text-sm leading-none flex items-center justify-center shrink-0" onclick="closeIsabelMenu()" title="Cerrar" type="button">×</button>
 </div>
 <div class="flex flex-col gap-2 mt-4">
-<a class="flex items-center gap-3 p-3 rounded-xl bg-surface-2 border border-white/10 hover:border-pink-500/50 transition-colors" href="https://wa.me/527122345562?text=Hola%20Isabel%2C%20me%20gustar%C3%ADa%20un%20protector%20para%20mi%20celular.%20Mi%20modelo%20es%3A%20" rel="noopener" target="_blank"><span class="material-symbols-outlined text-pink-primary">shield</span><span class="font-archivo text-sm text-white">Un protector</span><span class="material-symbols-outlined text-text-muted ml-auto text-[18px]">chevron_right</span></a>
-<a class="flex items-center gap-3 p-3 rounded-xl bg-surface-2 border border-white/10 hover:border-pink-500/50 transition-colors" href="https://wa.me/527122345562?text=Hola%20Isabel%2C%20me%20gustar%C3%ADa%20una%20mica%20para%20mi%20celular.%20Mi%20modelo%20es%3A%20" rel="noopener" target="_blank"><span class="material-symbols-outlined text-pink-primary">layers</span><span class="font-archivo text-sm text-white">Una mica</span><span class="material-symbols-outlined text-text-muted ml-auto text-[18px]">chevron_right</span></a>
-<a class="flex items-center gap-3 p-3 rounded-xl bg-surface-2 border border-white/10 hover:border-pink-500/50 transition-colors" href="https://wa.me/527122345562?text=Hola%20Isabel%2C%20me%20gustar%C3%ADa%20informaci%C3%B3n%20sobre%20un%20producto%20de%20Pink%20Case%3A%20" rel="noopener" target="_blank"><span class="material-symbols-outlined text-pink-primary">shopping_bag</span><span class="font-archivo text-sm text-white">Otro producto</span><span class="material-symbols-outlined text-text-muted ml-auto text-[18px]">chevron_right</span></a>
-<a class="flex items-center gap-3 p-3 rounded-xl bg-surface-2 border border-white/10 hover:border-pink-500/50 transition-colors" href="https://wa.me/527122345562?text=Hola%20Isabel%2C%20me%20gustar%C3%ADa%20un%20servicio%20de%20reparaci%C3%B3n%3A%20" rel="noopener" target="_blank"><span class="material-symbols-outlined text-pink-primary">handyman</span><span class="font-archivo text-sm text-white">Un servicio de reparación</span><span class="material-symbols-outlined text-text-muted ml-auto text-[18px]">chevron_right</span></a>
-<a class="flex items-center gap-3 p-3 rounded-xl bg-surface-2 border border-white/10 hover:border-pink-500/50 transition-colors" href="https://wa.me/527122345562?text=Hola%20Isabel%2C%20tengo%20una%20duda%20de%20compatibilidad%20con%20un%20producto%20de%20Pink%20Case." rel="noopener" target="_blank"><span class="material-symbols-outlined text-pink-primary">chat</span><span class="font-archivo text-sm text-white">Otra duda</span><span class="material-symbols-outlined text-text-muted ml-auto text-[18px]">chevron_right</span></a>
+<a class="flex items-center gap-3 p-3 rounded-xl isabel-row border border-white/10 hover:border-white/30 transition-colors" href="https://wa.me/527122345562?text=Hola%20Isabel%2C%20me%20gustar%C3%ADa%20un%20protector%20para%20mi%20celular.%20Mi%20modelo%20es%3A%20" rel="noopener" target="_blank"><span class="material-symbols-outlined text-white">shield</span><span class="font-archivo text-sm text-white">Un protector</span><span class="material-symbols-outlined text-white/60 ml-auto text-[18px]">chevron_right</span></a>
+<a class="flex items-center gap-3 p-3 rounded-xl isabel-row border border-white/10 hover:border-white/30 transition-colors" href="https://wa.me/527122345562?text=Hola%20Isabel%2C%20me%20gustar%C3%ADa%20una%20mica%20para%20mi%20celular.%20Mi%20modelo%20es%3A%20" rel="noopener" target="_blank"><span class="material-symbols-outlined text-white">layers</span><span class="font-archivo text-sm text-white">Una mica</span><span class="material-symbols-outlined text-white/60 ml-auto text-[18px]">chevron_right</span></a>
+<a class="flex items-center gap-3 p-3 rounded-xl isabel-row border border-white/10 hover:border-white/30 transition-colors" href="https://wa.me/527122345562?text=Hola%20Isabel%2C%20me%20gustar%C3%ADa%20informaci%C3%B3n%20sobre%20un%20producto%20de%20Pink%20Case%3A%20" rel="noopener" target="_blank"><span class="material-symbols-outlined text-white">shopping_bag</span><span class="font-archivo text-sm text-white">Otro producto</span><span class="material-symbols-outlined text-white/60 ml-auto text-[18px]">chevron_right</span></a>
+<a class="flex items-center gap-3 p-3 rounded-xl isabel-row border border-white/10 hover:border-white/30 transition-colors" href="https://wa.me/527122345562?text=Hola%20Isabel%2C%20me%20gustar%C3%ADa%20un%20servicio%20de%20reparaci%C3%B3n%3A%20" rel="noopener" target="_blank"><span class="material-symbols-outlined text-white">handyman</span><span class="font-archivo text-sm text-white">Un servicio de reparación</span><span class="material-symbols-outlined text-white/60 ml-auto text-[18px]">chevron_right</span></a>
+<a class="flex items-center gap-3 p-3 rounded-xl isabel-row border border-white/10 hover:border-white/30 transition-colors" href="https://wa.me/527122345562?text=Hola%20Isabel%2C%20tengo%20una%20duda%20de%20compatibilidad%20con%20un%20producto%20de%20Pink%20Case." rel="noopener" target="_blank"><span class="material-symbols-outlined text-white">chat</span><span class="font-archivo text-sm text-white">Otra duda</span><span class="material-symbols-outlined text-white/60 ml-auto text-[18px]">chevron_right</span></a>
 </div>
 </div>
 </div>
