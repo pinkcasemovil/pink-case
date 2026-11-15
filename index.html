@@ -889,6 +889,14 @@
 .isabel-row{background-color:#2b2b2e}
 .hover\:border-white\/30:hover{border-color:rgb(255 255 255/.3)}
 .text-white\/60{color:rgb(255 255 255/.6)}
+.cart-root{z-index:70}
+.cart-backdrop{opacity:0;pointer-events:none;transition:opacity .3s ease}
+.cart-backdrop.open{opacity:1;pointer-events:auto}
+.cart-panel{transform:translateX(105%);transition:transform .38s cubic-bezier(.32,.72,0,1)}
+.cart-panel.open{transform:translateX(0)}
+.max-w-\[420px\]{max-width:420px}
+.min-h-0{min-height:0}
+.hover\:bg-white\/10:hover{background-color:rgb(255 255 255/.1)}
 .w-4{width:1rem}
 .h-4{height:1rem}
 .p-1\.5{padding:.375rem}
@@ -967,16 +975,16 @@
           Ver accesorios
         </a>
 <!-- Consulta Counter Floating CTA -->
-<a class="relative flex items-center justify-center w-10 h-10 rounded-full hover:bg-white/5 text-white transition-colors" href="#pedido" aria-label="Mi carrito">
+<button class="relative flex items-center justify-center w-10 h-10 rounded-full hover:bg-white/5 text-white transition-colors cursor-pointer" onclick="openCart()" type="button" aria-label="Mi carrito">
 <span class="material-symbols-outlined text-[24px]">shopping_cart</span>
 <span class="absolute top-0.5 right-0 min-w-[18px] h-[18px] px-1 rounded-full bg-pink-primary text-white text-[11px] font-bold leading-[18px] text-center" id="header-inquiry-count">0</span>
-</a>
+</button>
 </div>
 <nav class="w-full min-w-0 order-4 flex flex-nowrap items-center justify-start sm:justify-center gap-4 sm:gap-9 overflow-x-auto pt-2 sm:pt-2.5 border-t border-pink-500/10 scrollbar-none" id="main-nav">
 <a class="nav-link active font-archivo text-sm font-medium text-white whitespace-nowrap" href="#">Inicio</a>
 <a class="nav-link font-archivo text-sm font-medium text-[#c4b5bc] hover:text-white transition-colors whitespace-nowrap" href="#catalogo">Accesorios</a>
 <a class="nav-link font-archivo text-sm font-medium text-[#c4b5bc] hover:text-white transition-colors whitespace-nowrap" href="#asesoria-humana">Contáctanos</a>
-<a class="nav-link font-archivo text-sm font-medium text-[#c4b5bc] hover:text-white transition-colors whitespace-nowrap" href="#pedido">Mi carrito</a>
+<button class="nav-link font-archivo text-sm font-medium text-[#c4b5bc] hover:text-white transition-colors whitespace-nowrap cursor-pointer" onclick="openCart()" type="button">Mi carrito</button>
 <a class="nav-link font-archivo text-sm font-medium text-[#c4b5bc] hover:text-white transition-colors whitespace-nowrap" href="#visitanos">Acerca de nosotros</a>
 </nav>
 </div>
@@ -2020,53 +2028,6 @@
 <button class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-surface-2 hover:bg-surface-3 border border-pink-500/30 text-white font-unbounded text-xs sm:text-sm font-semibold transition-all" id="ver-mas-btn" onclick="showMore()" type="button"><span>Ver más productos</span><span class="material-symbols-outlined text-[18px]">expand_more</span></button>
 </div>
 </section>
-<!-- 5. MI CONSULTA DE MOSTRADOR / CONVERSIÓN WHATSAPP (#pedido) -->
-<section class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 scroll-mt-[11.5rem] lg:scroll-mt-[7.75rem]" id="pedido">
-<div class="p-6 md:p-10 rounded-2xl bg-surface-1 border border-pink-500/25 shadow-2xl flex flex-col gap-6">
-<!-- Header del resumen -->
-<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
-<div>
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-pink-primary text-[24px]">receipt_long</span>
-<h2 class="font-unbounded text-xl sm:text-2xl font-bold text-white">Mi lista de productos</h2>
-</div>
-<p class="font-archivo text-xs sm:text-sm text-text-muted mt-1">Reúne lo que te gusta y consulta descuentos y disponibilidad por WhatsApp.</p>
-</div>
-<button class="text-text-muted hover:text-pink-light text-xs font-archivo flex items-center gap-1 transition-colors" onclick="clearInquiry()" type="button">
-<span class="material-symbols-outlined text-[16px]">delete_sweep</span>
-<span>Vaciar lista</span>
-</button>
-</div>
-<!-- Items Container Dinámico -->
-<div class="hidden p-3.5 rounded-xl bg-pink-primary/10 border border-pink-500/30 text-xs sm:text-sm font-archivo text-pink-light" id="shared-banner"></div>
-<div class="flex flex-col gap-3 min-h-[120px]" id="inquiry-items-container">
-<!-- Renderizado por JS -->
-</div>
-<!-- Callout de transparencia: No pagos en línea -->
-<div class="p-4 rounded-xl bg-surface-2 border border-pink-500/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-<div class="flex flex-col gap-1.5 max-w-xl">
-<div class="flex items-center gap-2">
-<span class="font-archivo text-sm text-text-muted">Estimado Total Informativo:</span>
-<span class="font-unbounded text-xl font-bold text-white" id="inquiry-total">$0 MXN</span>
-</div>
-<p class="font-archivo text-xs text-text-muted leading-relaxed">
-<strong class="text-white font-medium">Aviso de transparencia:</strong> No requiere tarjetas ni pagos en línea. Pagas directamente en efectivo o transferencia al recibir tu accesorio en tienda.
-            </p>
-</div>
-<!-- Botón de WhatsApp Oficial -->
-<div class="w-full md:w-auto flex flex-col gap-2 shrink-0">
-<button class="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-xl bg-whatsapp hover:bg-[#20bd5a] text-[#0a0608] font-unbounded text-xs sm:text-sm font-bold shadow-lg shadow-whatsapp/25 transition-all hover:scale-[1.02] active:scale-95" id="whatsapp-send-btn" onclick="sendWhatsAppInquiry()" type="button">
-<svg class="w-5 h-5 fill-current" viewbox="0 0 24 24">
-<path d="M12.031 2C6.495 2 2 6.495 2 12.031a10.01 10.01 0 0 0 1.609 5.484L2.094 22l4.633-1.488a10.038 10.038 0 0 0 5.304 1.52h.004c5.536 0 10.031-4.495 10.031-10.031A10.034 10.034 0 0 0 12.031 2zm0 18.35a8.33 8.33 0 0 1-4.25-1.156l-.305-.18-3.156 1.013 1.039-3.078-.199-.316a8.312 8.312 0 0 1-1.277-4.602c0-4.606 3.746-8.352 8.352-8.352 2.23 0 4.328.871 5.906 2.45a8.293 8.293 0 0 1 2.446 5.902c0 4.606-3.746 8.352-8.556 8.32z"></path>
-<path d="M16.89 14.383c-.266-.133-1.574-.777-1.816-.867-.246-.086-.426-.133-.605.133s-.699.867-.855 1.047c-.156.176-.312.2-.578.066s-1.125-.414-2.145-1.32c-.793-.707-1.328-1.582-1.484-1.848s-.016-.41.117-.543c.121-.121.266-.312.4-.469.133-.156.176-.266.266-.445.086-.176.043-.332-.023-.465-.066-.133-.605-1.457-.828-1.996-.219-.527-.441-.453-.605-.461-.156-.008-.332-.008-.512-.008s-.469.066-.715.332c-.246.266-.941.922-.941 2.246s.965 2.605 1.102 2.785c.133.176 1.898 2.898 4.6 4.062.645.277 1.148.441 1.543.566.652.207 1.246.176 1.715.105.523-.078 1.574-.645 1.797-1.266.223-.625.223-1.164.156-1.27-.066-.109-.246-.176-.512-.309z"></path>
-</svg>
-<span>Consultar por WhatsApp (Abre chat con tu lista preparada)</span>
-</button>
-<span class="text-center font-archivo text-xs text-text-muted"><div class="flex flex-col items-center gap-1 text-center font-archivo text-xs text-text-muted"><span>⚡ Respuesta promedio: <strong>&lt; 15 min</strong> en horario comercial</span><span class="text-emerald-400 flex items-center justify-center gap-1"><span class="material-symbols-outlined text-[14px]">lock_open</span> Sin pago anticipado • Ajuste verificado en mano</span></div></span>
-</div>
-</div>
-</div>
-</section>
 <!-- 6. EXPERIENCIA DE VISITA Y CONFIANZA LOCAL (#visitanos) -->
 <section class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 scroll-mt-[11.5rem] lg:scroll-mt-[7.75rem]" id="visitanos">
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -2204,7 +2165,7 @@
 <span class="opacity-30">•</span>
 <a class="hover:text-pink-light transition-colors" href="#catalogo">Compatibilidad</a>
 <span class="opacity-30">•</span>
-<a class="hover:text-pink-light transition-colors" href="#pedido">Garantía Mostrador</a>
+<a class="hover:text-pink-light transition-colors cursor-pointer" href="#" onclick="openCart(); return false;">Garantía Mostrador</a>
 </div>
 </div>
 </div>
@@ -2241,6 +2202,49 @@
 <a class="flex items-center gap-3 p-3 rounded-xl isabel-row border border-white/10 hover:border-white/30 transition-colors" href="https://wa.me/527122345562?text=Hola%20Isabel%2C%20tengo%20una%20duda%20de%20compatibilidad%20con%20un%20producto%20de%20Pink%20Case." rel="noopener" target="_blank"><span class="material-symbols-outlined text-white">chat</span><span class="font-archivo text-sm text-white">Otra duda</span><span class="material-symbols-outlined text-white/60 ml-auto text-[18px]">chevron_right</span></a>
 </div>
 </div>
+</div>
+<!-- Carrito lateral (drawer) -->
+<div class="cart-root hidden fixed inset-0" id="cart-drawer">
+<div class="cart-backdrop absolute inset-0 bg-black/60" onclick="closeCart()"></div>
+<aside class="cart-panel absolute right-0 top-0 h-full w-full max-w-[420px] isabel-panel border-l border-white/20 shadow-2xl flex flex-col" role="dialog" aria-modal="true" aria-label="Mi lista de productos">
+<div class="flex items-start justify-between gap-4 p-5 pb-4 border-b border-white/10 shrink-0">
+<div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-white text-[24px]">receipt_long</span>
+<h2 class="font-unbounded text-lg font-bold text-white">Mi lista de productos</h2>
+</div>
+<p class="font-archivo text-xs text-white/60 mt-1">Reúne lo que te gusta y consulta descuentos y disponibilidad por WhatsApp.</p>
+</div>
+<button class="w-8 h-8 rounded-full isabel-row border border-white/15 text-white flex items-center justify-center shrink-0 hover:bg-white/10 transition-colors" onclick="closeCart()" title="Cerrar" type="button" aria-label="Cerrar carrito"><span class="material-symbols-outlined text-[18px]">close</span></button>
+</div>
+<div class="flex items-center justify-end px-5 pt-3 shrink-0">
+<button class="text-white/60 hover:text-white text-xs font-archivo flex items-center gap-1 transition-colors" onclick="clearInquiry()" type="button">
+<span class="material-symbols-outlined text-[16px]">delete_sweep</span>
+<span>Vaciar lista</span>
+</button>
+</div>
+<div class="hidden mx-5 mt-3 p-3.5 rounded-xl bg-white/5 border border-white/20 text-xs font-archivo text-white shrink-0" id="shared-banner"></div>
+<div class="flex-1 overflow-y-auto p-5 pt-3 flex flex-col gap-3 min-h-0" id="inquiry-items-container">
+<!-- Renderizado por JS -->
+</div>
+<div class="p-5 pt-4 border-t border-white/10 shrink-0 flex flex-col gap-3">
+<div class="flex items-center justify-between gap-2">
+<span class="font-archivo text-sm text-white/60">Estimado Total Informativo:</span>
+<span class="font-unbounded text-xl font-bold text-white" id="inquiry-total">$0 MXN</span>
+</div>
+<p class="font-archivo text-xs text-white/60 leading-relaxed">
+<strong class="text-white font-medium">Aviso de transparencia:</strong> No requiere tarjetas ni pagos en línea. Pagas directamente en efectivo o transferencia al recibir tu accesorio en tienda.
+</p>
+<button class="w-full inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-xl text-[#0a0608] font-unbounded text-xs sm:text-sm font-bold shadow-lg shadow-whatsapp/25 transition-all hover:scale-[1.02] active:scale-95" style="background:#08EF4F" id="whatsapp-send-btn" onclick="sendWhatsAppInquiry()" type="button">
+<svg class="w-5 h-5 fill-current" viewbox="0 0 24 24">
+<path d="M12.031 2C6.495 2 2 6.495 2 12.031a10.01 10.01 0 0 0 1.609 5.484L2.094 22l4.633-1.488a10.038 10.038 0 0 0 5.304 1.52h.004c5.536 0 10.031-4.495 10.031-10.031A10.034 10.034 0 0 0 12.031 2zm0 18.35a8.33 8.33 0 0 1-4.25-1.156l-.305-.18-3.156 1.013 1.039-3.078-.199-.316a8.312 8.312 0 0 1-1.277-4.602c0-4.606 3.746-8.352 8.352-8.352 2.23 0 4.328.871 5.906 2.45a8.293 8.293 0 0 1 2.446 5.902c0 4.606-3.746 8.352-8.556 8.32z"></path>
+<path d="M16.89 14.383c-.266-.133-1.574-.777-1.816-.867-.246-.086-.426-.133-.605.133s-.699.867-.855 1.047c-.156.176-.312.2-.578.066s-1.125-.414-2.145-1.32c-.793-.707-1.328-1.582-1.484-1.848s-.016-.41.117-.543c.121-.121.266-.312.4-.469.133-.156.176-.266.266-.445.086-.176.043-.332-.023-.465-.066-.133-.605-1.457-.828-1.996-.219-.527-.441-.453-.605-.461-.156-.008-.332-.008-.512-.008s-.469.066-.715.332c-.246.266-.941.922-.941 2.246s.965 2.605 1.102 2.785c.133.176 1.898 2.898 4.6 4.062.645.277 1.148.441 1.543.566.652.207 1.246.176 1.715.105.523-.078 1.574-.645 1.797-1.266.223-.625.223-1.164.156-1.27-.066-.109-.246-.176-.512-.309z"></path>
+</svg>
+<span>Consultar por WhatsApp</span>
+</button>
+<div class="flex flex-col items-center gap-1 text-center font-archivo text-xs text-white/60"><span>⚡ Respuesta promedio: <strong>&lt; 15 min</strong> en horario comercial</span><span class="text-emerald-400 flex items-center justify-center gap-1"><span class="material-symbols-outlined text-[14px]">lock_open</span> Sin pago anticipado • Ajuste verificado en mano</span></div>
+</div>
+</aside>
 </div>
 <!-- Interactivity Scripts: catálogo real Pink Case -->
 <script>
@@ -2459,8 +2463,8 @@
       if (!folio && inquiryItems.length) { folio = newFolio(); }
       if (inquiryItems.length === 0) {
         container.innerHTML = `
-          <div class="p-8 rounded-xl bg-surface-2 border border-white/5 text-center flex flex-col items-center justify-center gap-2 text-text-muted">
-            <span class="material-symbols-outlined text-[32px] text-pink-primary/40">shopping_bag</span>
+          <div class="p-8 rounded-xl isabel-row border border-white/5 text-center flex flex-col items-center justify-center gap-2 text-white/60">
+            <span class="material-symbols-outlined text-[32px] text-white/60">shopping_bag</span>
             <p class="font-unbounded text-xs sm:text-sm text-white">Tu lista está vacía.</p>
             <span class="font-archivo text-xs">Explora los accesorios y pulsa "+ Carrito" para añadir artículos.</span>
           </div>`;
@@ -2475,28 +2479,28 @@
         const sub = p.price * item.qty;
         total += sub; units += item.qty;
         return `
-          <div class="p-3.5 rounded-xl bg-surface-2 border border-pink-500/15 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="p-3.5 rounded-xl isabel-row border border-white/10 flex flex-col justify-between gap-3">
             <div class="flex items-center gap-3">
-              <img class="w-11 h-11 rounded-lg object-cover border border-pink-500/25 cursor-pointer" alt="${p.name}" src="${p.img}" onclick="openProduct('${item.code}')" title="Ver en grande"/>
+              <img class="w-11 h-11 rounded-lg object-cover border border-white/20 cursor-pointer" alt="${p.name}" src="${p.img}" onclick="openProduct('${item.code}')" title="Ver en grande"/>
               <div class="flex flex-col">
-                <span class="font-archivo font-bold text-sm text-white cursor-pointer hover:text-pink-light transition-colors" onclick="openProduct('${item.code}')" title="Ver en grande">${p.name}</span>
-                <span class="font-archivo text-xs text-text-muted">${money(p.price)} MXN c/u · ${p.line}</span>
+                <span class="font-archivo font-bold text-sm text-white cursor-pointer hover:text-white transition-colors" onclick="openProduct('${item.code}')" title="Ver en grande">${p.name}</span>
+                <span class="font-archivo text-xs text-white/60">${money(p.price)} MXN c/u · ${p.line}</span>
               </div>
             </div>
-            <div class="flex items-center justify-between sm:justify-end gap-4">
-              <div class="flex items-center gap-1.5 bg-surface-3 rounded-lg p-1 border border-white/10">
-                <button type="button" onclick="updateQty(${index}, -1)" class="w-6 h-6 rounded flex items-center justify-center text-white hover:bg-pink-primary/30 transition-colors font-bold text-xs" title="Restar">-</button>
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex items-center gap-1.5 isabel-panel rounded-lg p-1 border border-white/10">
+                <button type="button" onclick="updateQty(${index}, -1)" class="w-6 h-6 rounded flex items-center justify-center text-white hover:bg-white/10 transition-colors font-bold text-xs" title="Restar">-</button>
                 <span class="w-6 text-center font-unbounded text-xs text-white">${item.qty}</span>
-                <button type="button" onclick="updateQty(${index}, 1)" class="w-6 h-6 rounded flex items-center justify-center text-white hover:bg-pink-primary/30 transition-colors font-bold text-xs" title="Sumar">+</button>
+                <button type="button" onclick="updateQty(${index}, 1)" class="w-6 h-6 rounded flex items-center justify-center text-white hover:bg-white/10 transition-colors font-bold text-xs" title="Sumar">+</button>
               </div>
               <span class="font-unbounded text-sm font-bold text-white min-w-[75px] text-right">${money(sub)}</span>
-              <button type="button" onclick="removeItem(${index})" class="text-text-muted hover:text-pink-primary transition-colors p-1" title="Eliminar de la consulta">
+              <button type="button" onclick="removeItem(${index})" class="text-white/60 hover:text-white transition-colors p-1" title="Eliminar de la consulta">
                 <span class="material-symbols-outlined text-[18px]">close</span>
               </button>
             </div>
           </div>`;
       }).join("") + `
-          <p class="font-archivo text-xs text-text-muted">Folio de tu lista: <strong class="text-pink-light">${folio}</strong> · Compártela con esta liga: <button type="button" class="underline text-pink-light" onclick="copyShareLink()">copiar liga de mi lista</button></p>`;
+          <p class="font-archivo text-xs text-white/60">Folio de tu lista: <strong class="text-white">${folio}</strong> · Compártela con esta liga: <button type="button" class="underline text-white" onclick="copyShareLink()">copiar liga de mi lista</button></p>`;
       if (totalElement) totalElement.innerText = money(total) + " MXN";
       updateHeaderBadge(units);
       refreshCardButtons();
@@ -2512,7 +2516,7 @@
       if (found) found.qty += 1; else inquiryItems.push({ code, qty: 1 });
       if (!folio) folio = newFolio();
       renderInquiry();
-      document.getElementById("pedido")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      openCart();
     }
     function toggleInquiry(code) {
       const idx = inquiryItems.findIndex(i => i.code === code);
@@ -2543,6 +2547,27 @@
     }
     function openIsabelMenu() { document.getElementById("isabel-menu")?.classList.remove("hidden"); }
     function closeIsabelMenu() { document.getElementById("isabel-menu")?.classList.add("hidden"); }
+    let cartCloseTimer = null;
+    function openCart() {
+      const root = document.getElementById("cart-drawer");
+      if (!root) return;
+      if (cartCloseTimer) { clearTimeout(cartCloseTimer); cartCloseTimer = null; }
+      root.classList.remove("hidden");
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        root.querySelector(".cart-backdrop")?.classList.add("open");
+        root.querySelector(".cart-panel")?.classList.add("open");
+      }));
+      document.body.style.overflow = "hidden";
+    }
+    function closeCart() {
+      const root = document.getElementById("cart-drawer");
+      if (!root || root.classList.contains("hidden")) return;
+      root.querySelector(".cart-backdrop")?.classList.remove("open");
+      root.querySelector(".cart-panel")?.classList.remove("open");
+      document.body.style.overflow = "";
+      cartCloseTimer = setTimeout(() => { root.classList.add("hidden"); }, 400);
+    }
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeCart(); });
     function updateQty(index, change) {
       if (!inquiryItems[index]) return;
       inquiryItems[index].qty += change;
@@ -2662,7 +2687,7 @@
         renderFilters();
         renderGrid(PRODUCTS);
         renderInquiry();
-        if (fromShared) setTimeout(() => document.getElementById("pedido")?.scrollIntoView({ behavior: "smooth" }), 450);
+        if (fromShared) setTimeout(openCart, 450);
       }
     });
   </script>
