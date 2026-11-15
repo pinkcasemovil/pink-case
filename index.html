@@ -884,6 +884,11 @@
 .placeholder\:text-white\/40::placeholder{color:rgb(255 255 255/.4)}
 .border-l{border-left-width:1px}
 .border-white\/30{border-color:rgb(255 255 255/.3)}
+.border-white\/20{border-color:rgb(255 255 255/.2)}
+.w-4{width:1rem}
+.h-4{height:1rem}
+.p-1\.5{padding:.375rem}
+.text-\[11px\]{font-size:11px}
 .gap-5{gap:1.25rem}
 .h-2\.5{height:.625rem}
 .w-2\.5{width:.625rem}
@@ -2200,17 +2205,16 @@
 </div>
 </div>
 </footer>
-<div class="fixed bottom-4 inset-x-4 sm:inset-x-auto sm:right-6 sm:bottom-6 sm:w-[400px] z-40" id="isabel-pill">
-<div class="relative flex items-center gap-3 p-2.5 pr-3 rounded-full bg-[#171016]/95 backdrop-blur border-2 border-pink-primary shadow-2xl shadow-pink-primary/25">
-<button class="flex items-center gap-3 flex-1 min-w-0 text-left cursor-pointer" onclick="openIsabelMenu()" type="button">
-<img alt="Isabel, asesora de Pink Case" class="w-12 h-12 rounded-full object-cover border-2 border-pink-primary/60 shrink-0" src="assets/isabel-mostrador-v2-640.webp" style="object-position: center 18%;"/>
+<div class="fixed bottom-4 right-4 sm:right-6 sm:bottom-6 z-40" id="isabel-pill">
+<div class="relative flex items-center gap-2 p-1.5 pr-2 rounded-full backdrop-blur border border-white/20 shadow-2xl" style="background:rgba(34,34,35,.95)">
+<button class="flex items-center gap-2 flex-1 min-w-0 text-left cursor-pointer" onclick="openIsabelMenu()" type="button">
+<img alt="Isabel, asesora de Pink Case" class="w-8 h-8 rounded-full object-cover border border-white/20 shrink-0" src="assets/isabel-mostrador-v2-640.webp" style="object-position: center 18%;"/>
 <span class="flex flex-col min-w-0">
-<span class="font-archivo font-bold text-pink-light text-sm leading-tight flex items-center gap-1.5">Isabel • Te ayudamos <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span></span>
-<span class="font-archivo text-white text-xs sm:text-[13px] leading-tight truncate">¿Buscas algo? Escríbenos</span>
+<span class="font-archivo font-bold text-white text-xs leading-tight flex items-center gap-1.5">Isabel • Te ayudamos <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span></span>
+<span class="font-archivo text-white text-[11px] leading-tight truncate">¿Buscas algo? Escríbenos</span>
 </span>
-<span class="ml-auto w-11 h-11 rounded-full bg-whatsapp flex items-center justify-center shrink-0"><svg class="w-6 h-6 fill-[#0a0608]" viewBox="0 0 24 24"><path d="M12.031 2C6.495 2 2 6.495 2 12.031a10.01 10.01 0 0 0 1.609 5.484L2.094 22l4.633-1.488a10.038 10.038 0 0 0 5.304 1.52h.004c5.536 0 10.031-4.495 10.031-10.031A10.034 10.034 0 0 0 12.031 2zm0 18.35a8.33 8.33 0 0 1-4.25-1.156l-.305-.18-3.156 1.013 1.039-3.078-.199-.316a8.312 8.312 0 0 1-1.277-4.602c0-4.606 3.746-8.352 8.352-8.352 2.23 0 4.328.871 5.906 2.45a8.293 8.293 0 0 1 2.446 5.902c0 4.606-3.746 8.352-8.556 8.32z"></path><path d="M16.89 14.383c-.266-.133-1.574-.777-1.816-.867-.246-.086-.426-.133-.605.133s-.699.867-.855 1.047c-.156.176-.312.2-.578.066s-1.125-.414-2.145-1.32c-.793-.707-1.328-1.582-1.484-1.848s-.016-.41.117-.543c.121-.121.266-.312.4-.469.133-.156.176-.266.266-.445.086-.176.043-.332-.023-.465-.066-.133-.605-1.457-.828-1.996-.219-.527-.441-.453-.605-.461-.156-.008-.332-.008-.512-.008s-.469.066-.715.332c-.246.266-.941.922-.941 2.246s.965 2.605 1.102 2.785c.133.176 1.898 2.898 4.6 4.062.645.277 1.148.441 1.543.566.652.207 1.246.176 1.715.105.523-.078 1.574-.645 1.797-1.266.223-.625.223-1.164.156-1.27-.066-.109-.246-.176-.512-.309z"></path></svg></span>
+<span class="ml-auto w-8 h-8 rounded-full flex items-center justify-center shrink-0" style="background:#08EF4F"><svg class="w-4 h-4 fill-[#0a0608]" viewBox="0 0 24 24"><path d="M12.031 2C6.495 2 2 6.495 2 12.031a10.01 10.01 0 0 0 1.609 5.484L2.094 22l4.633-1.488a10.038 10.038 0 0 0 5.304 1.52h.004c5.536 0 10.031-4.495 10.031-10.031A10.034 10.034 0 0 0 12.031 2zm0 18.35a8.33 8.33 0 0 1-4.25-1.156l-.305-.18-3.156 1.013 1.039-3.078-.199-.316a8.312 8.312 0 0 1-1.277-4.602c0-4.606 3.746-8.352 8.352-8.352 2.23 0 4.328.871 5.906 2.45a8.293 8.293 0 0 1 2.446 5.902c0 4.606-3.746 8.352-8.556 8.32z"></path><path d="M16.89 14.383c-.266-.133-1.574-.777-1.816-.867-.246-.086-.426-.133-.605.133s-.699.867-.855 1.047c-.156.176-.312.2-.578.066s-1.125-.414-2.145-1.32c-.793-.707-1.328-1.582-1.484-1.848s-.016-.41.117-.543c.121-.121.266-.312.4-.469.133-.156.176-.266.266-.445.086-.176.043-.332-.023-.465-.066-.133-.605-1.457-.828-1.996-.219-.527-.441-.453-.605-.461-.156-.008-.332-.008-.512-.008s-.469.066-.715.332c-.246.266-.941.922-.941 2.246s.965 2.605 1.102 2.785c.133.176 1.898 2.898 4.6 4.062.645.277 1.148.441 1.543.566.652.207 1.246.176 1.715.105.523-.078 1.574-.645 1.797-1.266.223-.625.223-1.164.156-1.27-.066-.109-.246-.176-.512-.309z"></path></svg></span>
 </button>
-<button class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-surface-3 border border-white/20 text-white text-sm leading-none flex items-center justify-center" onclick="document.getElementById('isabel-pill').style.display='none'" title="Cerrar" type="button">×</button>
 </div>
 </div>
 
