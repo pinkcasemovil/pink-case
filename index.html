@@ -1153,6 +1153,11 @@
        única hija del contenedor (con productos hay más hijos y no aplica). */
     #inquiry-items-container>div:only-child{margin-top:auto;margin-bottom:auto}
   </style>
+  <!-- Encabezado del catálogo (2026-11-16, maqueta de Axel): título grande
+       en Archivo Black y texto de presentación a la derecha. -->
+  <style id="catalogo-encabezado">
+    .catalogo-titulo{font-family:'Archivo Black',Archivo,sans-serif;font-size:clamp(30px,4.2vw,52px);line-height:1.05;letter-spacing:-.01em;color:#fff;text-transform:uppercase}
+  </style>
 
 
 <style id="titulo-ciclo">
@@ -1361,21 +1366,15 @@ HORARIOS DE ATENCIÓN
 </div>
 </section>
 <section class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 scroll-mt-[11.5rem] lg:scroll-mt-[7.75rem]" id="catalogo">
-<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
 <div>
-<div class="flex items-center gap-2">
-<span class="font-unbounded text-xs tracking-wider uppercase text-pink-primary font-bold">Inventario de Mostrador</span>
-<span class="w-8 h-px bg-pink-primary/40"></span>
+<h2 class="catalogo-titulo">TODO PARA TU CELULAR</h2>
 </div>
-<h2 class="font-unbounded text-2xl sm:text-3xl font-bold text-white mt-1">Accesorios en exhibición</h2>
-</div>
-<p class="font-archivo text-xs sm:text-sm text-text-muted max-w-md">
-          Precios informativos para consulta rápida. Añade los artículos de tu interés a la lista para verificar disponibilidad al instante.
-        </p>
+<p class="font-archivo text-base sm:text-lg text-white max-w-md">Fundas, audífonos, cargadores y más. Elige lo que te guste y consúltanos por WhatsApp.</p>
 </div>
 <p class="hidden font-archivo text-xs text-text-muted mb-4" id="search-info"></p>
 <!-- Filtros de categorías estilo Pill Activos -->
-<div class="flex items-center gap-2 overflow-x-auto pb-4 mb-8 scrollbar-none" id="catalog-filters"></div>
+<div class="flex items-center gap-3 overflow-x-auto pb-4 mb-8 scrollbar-none" id="catalog-filters"></div>
 <!-- Catalog Grid (Cards con elevación y precio Unbounded) -->
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="product-grid">
 <!-- Tarjetas estáticas del catálogo (43 productos): los buscadores leen
@@ -2567,7 +2566,7 @@ HORARIOS DE ATENCIÓN
     const money = n => "$" + n.toLocaleString("es-MX");
 
     /* ---------- Catálogo ---------- */
-    const CATS = [["all", "Todos en Mostrador"], ["fundas", "Fundas"], ["micas", "Micas de Protección"], ["audifonos", "Audífonos"], ["baterias", "Baterías"], ["servicios", "Servicios y Más"]];
+    const CATS = [["all", "Ver todo"], ["fundas", "Fundas"], ["micas", "Micas"], ["audifonos", "Audífonos"], ["baterias", "Baterías"], ["servicios", "Servicios y más"]];
     let activeCat = "all";
 
     function renderFilters() {
@@ -2575,7 +2574,7 @@ HORARIOS DE ATENCIÓN
       wrap.innerHTML = CATS.map(([key, label]) => {
         const n = key === "all" ? PRODUCTS.length : PRODUCTS.filter(p => p.cat === key).length;
         const active = key === activeCat;
-        return `<button class="cat-chip ${active ? "active bg-pink-primary text-white pink-glow-sm" : "bg-surface-2 border border-white/10 text-text-muted"} px-4 py-2 rounded-full hover:bg-surface-3 hover:text-white font-unbounded text-xs ${active ? "font-semibold" : ""} whitespace-nowrap transition-all flex items-center gap-1.5" data-category="${key}" onclick="filterCatalog('${key}')" type="button"><span>${label}</span><span class="px-1.5 py-0.5 rounded-full ${active ? "bg-black/40" : "bg-surface-3"} text-[10px]">${n}</span></button>`;
+        return `<button class="cat-chip ${active ? "active bg-pink-primary text-white pink-glow-sm border border-pink-primary" : "bg-surface-2 border border-white/10 text-white"} px-5 py-3 rounded-full hover:bg-surface-3 hover:text-white font-archivo text-lg font-semibold whitespace-nowrap transition-all flex items-center gap-2.5" data-category="${key}" onclick="filterCatalog('${key}')" type="button"><span>${label}</span><span class="px-2 py-1 rounded-lg ${active ? "bg-black/40" : "bg-surface-3"} text-sm font-bold">${n}</span></button>`;
       }).join("");
     }
 
