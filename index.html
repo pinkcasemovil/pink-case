@@ -1161,6 +1161,9 @@
     .catalogo-titulo-frente{position:absolute;inset:0;display:block;color:transparent;-webkit-text-stroke:1.5px #0a0608}
     #catalog-filters .cat-chip{height:54px}
     #catalog-filters .cat-chip>span{line-height:1}
+    #catalog-filters .cat-num{font-size:18px;font-weight:600;color:rgba(255,255,255,.6)}
+    #catalog-filters .cat-chip.active .cat-num{color:rgba(255,255,255,.85)}
+    #catalog-filters .cat-punto{color:rgba(255,255,255,.35)}
   </style>
 
 
@@ -1374,7 +1377,7 @@ HORARIOS DE ATENCIÓN
 <div>
 <h2 class="catalogo-titulo"><span class="catalogo-titulo-atras">TODO PARA TU CELULAR</span><span class="catalogo-titulo-frente" aria-hidden="true">TODO PARA TU CELULAR</span></h2>
 </div>
-<p class="font-archivo text-base sm:text-lg text-white max-w-md">Fundas, audífonos, cargadores y más. Elige lo que te guste y consúltanos por WhatsApp.</p>
+<p class="font-archivo text-base sm:text-lg text-white max-w-md">Elige lo que te guste y consúltanos por WhatsApp.</p>
 </div>
 <p class="hidden font-archivo text-xs text-text-muted mb-4" id="search-info"></p>
 <!-- Filtros de categorías estilo Pill Activos -->
@@ -2578,7 +2581,7 @@ HORARIOS DE ATENCIÓN
       wrap.innerHTML = CATS.map(([key, label]) => {
         const n = key === "all" ? PRODUCTS.length : PRODUCTS.filter(p => p.cat === key).length;
         const active = key === activeCat;
-        return `<button class="cat-chip ${active ? "active bg-pink-primary text-white border border-pink-primary" : "bg-surface-2 border border-white/10 text-white"} px-5 py-3 rounded-full hover:bg-surface-3 hover:text-white font-archivo text-lg font-semibold whitespace-nowrap transition-all flex items-center gap-2.5" data-category="${key}" onclick="filterCatalog('${key}')" type="button"><span>${label}</span><span class="px-2 py-1 rounded-lg ${active ? "bg-black/40" : "bg-surface-3"} text-sm font-bold">${n}</span></button>`;
+        return `<button class="cat-chip ${active ? "active bg-pink-primary text-white border border-pink-primary" : "bg-surface-2 border border-white/10 text-white"} px-5 py-3 rounded-full hover:bg-surface-3 hover:text-white font-archivo text-lg font-semibold whitespace-nowrap transition-all flex items-center gap-2.5" data-category="${key}" onclick="filterCatalog('${key}')" type="button"><span>${label}</span><span class="cat-punto" aria-hidden="true">·</span><span class="cat-num">${n}</span></button>`;
       }).join("");
     }
 
