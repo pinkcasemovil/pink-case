@@ -1092,28 +1092,6 @@
 </style>
 
 
-<style id="isabel-2col-movil">
-/* Isabel en 2 columnas en teléfono (<640 px): retrato a la izquierda,
-   título y botón a la derecha, horarios a todo lo ancho debajo. */
-@media (max-width:639px){
-  #asesoria-humana .isabel-sec-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:.75rem 1rem!important;padding:1.25rem!important}
-  #asesoria-humana .isabel-photo{height:240px!important;grid-column:1!important;grid-row:1/span 4!important}
-  /* El contenedor del texto se vuelve transparente para la rejilla:
-     sus hijos pasan a ser celdas directas de las 2 columnas. */
-  #asesoria-humana .isabel-copy{display:contents!important}
-  #asesoria-humana .isabel-dash{grid-column:2!important;margin:0!important}
-  #asesoria-humana .isabel-copy h2{grid-column:2!important;font-size:1.35rem!important;line-height:1.15!important;margin-top:0!important}
-  #asesoria-humana .isabel-sub{grid-column:2!important;font-size:.85rem!important;margin-top:0!important}
-  #asesoria-humana .isabel-wa{grid-column:2!important;margin-top:.25rem!important;justify-self:start!important}
-  #asesoria-humana .isabel-wa-main{padding:.65rem .9rem!important;gap:.5rem!important}
-  #asesoria-humana .isabel-wa-main b{font-size:.8rem!important;white-space:normal!important;text-align:center;line-height:1.25!important}
-  #asesoria-humana .isabel-wa-main svg{width:1.25rem!important;height:1.25rem!important}
-  #asesoria-humana .isabel-wa-arrow{padding:0 .7rem!important}
-  #asesoria-humana .isabel-wa-arrow svg{width:1.1rem!important;height:1.1rem!important}
-  #asesoria-humana .isabel-hours{grid-column:1/-1!important;margin-top:.5rem!important}
-  #asesoria-humana .isabel-hours-grid{font-size:.85rem!important;column-gap:1rem!important}
-}
-</style>
 
 
 <style id="header-carrito-movil">
@@ -1134,6 +1112,25 @@
    y tocando ahí se cierra. */
 @media (max-width:639px){
   #cart-drawer .cart-panel{width:85%!important;max-width:360px!important}
+}
+</style>
+
+
+<style id="carrito-aire">
+/* La clase justify-end se perdió al purgar el CSS: "Vaciar lista" quedaba
+   a la izquierda en vez de a la derecha, como estaba diseñado. Se repone. */
+.justify-end{justify-content:flex-end}
+@media (max-width:639px){
+  /* El título cabe en una línea (antes se partía en dos): texto un poco
+     más chico y sin el icono decorativo, que no cabe junto al botón X */
+  #cart-drawer h2{font-size:.9375rem!important}
+  #cart-drawer div.flex.items-center.gap-2:not(.flex-col)>span.material-symbols-outlined{display:none!important}
+  /* El botón X más cómodo de tocar */
+  #cart-drawer button[aria-label="Cerrar carrito"]{width:2.5rem!important;height:2.5rem!important}
+  /* Más aire entre el total, el aviso y los botones */
+  #cart-drawer aside>div:last-child{gap:1rem!important}
+  /* El icono de bolsa vacía se lee mejor un poco más grande */
+  #inquiry-items-container .material-symbols-outlined{font-size:40px!important}
 }
 </style>
 
