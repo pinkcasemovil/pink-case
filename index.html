@@ -1156,16 +1156,16 @@
 
 
 <style id="titulo-ciclo">
-/* El título PINK CASE cambia de estilo cada 3 s (ciclo de 15 s, corte seco).
+/* El título PINK CASE cambia de estilo cada 1,5 s (ciclo de 7,5 s, glitch).
    La animación va en el envoltorio de cada capa: si se anima el texto mismo,
    Chromium deja de recortar el fondo con la forma de las letras. La capa 1
    (la foto actual) queda siempre visible debajo; las demás la tapan al entrar. */
 .titulo-ciclo{display:block;position:relative}
-.titulo-capa{position:absolute;inset:0;opacity:0;animation:titulo-ciclo 15s steps(1) infinite}
-.titulo-capa-2{animation-delay:3s}
-.titulo-capa-3{animation-delay:6s}
-.titulo-capa-4{animation-delay:9s}
-.titulo-capa-5{animation-delay:12s}
+.titulo-capa{position:absolute;inset:0;opacity:0;animation:titulo-ciclo 7.5s steps(1) infinite}
+.titulo-capa-2{animation-delay:1.5s}
+.titulo-capa-3{animation-delay:3s}
+.titulo-capa-4{animation-delay:4.5s}
+.titulo-capa-5{animation-delay:6s}
 /* 2 · Negativo azul (invertir el velo rosa da verde; el giro de tono lo lleva al azul) */
 .hero-v3-foto-2{background:linear-gradient(rgba(255,46,147,.45) 0 50%,rgba(255,46,147,0) 50% 100%),linear-gradient(rgba(255,255,255,.22),rgba(255,255,255,.22)),url('assets/tienda-pc5-hero-v3.webp') center 35%/cover no-repeat;filter:invert(1) hue-rotate(60deg)}
 /* 3 · Degradado rosa */
