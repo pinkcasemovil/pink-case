@@ -2574,10 +2574,11 @@ HORARIOS DE ATENCIÓN
 
     let currentList = [];
     let shownCount = 0;
-    const PAGE_SIZE = 24;
+    const PAGE_SIZE = 6; /* cuántos se agregan con cada toque en "Ver más" */
+    const INITIAL_COUNT = 14; /* cuántos se muestran al abrir o al filtrar */
     function renderGrid(list) {
       currentList = list;
-      shownCount = PAGE_SIZE;
+      shownCount = INITIAL_COUNT;
       paintGrid();
     }
     function paintGrid() {
