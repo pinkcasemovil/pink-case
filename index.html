@@ -1133,6 +1133,26 @@
   #inquiry-items-container .material-symbols-outlined{font-size:40px!important}
 }
 </style>
+  <!-- Paquete de tacto del carrito (2026-11-16): botones +/-, eliminar, X,
+       total en una línea y caja vacía centrada. Vale en las 3 vistas. -->
+  <style id="carrito-tactil">
+    /* X de cerrar a 40 px en las 3 vistas (en teléfono ya era 40 por el
+       arreglo K; aquí se extiende a tablet y computadora). */
+    #cart-drawer button[aria-label="Cerrar carrito"]{width:40px!important;height:40px!important}
+    /* Botones + / - de cantidad: de 24 px a 36 px. */
+    #inquiry-items-container button[onclick^="updateQty"]{width:36px!important;height:36px!important;font-size:14px}
+    /* Botón × de eliminar: 40x40 px en las 3 vistas. */
+    #inquiry-items-container button[onclick^="removeItem"]{width:40px!important;height:40px!important;display:flex;align-items:center;justify-content:center;padding:0!important}
+    /* "Vaciar lista": más zona de toque (16 px -> 32 px de alto). */
+    #cart-drawer button[onclick="clearInquiry()"]{padding-top:8px;padding-bottom:8px}
+    /* "copiar liga de mi lista": más zona de toque (16 px -> 32 px de alto). */
+    #inquiry-items-container button[onclick="copyShareLink()"]{display:inline-block;padding:8px 2px}
+    /* El total no salta de línea: en teléfono se partía en "$180 / MXN". */
+    #inquiry-total{white-space:nowrap;flex-shrink:0}
+    /* Caja de lista vacía centrada verticalmente. Solo casa cuando es la
+       única hija del contenedor (con productos hay más hijos y no aplica). */
+    #inquiry-items-container>div:only-child{margin-top:auto;margin-bottom:auto}
+  </style>
 
 
 <style id="titulo-ciclo">
