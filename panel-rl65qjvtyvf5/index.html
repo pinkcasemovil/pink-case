@@ -62,6 +62,17 @@
   .photo-box img { width: 110px; height: 110px; object-fit: cover; border-radius: 14px; border: 1px solid rgba(255,255,255,.2); background: #2b2b2e; flex-shrink: 0; }
   .photo-box .photo-actions { display: flex; flex-direction: column; gap: 8px; }
   .photo-box .photo-note { color: rgba(255,255,255,.6); font-size: 12px; line-height: 1.5; }
+  /* ---------- Recorte de foto ---------- */
+  .crop-box { margin-top: 16px; }
+  .crop-view { position: relative; width: 100%; max-width: 340px; aspect-ratio: 1 / 1; margin: 0 auto; overflow: hidden; border-radius: 14px; border: 1px solid rgba(255,255,255,.2); background: #111; touch-action: none; cursor: grab; }
+  .crop-view.dragging { cursor: grabbing; }
+  .crop-view img { position: absolute; left: 0; top: 0; max-width: none; user-select: none; -webkit-user-drag: none; pointer-events: none; }
+  .crop-zoom { display: flex; align-items: center; gap: 12px; max-width: 340px; margin: 14px auto 0; }
+  .crop-zoom span { color: rgba(255,255,255,.6); font-size: 18px; font-weight: 700; line-height: 1; }
+  .crop-zoom input[type="range"] { flex: 1; accent-color: #08EF4F; }
+  .crop-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  .crop-actions .btn-green { width: auto; flex: 1; margin-top: 0; }
+  .crop-actions .btn-ghost { flex: 1; }
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
   .check-row { display: flex; align-items: center; gap: 10px; margin-top: 18px; font-size: 14px; font-weight: 600; }
   .check-row input { width: 20px; height: 20px; accent-color: #08EF4F; }
@@ -141,12 +152,25 @@
     <div class="card">
       <h2 id="editor-title">Nuevo producto</h2>
       <p class="hint" id="editor-code"></p>
-      <div class="photo-box">
+      <div class="photo-box" id="photo-box">
         <img id="photo-preview" alt="Foto del producto"/>
         <div class="photo-actions">
           <button class="btn btn-ghost btn-sm" id="btn-photo" type="button">Elegir foto</button>
           <input id="photo-input" type="file" accept="image/*" class="hidden"/>
-          <p class="photo-note">Puedes tomarla con la cámara o elegirla de la galería. Se comprime sola antes de subirla.</p>
+          <p class="photo-note">Puedes tomarla con la cámara o elegirla de la galería. Después la acomodas en el cuadro y se comprime sola antes de subirla.</p>
+        </div>
+      </div>
+      <div class="crop-box hidden" id="crop-box">
+        <div class="crop-view" id="crop-view"><img id="crop-img" alt=""/></div>
+        <div class="crop-zoom">
+          <span>−</span>
+          <input id="crop-zoom" type="range" min="100" max="300" value="100" step="1" aria-label="Acercar o alejar"/>
+          <span>+</span>
+        </div>
+        <p class="hint" style="margin-top:10px;text-align:center">Arrastra la foto para acomodarla. Lo que ves en el cuadro es lo que se verá en la tienda.</p>
+        <div class="crop-actions">
+          <button class="btn btn-green" id="btn-crop-apply" type="button">Usar esta foto</button>
+          <button class="btn btn-ghost" id="btn-crop-cancel" type="button">Cancelar</button>
         </div>
       </div>
       <div class="field">
@@ -248,7 +272,7 @@ var newPhotoData = '';
 
 function $(id) { return document.getElementById(id); }
 function token() { return sessionStorage.getItem(TOKEN_KEY) || ''; }
-function show(id) { ['view-login', 'view-main', 'view-editor', 'view-password'].forEach(function (v) { $(v).classList.toggle('hidden', v !== id); }); window.scrollTo(0, 0); }
+function show(id) { closeCrop(); ['view-login', 'view-main', 'view-editor', 'view-password'].forEach(function (v) { $(v).classList.toggle('hidden', v !== id); }); window.scrollTo(0, 0); }
 
 var toastTimer = null;
 function toast(msg, isErr) {
@@ -447,35 +471,95 @@ function openEditor(code) {
   show('view-editor');
 }
 
-/* Comprime la foto en el celular antes de subirla (lado máximo 1280 px,
-   JPEG calidad 0,82), igual que la foto de la promo de funda. */
-function compressPhoto(file) {
-  return new Promise(function (resolve, reject) {
-    var img = new Image();
-    var url = URL.createObjectURL(file);
-    img.onload = function () {
-      URL.revokeObjectURL(url);
-      var w = img.naturalWidth, h = img.naturalHeight;
-      var max = 1280;
-      if (w > max || h > max) { var k = max / Math.max(w, h); w = Math.round(w * k); h = Math.round(h * k); }
-      var c = document.createElement('canvas');
-      c.width = w; c.height = h;
-      c.getContext('2d').drawImage(img, 0, 0, w, h);
-      resolve(c.toDataURL('image/jpeg', 0.82));
-    };
-    img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('foto')); };
-    img.src = url;
-  });
+/* ---------- Recorte de foto ----------
+   La tarjeta de la tienda es cuadrada y recorta la foto por el centro.
+   Aquí se acomoda la foto dentro de un cuadro igual al de la tienda:
+   se arrastra para moverla y la barra acerca o aleja. Lo que se ve en
+   el cuadro es exactamente lo que se sube. El recorte y la compresión
+   se hacen en el celular, antes de subir; el servidor no cambia. */
+var cropImg = null;   /* Image con la foto elegida */
+var cropUrl = '';     /* object URL de la foto elegida */
+var cropZoom = 1;     /* 1 = la foto cabe completa; hasta 3 */
+var cropCx = 0, cropCy = 0; /* punto de la foto (en px originales) al centro del cuadro */
+var cropDrag = null;  /* {x, y} del puntero mientras se arrastra */
+
+function cropScale() {
+  var v = $('crop-view').clientWidth;
+  return v / Math.min(cropImg.naturalWidth, cropImg.naturalHeight) * cropZoom;
+}
+
+/* El cuadro nunca muestra huecos: el centro se queda dentro de la foto. */
+function cropClamp() {
+  var side = $('crop-view').clientWidth / cropScale();
+  var w = cropImg.naturalWidth, h = cropImg.naturalHeight;
+  cropCx = Math.max(side / 2, Math.min(w - side / 2, cropCx));
+  cropCy = Math.max(side / 2, Math.min(h - side / 2, cropCy));
+}
+
+function cropRender() {
+  if (!cropImg) return;
+  cropClamp();
+  var v = $('crop-view').clientWidth;
+  var s = cropScale();
+  var img = $('crop-img');
+  img.style.width = Math.round(cropImg.naturalWidth * s) + 'px';
+  img.style.height = Math.round(cropImg.naturalHeight * s) + 'px';
+  img.style.left = Math.round(v / 2 - cropCx * s) + 'px';
+  img.style.top = Math.round(v / 2 - cropCy * s) + 'px';
+}
+
+function openCrop(file) {
+  if (cropUrl) URL.revokeObjectURL(cropUrl);
+  cropUrl = URL.createObjectURL(file);
+  var img = new Image();
+  img.onload = function () {
+    cropImg = img;
+    cropZoom = 1;
+    cropCx = img.naturalWidth / 2;
+    cropCy = img.naturalHeight / 2;
+    $('crop-img').src = cropUrl;
+    $('crop-zoom').value = '100';
+    $('photo-box').classList.add('hidden');
+    $('crop-box').classList.remove('hidden');
+    /* El cuadro debe estar visible para medir su ancho. */
+    requestAnimationFrame(cropRender);
+  };
+  img.onerror = function () {
+    URL.revokeObjectURL(cropUrl); cropUrl = '';
+    toast('Esa foto no se pudo leer. Prueba con otra.', true);
+  };
+  img.src = cropUrl;
+}
+
+function closeCrop() {
+  if (cropUrl) { URL.revokeObjectURL(cropUrl); cropUrl = ''; }
+  cropImg = null; cropDrag = null;
+  $('crop-box').classList.add('hidden');
+  $('photo-box').classList.remove('hidden');
+  $('photo-input').value = '';
+}
+
+/* Dibuja en un lienzo cuadrado justo lo que se ve en el cuadro
+   (lado máximo 1280 px, JPEG calidad 0,82) y lo deja listo para subir. */
+function applyCrop() {
+  if (!cropImg) return;
+  cropClamp();
+  var side = $('crop-view').clientWidth / cropScale();
+  var sx = cropCx - side / 2, sy = cropCy - side / 2;
+  var out = Math.min(1280, Math.max(1, Math.round(side)));
+  var c = document.createElement('canvas');
+  c.width = out; c.height = out;
+  c.getContext('2d').drawImage(cropImg, sx, sy, side, side, 0, 0, out, out);
+  newPhotoData = c.toDataURL('image/jpeg', 0.82);
+  $('photo-preview').src = newPhotoData;
+  closeCrop();
 }
 
 $('btn-photo').addEventListener('click', function () { $('photo-input').click(); });
 $('photo-input').addEventListener('change', function () {
   var f = $('photo-input').files && $('photo-input').files[0];
   if (!f) return;
-  compressPhoto(f).then(function (dataUrl) {
-    newPhotoData = dataUrl;
-    $('photo-preview').src = dataUrl;
-  }).catch(function () { toast('Esa foto no se pudo leer. Prueba con otra.', true); });
+  openCrop(f);
 });
 
 function saveProduct() {
@@ -597,6 +681,33 @@ $('btn-back-list-2').addEventListener('click', function () { show('view-main'); 
 $('btn-cancel').addEventListener('click', function () { show('view-main'); });
 $('btn-save').addEventListener('click', saveProduct);
 $('btn-delete').addEventListener('click', deleteProduct);
+$('crop-view').addEventListener('pointerdown', function (e) {
+  if (!cropImg) return;
+  cropDrag = { x: e.clientX, y: e.clientY };
+  $('crop-view').classList.add('dragging');
+  try { $('crop-view').setPointerCapture(e.pointerId); } catch (err) {}
+});
+$('crop-view').addEventListener('pointermove', function (e) {
+  if (!cropDrag || !cropImg) return;
+  var s = cropScale();
+  cropCx -= (e.clientX - cropDrag.x) / s;
+  cropCy -= (e.clientY - cropDrag.y) / s;
+  cropDrag.x = e.clientX; cropDrag.y = e.clientY;
+  cropRender();
+});
+function cropEndDrag() { cropDrag = null; $('crop-view').classList.remove('dragging'); }
+$('crop-view').addEventListener('pointerup', cropEndDrag);
+$('crop-view').addEventListener('pointercancel', cropEndDrag);
+$('crop-zoom').addEventListener('input', function () {
+  if (!cropImg) return;
+  cropZoom = parseInt($('crop-zoom').value, 10) / 100;
+  cropRender();
+});
+$('btn-crop-apply').addEventListener('click', applyCrop);
+$('btn-crop-cancel').addEventListener('click', closeCrop);
+window.addEventListener('resize', function () {
+  if (!$('crop-box').classList.contains('hidden')) cropRender();
+});
 $('btn-pw-save').addEventListener('click', savePassword);
 $('btn-pw-cancel').addEventListener('click', function () { show('view-main'); });
 
