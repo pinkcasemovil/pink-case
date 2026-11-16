@@ -835,6 +835,18 @@
 @media (min-width:640px){
 .hero-v3-bienvenido{font-size:20px}
 }
+
+.mq-strip{overflow:hidden;padding:26px 0;border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08)}
+.mq-track{display:flex;width:max-content;animation:mq-scroll 28s linear infinite}
+.mq-group{display:flex;align-items:center;gap:2.5rem;padding-right:2.5rem}
+.mq-word{font-family:'Archivo Black',sans-serif;font-weight:400;font-size:clamp(30px,4.5vw,54px);line-height:1;letter-spacing:.01em;text-transform:uppercase;white-space:nowrap}
+.mq-sep{color:rgb(255 46 147);font-size:.55em;line-height:1}
+.mq-blanco{color:#fff}
+.mq-rosa{color:rgb(255 46 147)}
+.mq-borde-blanco{color:transparent;-webkit-text-stroke:2px #fff}
+.mq-borde-rosa{color:transparent;-webkit-text-stroke:2px rgb(255 46 147)}
+@keyframes mq-scroll{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.mq-track{animation:none}}
 </style>
 <style>
     @font-face { font-family: 'Material Symbols Outlined'; src: url('assets/fonts/material-symbols-outlined.woff2') format('woff2'); font-weight: 100 700; font-style: normal; font-display: swap; }
@@ -1111,6 +1123,14 @@
 </div>
 </div>
 </section>
+</div>
+
+<!-- 3. CARRUSEL INFINITO DE TEXTO -->
+<div class="mq-strip" aria-hidden="true">
+<div class="mq-track">
+<div class="mq-group"><span class="mq-word mq-blanco">FUNDAS</span><span class="mq-sep">✦</span><span class="mq-word mq-borde-rosa">MICAS</span><span class="mq-sep">✦</span><span class="mq-word mq-rosa">AUDÍFONOS</span><span class="mq-sep">✦</span><span class="mq-word mq-borde-blanco">CARGADORES</span><span class="mq-sep">✦</span><span class="mq-word mq-blanco">SMARTWATCH</span><span class="mq-sep">✦</span><span class="mq-word mq-borde-rosa">BOCINAS</span><span class="mq-sep">✦</span><span class="mq-word mq-rosa">CABLES</span><span class="mq-sep">✦</span><span class="mq-word mq-borde-blanco">BATERÍAS</span><span class="mq-sep">✦</span></div>
+<div class="mq-group"><span class="mq-word mq-blanco">FUNDAS</span><span class="mq-sep">✦</span><span class="mq-word mq-borde-rosa">MICAS</span><span class="mq-sep">✦</span><span class="mq-word mq-rosa">AUDÍFONOS</span><span class="mq-sep">✦</span><span class="mq-word mq-borde-blanco">CARGADORES</span><span class="mq-sep">✦</span><span class="mq-word mq-blanco">SMARTWATCH</span><span class="mq-sep">✦</span><span class="mq-word mq-borde-rosa">BOCINAS</span><span class="mq-sep">✦</span><span class="mq-word mq-rosa">CABLES</span><span class="mq-sep">✦</span><span class="mq-word mq-borde-blanco">BATERÍAS</span><span class="mq-sep">✦</span></div>
+</div>
 </div>
 
 <!-- 4. ASESORÍA HUMANA (#asesoria-humana) -->
