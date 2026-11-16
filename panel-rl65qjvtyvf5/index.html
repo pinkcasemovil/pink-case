@@ -363,7 +363,7 @@ function renderList() {
   $('empty').classList.toggle('hidden', list.length > 0);
   $('product-list').innerHTML = list.map(function (p) {
     return '<div class="prow' + (p.visible ? '' : ' oculto') + '">' +
-      '<img src="' + esc(p.img) + '" alt="" loading="lazy"/>' +
+      '<img src="' + esc(imgUrl(p.img)) + '" alt="" loading="lazy"/>' +
       '<div class="info"><div class="name">' + esc(p.name) + '</div>' +
       '<div class="meta">' + esc(CAT_LABELS[p.cat] || p.cat) + ' · ' + esc(p.code) + ' <span class="price-m">· $' + Number(p.price).toLocaleString('es-MX') + '</span></div></div>' +
       '<span class="price">$' + Number(p.price).toLocaleString('es-MX') + '</span>' +
@@ -376,6 +376,16 @@ function renderList() {
 }
 
 function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+/* Las fotos guardadas son rutas relativas a la raíz del sitio (assets/...),
+   pero el panel vive en una subcarpeta: se resuelven desde la raíz para que
+   carguen. Las URLs absolutas (Drive, data:) se dejan tal cual. Solo afecta
+   a lo que se muestra; lo que se guarda sigue siendo la ruta original. */
+function imgUrl(u) {
+  u = u || '';
+  if (u.indexOf('http://') === 0 || u.indexOf('https://') === 0 || u.indexOf('/') === 0 || u.indexOf('data:') === 0) return u;
+  return '/' + u;
+}
 
 function toggleVisible(code) {
   var p = productos.filter(function (x) { return x.code === code; })[0];
@@ -431,7 +441,7 @@ function openEditor(code) {
     $('f-model').value = p.model || ''; $('f-modelos').value = (p.modelos || []).join(', ');
     $('f-visible').checked = !!p.visible;
     currentImg = p.img || '';
-    $('photo-preview').src = currentImg;
+    $('photo-preview').src = imgUrl(currentImg);
     $('btn-delete').classList.remove('hidden');
   }
   show('view-editor');
