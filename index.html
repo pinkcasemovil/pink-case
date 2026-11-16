@@ -2649,7 +2649,10 @@ HORARIOS DE ATENCIÓN
     function applySearch() {
       const input = document.getElementById("catalog-search");
       const q = (input?.value || "").trim();
-      const primeraLetra = !lastQ && q;
+      /* Nueva consulta: antes no había texto, o el texto nuevo no continúa el
+         anterior (se borró y se escribió otra cosa). Al seguir escribiendo la
+         misma consulta no se vuelve a desplazar. */
+      const nuevaConsulta = !!q && (!lastQ || (!q.startsWith(lastQ) && !lastQ.startsWith(q)));
       lastQ = q;
       const clearBtn = document.getElementById("catalog-search-clear");
       if (clearBtn) { clearBtn.classList.toggle("hidden", !q); clearBtn.classList.toggle("flex", !!q); }
@@ -2666,17 +2669,24 @@ HORARIOS DE ATENCIÓN
       const list = PRODUCTS.filter(p => { const hay = normText([p.name, p.brand, p.model, p.catLabel, p.line, p.sub, p.tags, (p.modelos || []).join(" ")].join(" ")); return tokens.every(t => matchTok(hay, t)); });
       if (info) { info.textContent = list.length + (list.length === 1 ? " resultado para “" : " resultados para “") + q + "”"; info.classList.remove("hidden"); }
       renderGrid(list);
-      if (primeraLetra) {
-        if (window.innerWidth < 640) {
-          /* En teléfono, bajar directo a los resultados: el teclado tapa la
-             parte de abajo de la pantalla, y si solo se baja al título del
-             catálogo los productos quedan escondidos detrás del teclado.
-             Se desplaza después de pintar los resultados, para medir la
-             posición final de la cuadrícula. */
+      if (nuevaConsulta) desplazarAResultados();
+    }
+    function desplazarAResultados() {
+      if (window.innerWidth < 640) {
+        /* En teléfono, bajar directo a los resultados: el teclado tapa la
+           parte de abajo de la pantalla, y si solo se baja al título del
+           catálogo los productos quedan escondidos detrás del teclado.
+           Se desplaza dos veces: al momento y 350 ms después, porque al
+           abrirse el teclado el teléfono puede cancelar el primer
+           desplazamiento. Si el primero ya llegó, el segundo no mueve nada. */
+        const bajar = () => {
           const grid = document.getElementById("product-grid");
           if (grid) window.scrollTo({ top: grid.getBoundingClientRect().top + window.scrollY - 124, behavior: "smooth" });
-        } else document.getElementById("catalogo")?.scrollIntoView({ behavior: "smooth" });
-      }
+        };
+        bajar();
+        clearTimeout(window._scrollResultadosT);
+        window._scrollResultadosT = setTimeout(bajar, 350);
+      } else document.getElementById("catalogo")?.scrollIntoView({ behavior: "smooth" });
     }
     function clearSearch() { const input = document.getElementById("catalog-search"); if (input) input.value = ""; lastQ = ""; applySearch(); }
 
