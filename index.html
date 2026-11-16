@@ -1117,11 +1117,14 @@
 
 
 <style id="modal-emergente-movil">
-/* En teléfono, el detalle de producto es una ventana flotante con 20 px de
-   margen por todos lados (antes era una hoja pegada a los bordes): se ve la
-   tienda alrededor, oscurecida, y tocando ahí se cierra. */
+/* En teléfono, el detalle de producto es una ventana flotante: 40 px de
+   margen a los lados y 72 px arriba y abajo (310x700 en un teléfono de
+   390x844). La foto va al 72% de ancho y centrada, para que la ventana
+   sea más corta sin que el contenido se apriete. Se ve la tienda
+   alrededor, oscurecida, y tocando ahí se cierra. */
 @media (max-width:639px){
-  #product-modal .pm-panel{top:20px;right:20px;bottom:20px;left:20px;border-radius:24px}
+  #product-modal .pm-panel{top:72px;right:40px;bottom:72px;left:40px;border-radius:24px}
+  #product-modal #pm-zoom-wrap{width:72%;margin-left:auto;margin-right:auto}
 }
 </style>
 
