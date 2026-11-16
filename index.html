@@ -1116,11 +1116,12 @@
 </style>
 
 
-<style id="modal-65-movil">
-/* En teléfono, la ventana del producto ocupa el 65% del alto (antes el 95%):
-   arriba se sigue viendo la tienda, oscurecida, y tocando ahí se cierra. */
+<style id="modal-emergente-movil">
+/* En teléfono, el detalle de producto es una ventana flotante con 20 px de
+   margen por todos lados (antes era una hoja pegada a los bordes): se ve la
+   tienda alrededor, oscurecida, y tocando ahí se cierra. */
 @media (max-width:639px){
-  #product-modal .pm-panel{top:35%}
+  #product-modal .pm-panel{top:20px;right:20px;bottom:20px;left:20px;border-radius:24px}
 }
 </style>
 
