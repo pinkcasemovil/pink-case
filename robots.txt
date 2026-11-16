@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /panel-rl65qjvtyvf5/
+Disallow: /ruleta/validar/
+
+Sitemap: https://pinkcasee.com/sitemap.xml
