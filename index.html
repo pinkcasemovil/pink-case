@@ -2645,15 +2645,9 @@ HORARIOS DE ATENCIÓN
       if (clearBtn) { clearBtn.classList.add("hidden"); clearBtn.classList.remove("flex"); }
     }
     function normText(s) { return (s || "").toString().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, ""); }
-    let lastQ = "";
     function applySearch() {
       const input = document.getElementById("catalog-search");
       const q = (input?.value || "").trim();
-      /* Nueva consulta: antes no había texto, o el texto nuevo no continúa el
-         anterior (se borró y se escribió otra cosa). Al seguir escribiendo la
-         misma consulta no se vuelve a desplazar. */
-      const nuevaConsulta = !!q && (!lastQ || (!q.startsWith(lastQ) && !lastQ.startsWith(q)));
-      lastQ = q;
       const clearBtn = document.getElementById("catalog-search-clear");
       if (clearBtn) { clearBtn.classList.toggle("hidden", !q); clearBtn.classList.toggle("flex", !!q); }
       const info = document.getElementById("search-info");
@@ -2669,7 +2663,10 @@ HORARIOS DE ATENCIÓN
       const list = PRODUCTS.filter(p => { const hay = normText([p.name, p.brand, p.model, p.catLabel, p.line, p.sub, p.tags, (p.modelos || []).join(" ")].join(" ")); return tokens.every(t => matchTok(hay, t)); });
       if (info) { info.textContent = list.length + (list.length === 1 ? " resultado para “" : " resultados para “") + q + "”"; info.classList.remove("hidden"); }
       renderGrid(list);
-      if (nuevaConsulta) desplazarAResultados();
+      /* En cada tecla con texto se baja a los resultados: si ya se está
+         viendo la cuadrícula no se mueve nada, y si se borró y se escribe
+         otra cosa vuelve a bajar. */
+      desplazarAResultados();
     }
     function desplazarAResultados() {
       if (window.innerWidth < 640) {
@@ -2688,7 +2685,7 @@ HORARIOS DE ATENCIÓN
         window._scrollResultadosT = setTimeout(bajar, 350);
       } else document.getElementById("catalogo")?.scrollIntoView({ behavior: "smooth" });
     }
-    function clearSearch() { const input = document.getElementById("catalog-search"); if (input) input.value = ""; lastQ = ""; applySearch(); }
+    function clearSearch() { const input = document.getElementById("catalog-search"); if (input) input.value = ""; applySearch(); }
 
     /* ---------- Vista de producto: detalle con zoom y galería (lista para más fotos) ---------- */
     let pmCode = null, pmZoom = false;
