@@ -12,12 +12,12 @@
 <link as="font" crossorigin="" href="assets/fonts/material-symbols-outlined.woff2" rel="preload" type="font/woff2"/>
 <meta content="#0a0a0a" name="theme-color"/>
 <meta content="Fundas, micas con seguro, audífonos y servicios para tu celular en el Centro de Ixtlahuaca. Arma tu lista y confirma existencias por WhatsApp." name="description"/>
-<meta content="Pink Case — Tu estilo. Tu celular. Accesorios que van contigo." property="og:title"/>
+<meta content="Pink Case — Accesorios y micas para celular en Ixtlahuaca Centro" property="og:title"/>
 <meta content="Catálogo de mostrador en Ixtlahuaca Centro: fundas por modelo, micas desde $40 con instalación gratis y 1 cambio gratis en precio actual." property="og:description"/>
 <meta content="https://pinkcasemovil.github.io/pink-case/assets/tienda-pc5-og.jpg" property="og:image"/>
 <meta content="https://pinkcasemovil.github.io/pink-case/" property="og:url"/>
 <meta content="summary_large_image" name="twitter:card"/>
-<meta content="Pink Case — Tu estilo. Tu celular. Accesorios que van contigo." name="twitter:title"/>
+<meta content="Pink Case — Accesorios y micas para celular en Ixtlahuaca Centro" name="twitter:title"/>
 <meta content="Catálogo de mostrador en Ixtlahuaca Centro: fundas por modelo, micas desde $40 con instalación gratis y 1 cambio gratis en precio actual." name="twitter:description"/>
 <meta content="https://pinkcasemovil.github.io/pink-case/assets/tienda-pc5-og.jpg" name="twitter:image"/>
 <meta content="website" property="og:type"/>
@@ -792,6 +792,8 @@
     @font-face { font-family: 'Archivo'; src: url('assets/fonts/archivo-latin-ext.woff2') format('woff2'); font-weight: 300 700; font-style: normal; font-display: swap; unicode-range: U+0100-024F, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF; }
     @font-face { font-family: 'Unbounded'; src: url('assets/fonts/unbounded-latin.woff2') format('woff2'); font-weight: 400 900; font-style: normal; font-display: swap; }
     @font-face { font-family: 'Unbounded'; src: url('assets/fonts/unbounded-latin-ext.woff2') format('woff2'); font-weight: 400 900; font-style: normal; font-display: swap; unicode-range: U+0100-024F, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+    @font-face { font-family: 'Archivo Black'; src: url('assets/fonts/archivo-black-latin.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+
   
 .isabel-sec{position:relative;overflow:hidden;background:#000}
 .isabel-sec-grid{position:relative;max-width:1440px;margin:0 auto;display:grid}
@@ -824,6 +826,12 @@
 .isabel-sec-grid{grid-template-columns:5fr 7fr}
 .isabel-photo{height:640px}
 .isabel-copy{padding:4rem 3rem 4rem 1rem}
+}
+
+.hero-v3-bienvenido{display:block;font-family:'Archivo',sans-serif;font-weight:700;font-size:18px;letter-spacing:.35em;color:rgb(255 46 147);margin-bottom:14px}
+.hero-v3-foto{display:block;font-family:'Archivo Black',sans-serif;font-weight:400;font-size:clamp(90px,11vw,150px);line-height:.95;letter-spacing:-.01em;background:linear-gradient(rgba(255,46,147,.45) 0 50%,rgba(255,46,147,0) 50% 100%),linear-gradient(rgba(255,255,255,.22),rgba(255,255,255,.22)),url('assets/tienda-pc5-hero-v3.webp') center 35%/cover no-repeat;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+@media (min-width:640px){
+.hero-v3-bienvenido{font-size:20px}
 }
 </style>
 <style>
@@ -1046,8 +1054,9 @@
 <span class="font-archivo text-xs sm:text-sm font-semibold tracking-[0.25em] text-white">ACCESORIOS PARA TU DÍA A DÍA</span>
 </div>
 <!-- Hero Headline (Jerarquía contundente) -->
-<h1 class="font-unbounded text-[42px] sm:text-6xl lg:text-[64px] font-extrabold text-white tracking-tight leading-[1.05]">
-              Tu estilo.<br/>Tu celular.<br/><span class="block text-2xl sm:text-3xl lg:text-[32px] leading-[1.2] mt-3 tracking-tight">Accesorios que van contigo.</span>
+<h1 class="text-white">
+<span class="hero-v3-bienvenido">BIENVENIDO A</span>
+<span class="hero-v3-foto">PINK<br/>CASE</span>
 </h1>
 <span class="block w-16 h-1.5 rounded-full bg-pink-primary"></span>
 <!-- Microcopia empática -->
