@@ -2259,8 +2259,46 @@
 <script>
     let PRODUCTS = [];
     const byCode = {};
-    function setProducts(list) { PRODUCTS = list || []; PRODUCTS.forEach(p => byCode[p.code] = p); }
+    function setProducts(list) { PRODUCTS = list || []; for (const k in byCode) delete byCode[k]; PRODUCTS.forEach(p => byCode[p.code] = p); }
     const WA_NUMBER = "527122345562";
+    /* ---------- Catálogo desde el puente (panel admin) ---------- */
+    // La tienda muestra primero los productos embebidos (instantáneo) y
+    // después pide la lista actual al puente (la pestaña "Productos" de
+    // la hoja, que administra el panel /admin/). Si la lista cambió (un
+    // producto nuevo, un precio distinto, uno oculto), se vuelve a pintar
+    // el catálogo con lo actual. Si el puente no responde, la tienda sigue
+    // con los embebidos: la tienda nunca se queda sin catálogo.
+    const BRIDGE_URL = 'https://script.google.com/macros/s/AKfycbxaLju4YnKKt5C55CTo4B4N01A0WacpsdVKw_QcWmu0D7GJjqYxNud2NaihwrVeDUjInw/exec';
+    let catalogoActualizado = false;
+    function refrescarCatalogo() {
+      if (catalogoActualizado) return;
+      const ctrl = (typeof AbortController === 'function') ? new AbortController() : null;
+      const timer = ctrl ? setTimeout(() => { try { ctrl.abort(); } catch (e) {} }, 4000) : null;
+      fetch(BRIDGE_URL + '?action=productos', ctrl ? { signal: ctrl.signal } : {})
+        .then(r => { if (timer) clearTimeout(timer); if (!r.ok) throw new Error('http'); return r.json(); })
+        .then(res => {
+          if (!res || !res.ok || !Array.isArray(res.productos)) return;
+          // La lista pública solo trae productos visibles; el campo
+          // "visible" sobra en la tienda y se quita al guardar.
+          const lista = res.productos.map(p => { const resto = {}; for (const k in p) { if (k !== 'visible') resto[k] = p[k]; } return resto; });
+          // Para comparar se quitan también los campos vacíos ('' o []):
+          // el servidor siempre trae "modelos" aunque esté vacío y los
+          // embebidos no lo traen en 25 productos; sin esto, la lista
+          // siempre parecería distinta y el catálogo se repintaría en
+          // cada visita.
+          const canon = l => JSON.stringify(l.map(p => { const c = {}; for (const k in p) { const v = p[k]; if (v === '' || (Array.isArray(v) && !v.length)) continue; c[k] = v; } return c; }));
+          if (canon(lista) === canon(PRODUCTS)) { catalogoActualizado = true; return; }
+          catalogoActualizado = true;
+          setProducts(lista);
+          renderFilters();
+          if (activeCat === 'buscar') applySearch();
+          else renderGrid(activeCat === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.cat === activeCat));
+          updateSuggestion();
+          renderInquiry();
+        })
+        .catch(() => { if (timer) clearTimeout(timer); /* sin puente: quedan los embebidos */ });
+    }
+
     const money = n => "$" + n.toLocaleString("es-MX");
 
     /* ---------- Catálogo ---------- */
@@ -2466,6 +2504,9 @@
     }
 
     function renderInquiry() {
+      // Si el catálogo se actualizó y un producto de la lista ya no existe,
+      // se quita de la lista (no se puede consultar lo que ya no se vende).
+      inquiryItems = inquiryItems.filter(i => byCode[i.code]);
       const container = document.getElementById("inquiry-items-container");
       const totalElement = document.getElementById("inquiry-total");
       if (!container) return;
@@ -2697,6 +2738,7 @@
         renderGrid(PRODUCTS);
         renderInquiry();
         if (fromShared) setTimeout(openCart, 450);
+        refrescarCatalogo();
       }
     });
   </script>
