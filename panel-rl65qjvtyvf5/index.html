@@ -26,6 +26,7 @@
   .field textarea { resize: vertical; min-height: 72px; }
   .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: none; border-radius: 12px; padding: 13px 20px; font-size: 14px; font-weight: 700; transition: transform .1s, background .15s; }
   .btn:active { transform: scale(.97); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
   .btn-green { background: #08EF4F; color: #0a0608; width: 100%; margin-top: 20px; font-family: Unbounded, sans-serif; font-size: 13px; }
   .btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,.2); color: #fff; }
   .btn-danger { background: transparent; border: 1px solid rgba(229,72,77,.6); color: #ff8085; }
@@ -511,6 +512,10 @@ function cropRender() {
 function openCrop(file) {
   if (cropUrl) URL.revokeObjectURL(cropUrl);
   cropUrl = URL.createObjectURL(file);
+  /* Mientras el recorte está abierto no se puede guardar: si se guardara
+     ahora, se guardaría la foto vieja y la nueva se perdería. */
+  $('btn-save').disabled = true;
+  $('btn-save').textContent = 'Termina el recorte para guardar';
   var img = new Image();
   img.onload = function () {
     cropImg = img;
@@ -525,7 +530,7 @@ function openCrop(file) {
     requestAnimationFrame(cropRender);
   };
   img.onerror = function () {
-    URL.revokeObjectURL(cropUrl); cropUrl = '';
+    closeCrop();
     toast('Esa foto no se pudo leer. Prueba con otra.', true);
   };
   img.src = cropUrl;
@@ -537,6 +542,8 @@ function closeCrop() {
   $('crop-box').classList.add('hidden');
   $('photo-box').classList.remove('hidden');
   $('photo-input').value = '';
+  $('btn-save').disabled = false;
+  $('btn-save').textContent = 'Guardar producto';
 }
 
 /* Dibuja en un lienzo cuadrado justo lo que se ve en el cuadro
