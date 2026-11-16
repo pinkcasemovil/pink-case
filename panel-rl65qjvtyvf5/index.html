@@ -18,6 +18,7 @@
   /* ---------- Login ---------- */
   .login-box { max-width: 400px; margin: 12vh auto 0; background: #222223; border: 1px solid rgba(255,255,255,.2); border-radius: 20px; padding: 28px 24px; }
   .login-box h1 { font-family: Unbounded, sans-serif; font-size: 22px; letter-spacing: .02em; }
+  .login-box h1 img { height: 40px; width: auto; }
   .login-box .sub { color: rgba(255,255,255,.6); font-size: 13px; margin-top: 6px; }
   .field { margin-top: 16px; }
   .field label { display: block; font-size: 12px; font-weight: 600; color: rgba(255,255,255,.6); margin-bottom: 6px; }
@@ -36,6 +37,7 @@
   .topbar { position: sticky; top: 0; z-index: 10; background: rgba(10,6,8,.92); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255,255,255,.1); }
   .topbar-in { max-width: 880px; margin: 0 auto; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
   .topbar h1 { font-family: Unbounded, sans-serif; font-size: 17px; }
+  .topbar h1 img { height: 26px; width: auto; vertical-align: middle; }
   .topbar h1 span { color: rgba(255,255,255,.55); font-family: Archivo, sans-serif; font-size: 12px; font-weight: 500; margin-left: 6px; }
   .top-actions { display: flex; gap: 8px; flex-wrap: wrap; }
   /* ---------- Toolbar ---------- */
@@ -99,7 +101,7 @@
 <!-- ============ LOGIN ============ -->
 <div id="view-login" class="wrap">
   <div class="login-box">
-    <h1>PINK CASE</h1>
+    <h1><img src="/assets/logo-pinkcase.webp" alt="PINK CASE"/></h1>
     <p class="sub">Panel de administración · Solo el administrador puede entrar aquí.</p>
     <div class="field">
       <label for="login-user">Usuario</label>
@@ -118,10 +120,9 @@
 <div id="view-main" class="hidden">
   <div class="topbar">
     <div class="topbar-in">
-      <h1>PINK CASE <span>Panel admin</span></h1>
+      <h1><img src="/assets/logo-pinkcase.webp" alt="PINK CASE"/> <span>Panel admin</span></h1>
       <div class="top-actions">
         <button class="btn btn-ghost btn-sm" id="btn-ver-tienda" type="button">Ver tienda</button>
-        <button class="btn btn-ghost btn-sm" id="btn-password" type="button">Cambiar contraseña</button>
         <button class="btn btn-ghost btn-sm" id="btn-logout" type="button">Salir</button>
       </div>
     </div>
@@ -227,34 +228,6 @@
   </div>
 </div>
 
-<!-- ============ CAMBIAR CONTRASEÑA ============ -->
-<div id="view-password" class="hidden">
-  <div class="wrap">
-    <button class="back-link" id="btn-back-list-2" type="button">← Volver a la lista</button>
-    <div class="card">
-      <h2>Cambiar contraseña</h2>
-      <p class="hint">La nueva contraseña debe tener al menos 8 caracteres.</p>
-      <div class="field">
-        <label for="pw-actual">Contraseña actual</label>
-        <input id="pw-actual" type="password" autocomplete="current-password"/>
-      </div>
-      <div class="field">
-        <label for="pw-nueva">Contraseña nueva</label>
-        <input id="pw-nueva" type="password" autocomplete="new-password"/>
-      </div>
-      <div class="field">
-        <label for="pw-confirm">Repite la contraseña nueva</label>
-        <input id="pw-confirm" type="password" autocomplete="new-password"/>
-      </div>
-      <p class="error" id="password-error"></p>
-      <div class="form-actions">
-        <button class="btn btn-green" id="btn-pw-save" type="button">Guardar contraseña</button>
-        <button class="btn btn-ghost" id="btn-pw-cancel" type="button">Cancelar</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div id="toast"></div>
 
 <script>
@@ -273,7 +246,7 @@ var newPhotoData = '';
 
 function $(id) { return document.getElementById(id); }
 function token() { return sessionStorage.getItem(TOKEN_KEY) || ''; }
-function show(id) { closeCrop(); ['view-login', 'view-main', 'view-editor', 'view-password'].forEach(function (v) { $(v).classList.toggle('hidden', v !== id); }); window.scrollTo(0, 0); }
+function show(id) { closeCrop(); ['view-login', 'view-main', 'view-editor'].forEach(function (v) { $(v).classList.toggle('hidden', v !== id); }); window.scrollTo(0, 0); }
 
 var toastTimer = null;
 function toast(msg, isErr) {
@@ -646,45 +619,16 @@ function deleteProduct() {
   });
 }
 
-/* ---------- Contraseña ---------- */
-function savePassword() {
-  var actual = $('pw-actual').value;
-  var nueva = $('pw-nueva').value;
-  var conf = $('pw-confirm').value;
-  $('password-error').textContent = '';
-  if (!actual || !nueva) { $('password-error').textContent = 'Llena los tres campos.'; return; }
-  if (nueva.length < 8) { $('password-error').textContent = 'La contraseña nueva debe tener al menos 8 caracteres.'; return; }
-  if (nueva !== conf) { $('password-error').textContent = 'La contraseña nueva y su repetición no coinciden.'; return; }
-  var btn = $('btn-pw-save');
-  btn.disabled = true; btn.textContent = 'Guardando…';
-  remotePost({ action: 'cambiarPassword', token: token(), actual: actual, nueva: nueva }).then(function (res) {
-    btn.disabled = false; btn.textContent = 'Guardar contraseña';
-    if (!res || !res.ok) {
-      if (res && res.error === 'unauthorized') { doLogout(); toast('Tu sesión expiró. Vuelve a entrar.', true); return; }
-      $('password-error').textContent = errText(res && res.error ? res.error : 'sin_respuesta');
-      return;
-    }
-    $('pw-actual').value = ''; $('pw-nueva').value = ''; $('pw-confirm').value = '';
-    toast('Contraseña cambiada.');
-    show('view-main');
-  }).catch(function () {
-    btn.disabled = false; btn.textContent = 'Guardar contraseña';
-    $('password-error').textContent = 'No se pudo conectar. Revisa tu internet.';
-  });
-}
-
 /* ---------- Eventos ---------- */
 $('btn-login').addEventListener('click', doLogin);
 $('login-pin').addEventListener('keydown', function (e) { if (e.key === 'Enter') doLogin(); });
 $('login-user').addEventListener('keydown', function (e) { if (e.key === 'Enter') doLogin(); });
 $('btn-logout').addEventListener('click', doLogout);
 $('btn-ver-tienda').addEventListener('click', function () { window.open('/', '_blank'); });
-$('btn-password').addEventListener('click', function () { $('password-error').textContent = ''; $('pw-actual').value = ''; $('pw-nueva').value = ''; $('pw-confirm').value = ''; show('view-password'); });
 $('btn-new').addEventListener('click', function () { openEditor(null); });
 $('search').addEventListener('input', renderList);
 $('filter-cat').addEventListener('change', renderList);
 $('btn-back-list').addEventListener('click', function () { show('view-main'); });
-$('btn-back-list-2').addEventListener('click', function () { show('view-main'); });
 $('btn-cancel').addEventListener('click', function () { show('view-main'); });
 $('btn-save').addEventListener('click', saveProduct);
 $('btn-delete').addEventListener('click', deleteProduct);
@@ -715,8 +659,6 @@ $('btn-crop-cancel').addEventListener('click', closeCrop);
 window.addEventListener('resize', function () {
   if (!$('crop-box').classList.contains('hidden')) cropRender();
 });
-$('btn-pw-save').addEventListener('click', savePassword);
-$('btn-pw-cancel').addEventListener('click', function () { show('view-main'); });
 
 if (token()) { show('view-main'); loadProducts(); } else { show('view-login'); }
 </script>
