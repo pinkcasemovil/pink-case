@@ -1121,16 +1121,11 @@
    a la izquierda en vez de a la derecha, como estaba diseñado. Se repone. */
 .justify-end{justify-content:flex-end}
 @media (max-width:639px){
-  /* El título cabe en una línea (antes se partía en dos): texto un poco
-     más chico y sin el icono decorativo, que no cabe junto al botón X */
-  #cart-drawer h2{font-size:.9375rem!important}
   #cart-drawer div.flex.items-center.gap-2:not(.flex-col)>span.material-symbols-outlined{display:none!important}
   /* El botón X más cómodo de tocar */
   #cart-drawer button[aria-label="Cerrar carrito"]{width:2.5rem!important;height:2.5rem!important}
   /* Más aire entre el total, el aviso y los botones */
   #cart-drawer aside>div:last-child{gap:1rem!important}
-  /* El icono de bolsa vacía se lee mejor un poco más grande */
-  #inquiry-items-container .material-symbols-outlined{font-size:40px!important}
 }
 </style>
   <!-- Paquete de tacto del carrito (2026-11-16): botones +/-, eliminar, X,
@@ -1145,13 +1140,22 @@
     #inquiry-items-container button[onclick^="removeItem"]{width:40px!important;height:40px!important;display:flex;align-items:center;justify-content:center;padding:0!important}
     /* "Vaciar lista": más zona de toque (16 px -> 32 px de alto). */
     #cart-drawer button[onclick="clearInquiry()"]{padding-top:8px;padding-bottom:8px}
-    /* "copiar liga de mi lista": más zona de toque (16 px -> 32 px de alto). */
-    #inquiry-items-container button[onclick="copyShareLink()"]{display:inline-block;padding:8px 2px}
+    /* "Copiar enlace": más zona de toque (16 px -> 32 px de alto), con icono. */
+    #inquiry-items-container button[onclick="copyShareLink()"]{display:inline-flex;align-items:center;gap:6px;padding-top:8px;padding-bottom:8px}
     /* El total no salta de línea: en teléfono se partía en "$180 / MXN". */
     #inquiry-total{white-space:nowrap;flex-shrink:0}
     /* Caja de lista vacía centrada verticalmente. Solo casa cuando es la
        única hija del contenedor (con productos hay más hijos y no aplica). */
     #inquiry-items-container>div:only-child{margin-top:auto;margin-bottom:auto}
+  </style>
+  <!-- Rediseño del carrito (2026-11-16, maqueta de Axel): encabezado con
+       ceja PINK CASE + píldora de artículos, estado vacío con ilustración,
+       artículos con foto grande y pie según el estado (ayuda si está vacío,
+       total + WhatsApp si tiene artículos). -->
+  <style id="carrito-rediseno">
+    .cart-ceja{letter-spacing:.22em}
+    .cart-foto{width:88px;height:88px}
+    .cart-ilustracion{width:230px;max-width:80%}
   </style>
   <!-- Encabezado del catálogo (2026-11-16, maqueta de Axel): título grande
        en Archivo Black y texto de presentación a la derecha. -->
@@ -2409,12 +2413,6 @@ HORARIOS DE ATENCIÓN
             Boutique de fundas de alta protección, micas templadas y accesorios para smartphones. Asesoría directa y confirmación exprés en mostrador.
           </p>
 </div>
-<div class="flex items-center gap-4">
-<a class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 border border-pink-500/20 text-white font-archivo text-xs transition-colors" href="https://www.facebook.com/profile.php?id=100089142581532" rel="noopener noreferrer" target="_blank">
-<span class="material-symbols-outlined text-[17px] text-pink-primary">thumb_up</span>
-<span>Página Oficial de Facebook</span>
-</a>
-</div>
 </div>
 <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 text-text-muted font-archivo text-xs border-t border-white/5">
 <p>© 2026 Pink Case. Comercio Local Independiente en Ixtlahuaca, Estado de México.</p>
@@ -2464,47 +2462,46 @@ HORARIOS DE ATENCIÓN
 <!-- Carrito lateral (drawer) -->
 <div class="cart-root hidden fixed inset-0" id="cart-drawer">
 <div class="cart-backdrop absolute inset-0 bg-black/60" onclick="closeCart()"></div>
-<aside class="cart-panel absolute right-0 top-0 h-full w-full max-w-[420px] isabel-panel border-l border-white/20 shadow-2xl flex flex-col" role="dialog" aria-modal="true" aria-label="Mi lista de productos">
+<aside class="cart-panel absolute right-0 top-0 h-full w-full max-w-[420px] isabel-panel border-l border-white/20 shadow-2xl flex flex-col" role="dialog" aria-modal="true" aria-label="Mi lista">
 <div class="flex items-start justify-between gap-4 p-5 pb-4 border-b border-white/10 shrink-0">
-<div>
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-white text-[24px]">receipt_long</span>
-<h2 class="font-unbounded text-lg font-bold text-white">Mi lista de productos</h2>
+<div class="min-w-0">
+<span class="cart-ceja font-unbounded text-xs font-bold text-pink-primary">PINK CASE</span>
+<div class="flex items-center gap-3 mt-1">
+<h2 class="font-unbounded text-3xl font-bold text-white leading-none">Mi lista</h2>
+<span id="cart-count-pill" class="px-3 py-1 rounded-full isabel-row font-archivo text-xs text-white whitespace-nowrap">0 artículos</span>
 </div>
-<p class="font-archivo text-xs text-white/60 mt-1">Reúne lo que te gusta y consulta descuentos y disponibilidad por WhatsApp.</p>
+<p class="font-archivo text-sm text-white/60 mt-2">Elige aquí. Consulta por WhatsApp.</p>
 </div>
 <button class="w-8 h-8 rounded-full isabel-row border border-white/15 text-white flex items-center justify-center shrink-0 hover:bg-white/10 transition-colors" onclick="closeCart()" title="Cerrar" type="button" aria-label="Cerrar carrito"><span class="material-symbols-outlined text-[18px]">close</span></button>
-</div>
-<div class="flex items-center justify-end px-5 pt-3 shrink-0">
-<button class="text-white/60 hover:text-white text-xs font-archivo flex items-center gap-1 transition-colors" onclick="clearInquiry()" type="button">
-<span class="material-symbols-outlined text-[16px]">delete_sweep</span>
-<span>Vaciar lista</span>
-</button>
 </div>
 <div class="hidden mx-5 mt-3 p-3.5 rounded-xl bg-white/5 border border-white/20 text-xs font-archivo text-white shrink-0" id="shared-banner"></div>
 <div class="flex-1 overflow-y-auto p-5 pt-3 flex flex-col gap-3 min-h-0" id="inquiry-items-container">
 <!-- Renderizado por JS -->
 </div>
-<div class="p-5 pt-4 border-t border-white/10 shrink-0 flex flex-col gap-3">
+<div class="p-5 pt-4 border-t border-white/10 shrink-0 flex flex-col gap-3" id="cart-footer-filled">
 <div class="flex items-center justify-between gap-2">
-<span class="font-archivo text-sm text-white/60">Estimado Total Informativo:</span>
-<span class="font-unbounded text-xl font-bold text-white" id="inquiry-total">$0 MXN</span>
+<span class="font-archivo text-sm text-white/60">Total estimado</span>
+<span class="font-unbounded text-2xl font-bold text-white" id="inquiry-total">$0 MXN</span>
 </div>
-<p class="font-archivo text-xs text-white/60 leading-relaxed">
-<strong class="text-white font-medium">Aviso de transparencia:</strong> No requiere tarjetas ni pagos en línea. Pagas directamente en efectivo o transferencia al recibir tu accesorio en tienda.
-</p>
-<button class="w-full inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-xl text-[#0a0608] font-unbounded text-xs sm:text-sm font-bold shadow-lg shadow-whatsapp/25 transition-all hover:scale-[1.02] active:scale-95" style="background:#08EF4F" id="whatsapp-send-btn" onclick="sendWhatsAppInquiry()" type="button">
-<svg class="w-5 h-5 fill-current" viewbox="0 0 24 24">
-<path d="M12.031 2C6.495 2 2 6.495 2 12.031a10.01 10.01 0 0 0 1.609 5.484L2.094 22l4.633-1.488a10.038 10.038 0 0 0 5.304 1.52h.004c5.536 0 10.031-4.495 10.031-10.031A10.034 10.034 0 0 0 12.031 2zm0 18.35a8.33 8.33 0 0 1-4.25-1.156l-.305-.18-3.156 1.013 1.039-3.078-.199-.316a8.312 8.312 0 0 1-1.277-4.602c0-4.606 3.746-8.352 8.352-8.352 2.23 0 4.328.871 5.906 2.45a8.293 8.293 0 0 1 2.446 5.902c0 4.606-3.746 8.352-8.556 8.32z"></path>
-<path d="M16.89 14.383c-.266-.133-1.574-.777-1.816-.867-.246-.086-.426-.133-.605.133s-.699.867-.855 1.047c-.156.176-.312.2-.578.066s-1.125-.414-2.145-1.32c-.793-.707-1.328-1.582-1.484-1.848s-.016-.41.117-.543c.121-.121.266-.312.4-.469.133-.156.176-.266.266-.445.086-.176.043-.332-.023-.465-.066-.133-.605-1.457-.828-1.996-.219-.527-.441-.453-.605-.461-.156-.008-.332-.008-.512-.008s-.469.066-.715.332c-.246.266-.941.922-.941 2.246s.965 2.605 1.102 2.785c.133.176 1.898 2.898 4.6 4.062.645.277 1.148.441 1.543.566.652.207 1.246.176 1.715.105.523-.078 1.574-.645 1.797-1.266.223-.625.223-1.164.156-1.27-.066-.109-.246-.176-.512-.309z"></path>
-</svg>
-<span>Consultar por WhatsApp</span>
+<p class="font-archivo text-xs text-white/60">Confirmamos el precio final por WhatsApp.</p>
+<button class="w-full inline-flex items-center justify-between gap-2 px-4 py-4 rounded-xl bg-white text-[#0a0608] font-unbounded text-xs sm:text-sm font-bold shadow-lg transition-all hover:scale-[1.02] active:scale-95" id="whatsapp-send-btn" onclick="sendWhatsAppInquiry()" type="button">
+<svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="#25D366" aria-hidden="true"><path d="M12.031 2C6.495 2 2 6.495 2 12.031a10.01 10.01 0 0 0 1.609 5.484L2.094 22l4.633-1.488a10.038 10.038 0 0 0 5.304 1.52h.004c5.536 0 10.031-4.495 10.031-10.031A10.034 10.034 0 0 0 12.031 2zm0 18.35a8.33 8.33 0 0 1-4.25-1.156l-.305-.18-3.156 1.013 1.039-3.078-.199-.316a8.312 8.312 0 0 1-1.277-4.602c0-4.606 3.746-8.352 8.352-8.352 2.23 0 4.328.871 5.906 2.45a8.293 8.293 0 0 1 2.446 5.902c0 4.606-3.746 8.352-8.556 8.32z"/><path d="M16.89 14.383c-.266-.133-1.574-.777-1.816-.867-.246-.086-.426-.133-.605.133s-.699.867-.855 1.047c-.156.176-.312.2-.578.066s-1.125-.414-2.145-1.32c-.793-.707-1.328-1.582-1.484-1.848s-.016-.41.117-.543c.121-.121.266-.312.4-.469.133-.156.176-.266.266-.445.086-.176.043-.332-.023-.465-.066-.133-.605-1.457-.828-1.996-.219-.527-.441-.453-.605-.461-.156-.008-.332-.008-.512-.008s-.469.066-.715.332c-.246.266-.941.922-.941 2.246s.965 2.605 1.102 2.785c.133.176 1.898 2.898 4.6 4.062.645.277 1.148.441 1.543.566.652.207 1.246.176 1.715.105.523-.078 1.574-.645 1.797-1.266.223-.625.223-1.164.156-1.27-.066-.109-.246-.176-.512-.309z"/></svg>
+<span class="flex-1 text-center whitespace-nowrap">Consultar por WhatsApp</span>
+<svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
 </button>
-<button class="w-full inline-flex items-center justify-center gap-2 px-7 py-3 rounded-xl border border-white/20 text-white font-unbounded text-xs sm:text-sm font-bold transition-all hover:bg-white/10 active:scale-95" onclick="closeCart()" type="button">
-<span class="material-symbols-outlined text-[18px]">shopping_bag</span>
+<button class="w-full inline-flex items-center justify-center gap-2 py-2 text-white font-unbounded text-sm font-bold transition-colors hover:text-pink-light" onclick="closeCart()" type="button">
+<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
 <span>Seguir eligiendo</span>
 </button>
-<div class="flex flex-col items-center gap-1 text-center font-archivo text-xs text-white/60"><span>⚡ Respuesta promedio: <strong>&lt; 15 min</strong> en horario comercial</span><span class="text-emerald-400 flex items-center justify-center gap-1"><span class="material-symbols-outlined text-[14px]">lock_open</span> Sin pago anticipado • Ajuste verificado en mano</span></div>
+<p class="font-archivo text-xs text-white/60 text-center">Sin pago en línea. Pagas al recibir en tienda.</p>
+</div>
+<div class="p-5 pt-4 border-t border-white/10 shrink-0 flex flex-col gap-2 hidden" id="cart-footer-empty">
+<div class="flex items-center justify-center gap-2 font-archivo text-sm text-white flex-wrap">
+<svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="#25D366" aria-hidden="true"><path d="M12.031 2C6.495 2 2 6.495 2 12.031a10.01 10.01 0 0 0 1.609 5.484L2.094 22l4.633-1.488a10.038 10.038 0 0 0 5.304 1.52h.004c5.536 0 10.031-4.495 10.031-10.031A10.034 10.034 0 0 0 12.031 2zm0 18.35a8.33 8.33 0 0 1-4.25-1.156l-.305-.18-3.156 1.013 1.039-3.078-.199-.316a8.312 8.312 0 0 1-1.277-4.602c0-4.606 3.746-8.352 8.352-8.352 2.23 0 4.328.871 5.906 2.45a8.293 8.293 0 0 1 2.446 5.902c0 4.606-3.746 8.352-8.556 8.32z"/><path d="M16.89 14.383c-.266-.133-1.574-.777-1.816-.867-.246-.086-.426-.133-.605.133s-.699.867-.855 1.047c-.156.176-.312.2-.578.066s-1.125-.414-2.145-1.32c-.793-.707-1.328-1.582-1.484-1.848s-.016-.41.117-.543c.121-.121.266-.312.4-.469.133-.156.176-.266.266-.445.086-.176.043-.332-.023-.465-.066-.133-.605-1.457-.828-1.996-.219-.527-.441-.453-.605-.461-.156-.008-.332-.008-.512-.008s-.469.066-.715.332c-.246.266-.941.922-.941 2.246s.965 2.605 1.102 2.785c.133.176 1.898 2.898 4.6 4.062.645.277 1.148.441 1.543.566.652.207 1.246.176 1.715.105.523-.078 1.574-.645 1.797-1.266.223-.625.223-1.164.156-1.27-.066-.109-.246-.176-.512-.309z"/></svg>
+<span class="font-bold">¿Necesitas ayuda para elegir?</span>
+<a class="underline hover:text-pink-light transition-colors" href="https://wa.me/527122345562" target="_blank" rel="noopener noreferrer">Escríbenos</a>
+</div>
+<p class="font-archivo text-xs text-white/60 text-center">Pagas al recibir en tienda.</p>
 </div>
 </aside>
 </div>
@@ -2763,15 +2760,49 @@ HORARIOS DE ATENCIÓN
       inquiryItems = inquiryItems.filter(i => byCode[i.code]);
       const container = document.getElementById("inquiry-items-container");
       const totalElement = document.getElementById("inquiry-total");
+      const pill = document.getElementById("cart-count-pill");
+      const footerFilled = document.getElementById("cart-footer-filled");
+      const footerEmpty = document.getElementById("cart-footer-empty");
       if (!container) return;
       if (!folio && inquiryItems.length) { folio = newFolio(); }
       if (inquiryItems.length === 0) {
         container.innerHTML = `
-          <div class="p-8 rounded-xl isabel-row border border-white/5 text-center flex flex-col items-center justify-center gap-2 text-white/60">
-            <span class="material-symbols-outlined text-[32px] text-white/60">shopping_bag</span>
-            <p class="font-unbounded text-xs sm:text-sm text-white">Tu lista está vacía.</p>
-            <span class="font-archivo text-xs">Explora los accesorios y pulsa "+ Carrito" para añadir artículos.</span>
+          <div class="flex flex-col items-center text-center gap-5 py-6">
+            <svg class="cart-ilustracion" viewBox="0 0 260 180" fill="none" aria-hidden="true">
+<ellipse cx="130" cy="166" rx="96" ry="8" fill="#000" opacity=".55"/>
+<path d="M82 74h96l10 80a12 12 0 0 1-12 13H84a12 12 0 0 1-12-13l10-80z" fill="#2b2b2b"/>
+<path d="M104 74a26 26 0 0 1 52 0" stroke="#555" stroke-width="7" stroke-linecap="round"/>
+<path d="M130 102v26M117 115h26" stroke="#ff2e93" stroke-width="5" stroke-linecap="round"/>
+<g transform="rotate(-12 52 128)">
+<rect x="32" y="98" width="40" height="66" rx="9" fill="#1e1e1e" stroke="#9a9a9a" stroke-width="2"/>
+<rect x="38" y="105" width="11" height="11" rx="2.5" stroke="#9a9a9a" stroke-width="1.5"/>
+</g>
+<g transform="rotate(8 208 138)">
+<rect x="182" y="118" width="52" height="42" rx="12" fill="#1e1e1e" stroke="#9a9a9a" stroke-width="2"/>
+<circle cx="197" cy="134" r="6" stroke="#9a9a9a" stroke-width="1.5"/>
+<circle cx="215" cy="134" r="6" stroke="#9a9a9a" stroke-width="1.5"/>
+</g>
+<path d="M212 28l5 12M228 40l12 5" stroke="#ff2e93" stroke-width="4" stroke-linecap="round"/>
+</svg>
+            <div class="flex flex-col items-center gap-2">
+              <p class="font-unbounded text-xl font-bold text-white">Tu lista está vacía.</p>
+              <p class="font-archivo text-sm text-white/60 leading-relaxed">Agrega lo que te guste y revisamos disponibilidad contigo.</p>
+            </div>
+            <button type="button" onclick="cartExplore()" class="w-full inline-flex items-center justify-between gap-3 px-6 py-4 rounded-xl bg-white text-[#0a0608] font-unbounded text-sm font-bold shadow-lg transition-all hover:scale-[1.02] active:scale-95">
+              <span class="flex-1 text-left">Explorar accesorios</span>
+              <svg class="w-6 h-6 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+            </button>
+            <div class="flex items-center justify-center gap-3 font-archivo text-sm text-white">
+              <button type="button" onclick="cartGoTo('fundas')" class="hover:text-pink-light transition-colors">Fundas</button>
+              <span class="text-pink-primary" aria-hidden="true">|</span>
+              <button type="button" onclick="cartGoTo('audifonos')" class="hover:text-pink-light transition-colors">Audífonos</button>
+              <span class="text-pink-primary" aria-hidden="true">|</span>
+              <button type="button" onclick="cartGoTo('cargadores')" class="hover:text-pink-light transition-colors">Cargadores</button>
+            </div>
           </div>`;
+        if (pill) pill.textContent = "0 artículos";
+        if (footerFilled) footerFilled.classList.add("hidden");
+        if (footerEmpty) footerEmpty.classList.remove("hidden");
         if (totalElement) totalElement.innerText = "$0 MXN";
         updateHeaderBadge(0);
         refreshCardButtons();
@@ -2783,13 +2814,17 @@ HORARIOS DE ATENCIÓN
         const sub = p.price * item.qty;
         total += sub; units += item.qty;
         return `
-          <div class="p-3.5 rounded-xl isabel-row border border-white/10 flex flex-col justify-between gap-3">
-            <div class="flex items-center gap-3">
-              <img class="w-11 h-11 rounded-lg object-cover border border-white/20 cursor-pointer" alt="${p.name}" src="${p.img}" onclick="openProduct('${item.code}')" title="Ver en grande"/>
-              <div class="flex flex-col">
-                <span class="font-archivo font-bold text-sm text-white cursor-pointer hover:text-white transition-colors" onclick="openProduct('${item.code}')" title="Ver en grande">${p.name}</span>
-                <span class="font-archivo text-xs text-white/60">${money(p.price)} MXN c/u · ${p.line}</span>
+          <div class="p-3.5 rounded-xl isabel-row border border-white/10 flex flex-col gap-3">
+            <div class="flex items-start gap-3">
+              <img class="cart-foto rounded-xl object-cover border border-white/20 cursor-pointer shrink-0" alt="${p.name}" src="${p.img}" onclick="openProduct('${item.code}')" title="Ver en grande"/>
+              <div class="flex flex-col flex-1 min-w-0">
+                <span class="font-archivo font-bold text-base text-white leading-snug cursor-pointer" onclick="openProduct('${item.code}')" title="Ver en grande">${p.name}</span>
+                <span class="font-archivo text-sm text-white/60">${money(p.price)} MXN c/u</span>
+                <span class="font-archivo text-sm text-white/60">${p.line}</span>
               </div>
+              <button type="button" onclick="removeItem(${index})" class="text-white/60 hover:text-white transition-colors shrink-0" title="Eliminar de la consulta">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+              </button>
             </div>
             <div class="flex items-center justify-between gap-4">
               <div class="flex items-center gap-1.5 isabel-panel rounded-lg p-1 border border-white/10">
@@ -2797,14 +2832,31 @@ HORARIOS DE ATENCIÓN
                 <span class="w-6 text-center font-unbounded text-xs text-white">${item.qty}</span>
                 <button type="button" onclick="updateQty(${index}, 1)" class="w-6 h-6 rounded flex items-center justify-center text-white hover:bg-white/10 transition-colors font-bold text-xs" title="Sumar">+</button>
               </div>
-              <span class="font-unbounded text-sm font-bold text-white min-w-[75px] text-right">${money(sub)}</span>
-              <button type="button" onclick="removeItem(${index})" class="text-white/60 hover:text-white transition-colors p-1" title="Eliminar de la consulta">
-                <span class="material-symbols-outlined text-[18px]">close</span>
-              </button>
+              <span class="font-unbounded text-lg font-bold text-white">${money(sub)}</span>
             </div>
           </div>`;
       }).join("") + `
-          <p class="font-archivo text-xs text-white/60">Folio de tu lista: <strong class="text-white">${folio}</strong> · Compártela con esta liga: <button type="button" class="underline text-white" onclick="copyShareLink()">copiar liga de mi lista</button></p>`;
+          <div class="flex items-center justify-end">
+            <button class="text-white/60 hover:text-white text-sm font-archivo flex items-center gap-2 transition-colors" onclick="clearInquiry()" type="button">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+              <span>Vaciar lista</span>
+            </button>
+          </div>
+          <div class="border-t border-white/10"></div>
+          <div class="flex items-center justify-between gap-2 font-archivo text-sm">
+            <span class="text-white/60">Folio <strong class="text-white font-semibold">${folio}</strong></span>
+            <button type="button" class="text-white underline" onclick="copyShareLink()">
+              <svg style="width:18px;height:18px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span>Copiar enlace</span>
+            </button>
+          </div>
+          <div class="border-t border-white/10"></div>
+          <div class="flex items-start gap-3 font-archivo text-sm text-white leading-relaxed">
+            <svg class="w-6 h-6 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            <span>Revisamos disponibilidad y descuentos por WhatsApp.</span>
+          </div>`;
+      if (pill) pill.textContent = units === 1 ? "1 artículo" : units + " artículos";
+      if (footerFilled) footerFilled.classList.remove("hidden");
+      if (footerEmpty) footerEmpty.classList.add("hidden");
       if (totalElement) totalElement.innerText = money(total) + " MXN";
       updateHeaderBadge(units);
       refreshCardButtons();
@@ -2851,6 +2903,20 @@ HORARIOS DE ATENCIÓN
     }
     function openIsabelMenu() { document.getElementById("isabel-menu")?.classList.remove("hidden"); }
     function closeIsabelMenu() { document.getElementById("isabel-menu")?.classList.add("hidden"); }
+    function cartExplore() {
+      closeCart();
+      document.getElementById("catalogo")?.scrollIntoView({ behavior: "smooth" });
+    }
+    function cartGoTo(dest) {
+      closeCart();
+      if (dest === "cargadores") {
+        const input = document.getElementById("catalog-search");
+        if (input) { input.value = "cargador"; applySearch(); }
+      } else {
+        filterCatalog(dest);
+      }
+      document.getElementById("catalogo")?.scrollIntoView({ behavior: "smooth" });
+    }
     let cartCloseTimer = null;
     function openCart() {
       const root = document.getElementById("cart-drawer");
