@@ -2837,11 +2837,20 @@ HORARIOS DE ATENCIÓN
     function mostrarDetalle(code) {
       const p = byCode[code]; if (!p) return;
       pmCode = code;
+      /* Al cambiar de producto dentro del detalle (el modal ya está
+         abierto) la vista se queda donde estaba: se guarda la
+         posición del panel y se restaura al final del repintado. Al
+         abrir fresco desde el catálogo, el visor o la búsqueda, el
+         detalle empieza arriba, como siempre. */
+      const modalDetalle = document.getElementById("product-modal");
+      const yaAbierto = !modalDetalle.classList.contains("hidden");
+      const pp = document.querySelector("#product-modal .pm-panel");
+      const topGuardado = (yaAbierto && pp) ? pp.scrollTop : 0;
       /* Al abrir el detalle se fija la lista del navegador; al cambiar
          de producto dentro del detalle (el modal ya está abierto) la
          lista se conserva tal cual, salvo que el producto no esté en
          ella (cambio de hash con el detalle abierto). */
-      if (document.getElementById("product-modal").classList.contains("hidden") || !navLista || !navLista.some(p => p.code === code)) navLista = listaNavegador(code);
+      if (!yaAbierto || !navLista || !navLista.some(p => p.code === code)) navLista = listaNavegador(code);
       const imgs = (p.imgs && p.imgs.length) ? p.imgs : [p.img];
       const img = document.getElementById("pm-img"); img.src = imgs[0]; img.alt = p.name;
       const thumbs = document.getElementById("pm-thumbs");
@@ -2885,12 +2894,15 @@ HORARIOS DE ATENCIÓN
       document.getElementById("product-modal").classList.remove("hidden");
       colapsarEncabezado();
       ajustarVistaAlEncabezado(document.getElementById("product-modal"));
-      const pp = document.querySelector("#product-modal .pm-panel"); if (pp) pp.scrollTop = 0;
+      if (!yaAbierto && pp) pp.scrollTop = 0;
       bloquearScroll();
       refreshCardButtons();
       pintarMateriales(p);
       pintarRecomendaciones();
       pintarNavegador();
+      /* El repintado puede mover el panel; al cambiar dentro del
+         detalle se vuelve a donde estaba. */
+      if (yaAbierto && pp) pp.scrollTop = topGuardado;
     }
     function closeProduct() { volverVista(); }
     function pmSetImg(src, btn) { const img = document.getElementById("pm-img"); if (img) img.src = src; pmResetZoom(); document.querySelectorAll(".pm-thumb").forEach(b => b.classList.toggle("ring-2", b === btn)); }
