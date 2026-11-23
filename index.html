@@ -14,12 +14,12 @@
 <meta content="#0a0a0a" name="theme-color"/>
 <meta content="Fundas, micas con seguro, audífonos y servicios para tu celular en el Centro de Ixtlahuaca. Arma tu lista y confirma existencias por WhatsApp." name="description"/>
 <meta content="Pink Case — Accesorios y micas para celular en Ixtlahuaca Centro" property="og:title"/>
-<meta content="Catálogo de mostrador en Ixtlahuaca Centro: fundas por modelo, micas desde $40 con instalación gratis y 1 cambio gratis en precio actual." property="og:description"/>
+<meta content="Catálogo de la tienda en Ixtlahuaca Centro: fundas por modelo, micas desde $40 con instalación gratis y 1 cambio gratis en precio actual." property="og:description"/>
 <meta content="https://pinkcasee.com/assets/tienda-pc5-og.jpg" property="og:image"/>
 <meta content="https://pinkcasee.com/" property="og:url"/>
 <meta content="summary_large_image" name="twitter:card"/>
 <meta content="Pink Case — Accesorios y micas para celular en Ixtlahuaca Centro" name="twitter:title"/>
-<meta content="Catálogo de mostrador en Ixtlahuaca Centro: fundas por modelo, micas desde $40 con instalación gratis y 1 cambio gratis en precio actual." name="twitter:description"/>
+<meta content="Catálogo de la tienda en Ixtlahuaca Centro: fundas por modelo, micas desde $40 con instalación gratis y 1 cambio gratis en precio actual." name="twitter:description"/>
 <meta content="https://pinkcasee.com/assets/tienda-pc5-og.jpg" name="twitter:image"/>
 <meta content="website" property="og:type"/>
 <script type="application/ld+json">
@@ -2888,7 +2888,7 @@ HORARIOS DE ATENCIÓN
       document.getElementById("pm-models").innerHTML = chips.map(c => `<span class="px-2.5 py-1 rounded-full bg-surface-2 border border-pink-500/25 text-pink-light font-archivo text-[11px] font-semibold">${c}</span>`).join("");
       mw.classList.toggle("hidden", chips.length === 0);
       const addBtn = document.getElementById("pm-add"); addBtn.dataset.code = code;
-      const prodLink = "https://pinkcasemovil.github.io/pink-case/#lista=" + btoa(unescape(encodeURIComponent(JSON.stringify({ items: [[p.code, 1]] })))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+      const prodLink = location.origin + location.pathname + "#producto=" + p.code;
       document.getElementById("pm-wa").href = "https://wa.me/527122345562?text=" + encodeURIComponent("Hola, me interesa este producto: " + p.name + " (" + money(p.price) + "). ¿Sigue disponible?\nVer el producto: " + prodLink);
       pmResetZoom();
       document.getElementById("product-modal").classList.remove("hidden");
@@ -3751,7 +3751,7 @@ HORARIOS DE ATENCIÓN
       });
       message += `\n★ Total informativo: ${money(total)} MXN\n`;
       message += `Liga de mi lista: ${location.origin + location.pathname + shareHash()}\n`;
-      message += "¿Los tienen en existencia para pasar a mostrador? ¡Gracias!";
+      message += "¿Los tienen en existencia para pasar a la tienda? ¡Gracias!";
       window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`, "_blank");
     }
 
