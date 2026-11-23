@@ -2701,7 +2701,7 @@ HORARIOS DE ATENCIÓN
         window._scrollResultadosT = setTimeout(bajar, 350);
       } else document.getElementById("catalogo")?.scrollIntoView({ behavior: "smooth" });
     }
-    function clearSearch() { const input = document.getElementById("catalog-search"); if (input) input.value = ""; applySearch(); }
+    function clearSearch() { cerrarVistaDirecto(); const input = document.getElementById("catalog-search"); if (input) input.value = ""; applySearch(); }
 
     /* ---------- Vista de producto: detalle con zoom y galería (lista para más fotos) ---------- */
     /* Bloqueo de scroll seguro para iOS: al abrir una vista se guarda
@@ -2738,9 +2738,26 @@ HORARIOS DE ATENCIÓN
       raiz.style.removeProperty("scroll-behavior");
       b.style.removeProperty("scroll-behavior");
     }
+    /* Las vistas abren debajo del encabezado: el encabezado queda
+       visible (logo, buscador, carrito y menú) y la vista ocupa el
+       resto de la pantalla. La altura se mide al abrir, porque es
+       distinta en escritorio y en teléfono. */
+    function ajustarVistaAlEncabezado(el) {
+      const h = document.querySelector("header");
+      if (h) el.style.top = h.offsetHeight + "px";
+    }
+    /* Vuelve a ajustar las vistas abiertas al encabezado (al cambiar
+       el tamaño de la ventana o al desplegar el menú del teléfono). */
+    function reajustarVistasAbiertas() {
+      if (!vistaAbierta()) return;
+      const m = document.getElementById("product-modal");
+      const v = document.getElementById("visor-modelo");
+      if (m && !m.classList.contains("hidden")) ajustarVistaAlEncabezado(m);
+      if (v && !v.classList.contains("hidden")) ajustarVistaAlEncabezado(v);
+    }
     /* Origen de la vista: de dónde se vino al abrirla, para mostrarlo
        en la vista y para que el botón Volver diga a dónde va. */
-    let origenDetalle = null; /* {tipo:"visor", titulo} | {tipo:"busqueda", texto} | {tipo:"catalogo"} */
+    let origenDetalle = null; /* {tipo:"visor", titulo, kind} | {tipo:"busqueda", texto} | {tipo:"catalogo"} */
     let origenVisor = "catalogo"; /* "catalogo" | "busqueda" */
     function origenDesdeCatalogo() {
       if (activeCat === "buscar") {
@@ -2762,8 +2779,13 @@ HORARIOS DE ATENCIÓN
       document.getElementById("pm-cat").textContent = p.catLabel;
       /* Origen en la línea de la barra y destino en el botón Volver. */
       const orgD = origenDetalle || { tipo: "catalogo" };
-      document.getElementById("pm-origen").textContent = orgD.tipo === "visor" ? "Fundas · " + orgD.titulo : orgD.tipo === "busqueda" ? "Búsqueda: " + orgD.texto : "Catálogo";
-      document.getElementById("pm-volver").textContent = orgD.tipo === "visor" ? "← Fundas para " + orgD.titulo : orgD.tipo === "busqueda" ? "← Búsqueda" : "← Catálogo";
+      let lineaOrigen = "Catálogo", textoVolver = "← Catálogo";
+      if (orgD.tipo === "visor") {
+        if (orgD.kind === "audifonos") { lineaOrigen = "Audífonos · " + orgD.titulo; textoVolver = "← Audífonos " + orgD.titulo; }
+        else { lineaOrigen = "Fundas · " + orgD.titulo; textoVolver = "← Fundas para " + orgD.titulo; }
+      } else if (orgD.tipo === "busqueda") { lineaOrigen = "Búsqueda: " + orgD.texto; textoVolver = "← Búsqueda"; }
+      document.getElementById("pm-origen").textContent = lineaOrigen;
+      document.getElementById("pm-volver").textContent = textoVolver;
       document.getElementById("pm-name").textContent = p.name;
       document.getElementById("pm-line").textContent = p.line || "";
       document.getElementById("pm-sub").textContent = p.sub || "";
@@ -2779,6 +2801,7 @@ HORARIOS DE ATENCIÓN
       document.getElementById("pm-wa").href = "https://wa.me/527122345562?text=" + encodeURIComponent("Hola, me interesa este producto: " + p.name + " (" + money(p.price) + "). ¿Sigue disponible?\nVer el producto: " + prodLink);
       pmResetZoom();
       document.getElementById("product-modal").classList.remove("hidden");
+      ajustarVistaAlEncabezado(document.getElementById("product-modal"));
       const pp = document.querySelector("#product-modal .pm-panel"); if (pp) pp.scrollTop = 0;
       bloquearScroll();
       refreshCardButtons();
@@ -2790,7 +2813,7 @@ HORARIOS DE ATENCIÓN
     document.addEventListener("keydown", e => { if (e.key === "Escape") { const cart = document.getElementById("cart-drawer"); if (cart && !cart.classList.contains("hidden")) return; closeProduct(); } });
 
 
-    /* ---------- Fundas agrupadas por modelo + vista a pantalla completa ---------- */
+    /* ---------- Fundas agrupadas por modelo + audífonos por tipo + vista a pantalla completa ---------- */
     /* Agrupación: una tarjeta por modelo. Los modelos se toman del campo
        "modelos" de cada funda (una funda puede estar en varios modelos);
        el título es marca + modelo. Los grupos se ordenan por cantidad de
@@ -2825,7 +2848,7 @@ HORARIOS DE ATENCIÓN
           if (!g.productos.some(x => x.code === p.code)) g.productos.push(p);
         });
       });
-      const grupos = [...mapa.values()].map(g => ({ ...g, desde: Math.min(...g.productos.map(p => p.price)), foto: g.productos[0].img }));
+      const grupos = [...mapa.values()].map(g => ({ ...g, kind: "fundas", desde: Math.min(...g.productos.map(p => p.price)), foto: g.productos[0].img }));
       grupos.sort(compararGrupos);
       return grupos;
     }
@@ -2837,7 +2860,61 @@ HORARIOS DE ATENCIÓN
       const ta = a.titulo.toLowerCase(), tb = b.titulo.toLowerCase();
       return tb > ta ? 1 : tb < ta ? -1 : 0;
     }
-    function grupoPorSlug(slug) { return gruposDeFundas().find(g => g.slug === slug); }
+    function grupoPorSlug(slug) { return gruposDeFundas().find(g => g.slug === slug) || gruposDeAudifonos().find(g => g.slug === slug); }
+    /* Audífonos agrupados por tipo: Diadema, Inalámbricos y De cable
+       (siempre presente; vacío = Próximamente). El tipo se lee primero
+       del campo real del producto (tipo) cuando el puente lo trae; si
+       no existe, se infiere del NOMBRE (los tags de todos los
+       audífonos dicen "diadema", así que de ahí no se puede inferir).
+       "De cable" solo sale del campo real: del nombre no se infiere. */
+    function tipoAudifono(p) {
+      const real = (p.tipo === undefined || p.tipo === null) ? "" : normText(p.tipo);
+      if (real.includes("diadema")) return "Diadema";
+      if (real.includes("inalambric") || real.includes("tws")) return "Inalámbricos";
+      if (real.includes("cable")) return "De cable";
+      const n = normText(p.name);
+      if (n.includes("diadema")) return "Diadema";
+      if (n.includes("tws")) return "Inalámbricos";
+      return null;
+    }
+    function grupoAudifonos(titulo, ps) {
+      return { kind: "audifonos", titulo, slug: slugModelo(titulo), productos: ps,
+        desde: ps.length ? Math.min(...ps.map(p => p.price)) : null,
+        foto: ps.length ? ps[0].img : null };
+    }
+    function gruposDeAudifonos(audifonos) {
+      /* Sin argumento agrupa todos los audífonos del catálogo; con una
+         lista, solo los de esa lista (así en búsqueda el grupo trae
+         solo los que coincidieron). Orden fijo: Diadema, Inalámbricos
+         y De cable al final (igual que el select Tipo del panel). */
+      const lista = audifonos || PRODUCTS.filter(p => p.cat === "audifonos");
+      const porTipo = new Map();
+      lista.forEach(p => {
+        const t = tipoAudifono(p);
+        if (!t) return; /* sin tipo: no se agrupa, queda suelto */
+        if (!porTipo.has(t)) porTipo.set(t, []);
+        porTipo.get(t).push(p);
+      });
+      const grupos = [];
+      ["Diadema", "Inalámbricos"].forEach(t => {
+        const ps = porTipo.get(t);
+        if (ps && ps.length) grupos.push(grupoAudifonos(t, ps));
+      });
+      /* De cable siempre está (vacío = Próximamente), salvo que no haya
+         audífonos en la lista (otra categoría o búsqueda sin resultados). */
+      if (lista.length) grupos.push(grupoAudifonos("De cable", porTipo.get("De cable") || []));
+      return grupos;
+    }
+    /* Tipo nombrado en la búsqueda: "diadema", "tws"/"inalámbricos" o
+       "cable". Devuelve el slug del tipo o null. */
+    function tipoNombradoEnBusqueda(tokens) {
+      for (const t of tokens) {
+        if (matchTok("diadema", t)) return "diadema";
+        if (matchTok("inalambricos", t) || matchTok("tws", t)) return "inalambricos";
+        if (matchTok("cable", t)) return "de-cable";
+      }
+      return null;
+    }
     /* Grupos tal como se pintaron en la última cuadrícula (en búsqueda,
        cada grupo trae solo las fundas que coincidieron). El visor
        enseña exactamente las fundas de la tarjeta que se tocó; por
@@ -2845,14 +2922,17 @@ HORARIOS DE ATENCIÓN
     let gruposVisibles = new Map();
     function grupoParaVisor(slug) { return gruposVisibles.get(slug) || grupoPorSlug(slug); }
     function aTarjetas(list) {
-      /* Se agrupa en "Ver todo", en "Fundas" y en búsqueda. En las
-         sugerencias del asesor y en las demás categorías se muestran
-         los productos uno por uno. */
-      if (activeCat !== "all" && activeCat !== "fundas" && activeCat !== "buscar") {
+      /* Se agrupa en "Ver todo", en "Fundas", en "Audífonos" y en
+         búsqueda. En las sugerencias del asesor y en las demás
+         categorías se muestran los productos uno por uno. */
+      if (activeCat !== "all" && activeCat !== "fundas" && activeCat !== "audifonos" && activeCat !== "buscar") {
         gruposVisibles = new Map();
         return list.map(p => ({ tipo: "producto", p }));
       }
       let grupos = gruposDeFundas(list.filter(p => p.cat === "fundas"));
+      /* Audífonos: se agrupan por tipo. En "Ver todo" van después de
+         los grupos de fundas y antes de los productos sueltos. */
+      let gruposAud = gruposDeAudifonos(list.filter(p => p.cat === "audifonos"));
       if (activeCat === "buscar") {
         /* Si lo buscado nombra uno o más modelos (las palabras que
            aparecen en títulos de modelo), solo se enseñan esos modelos:
@@ -2867,33 +2947,63 @@ HORARIOS DE ATENCIÓN
           const soloModelos = grupos.filter(g => { const tit = normText(g.titulo); return tokensModelo.every(t => matchTok(tit, t)); });
           if (soloModelos.length) grupos = soloModelos;
         }
+        /* Igual con los audífonos: si lo buscado nombra un tipo, solo
+           ese tipo ("diadema" da solo Diadema, "tws" solo
+           Inalámbricos). Si no nombra ninguno ("audífonos"), salen
+           los 3. */
+        const tipoNombrado = tipoNombradoEnBusqueda(tokens);
+        if (tipoNombrado) {
+          const soloTipo = gruposAud.filter(g => g.slug === tipoNombrado);
+          if (soloTipo.length) gruposAud = soloTipo;
+        }
+        /* "cable" en la búsqueda incluye la tarjeta De cable aunque
+           ningún producto coincida con lo buscado. */
+        if (tokens.some(t => matchTok("cable", t)) && !gruposAud.some(g => g.slug === "de-cable")) {
+          gruposAud.push(grupoAudifonos("De cable", []));
+        }
       }
-      gruposVisibles = new Map(grupos.map(g => [g.slug, g]));
-      const resto = list.filter(p => p.cat !== "fundas").map(p => ({ tipo: "producto", p }));
+      gruposVisibles = new Map([...grupos, ...gruposAud].map(g => [g.slug, g]));
+      const resto = list.filter(p => p.cat !== "fundas" && (p.cat !== "audifonos" || !tipoAudifono(p))).map(p => ({ tipo: "producto", p }));
       const soloGrupos = grupos.map(g => ({ tipo: "grupo", grupo: g }));
       soloGrupos.sort((a, b) => compararGrupos(a.grupo, b.grupo));
-      return [...soloGrupos, ...resto];
+      const soloGruposAud = gruposAud.map(g => ({ tipo: "grupo", grupo: g }));
+      return [...soloGrupos, ...soloGruposAud, ...resto];
     }
     function grupoCardHTML(g) {
       const n = g.productos.length;
+      const esAud = g.kind === "audifonos";
+      const etiqueta = esAud ? "Audífonos" : "Fundas";
+      const ver = esAud ? "Ver modelos" : "Ver diseños";
+      const cuenta = esAud ? n + (n === 1 ? " modelo" : " modelos") : n + (n === 1 ? " diseño" : " diseños");
+      const altFoto = esAud ? "Audífonos " + g.titulo : "Fundas para " + g.titulo;
+      /* De cable sin productos: chip Próximamente en vez de la cuenta,
+         sin precio "desde", y el icono de audífonos que ya usa el hero
+         en vez de foto. */
+      const proximamente = esAud && n === 0;
+      const foto = g.foto
+        ? `<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" alt="${altFoto}" src="${g.foto}"/>`
+        : `<div class="w-full h-full flex items-center justify-center"><svg class="w-16 h-16 text-pink-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13a8 8 0 0 1 16 0"/><rect x="3" y="13" width="4" height="7" rx="1.5"/><rect x="17" y="13" width="4" height="7" rx="1.5"/></svg></div>`;
+      const precio = g.desde === null
+        ? `<div></div>`
+        : `<div>
+            <span class="font-unbounded text-lg text-white font-extrabold">desde ${money(g.desde)}</span>
+            <span class="block font-archivo text-[11px] text-text-muted">Precio web</span>
+          </div>`;
       return `
       <div class="product-card group p-4 rounded-2xl bg-surface-1 hover:bg-surface-2 border border-pink-500/15 hover:border-pink-500/40 transition-all flex flex-col justify-between shadow-lg cursor-pointer" onclick="irAModelo('${g.slug}')">
         <div>
           <div class="relative w-full aspect-square rounded-xl overflow-hidden bg-surface-3 mb-4">
-            <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" alt="Fundas para ${g.titulo}" src="${g.foto}"/>
-            <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-cyber-dark/85 backdrop-blur-md border border-pink-500/20 text-pink-light font-archivo text-[11px] font-semibold">Fundas</span>
-            <span class="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-cyber-dark/85 backdrop-blur-md border border-pink-500/30 text-white font-archivo text-[11px] font-semibold">Ver diseños<span class="material-symbols-outlined text-[14px]">chevron_right</span></span>
+            ${foto}
+            <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-cyber-dark/85 backdrop-blur-md border border-pink-500/20 text-pink-light font-archivo text-[11px] font-semibold">${etiqueta}</span>
+            <span class="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-cyber-dark/85 backdrop-blur-md border border-pink-500/30 text-white font-archivo text-[11px] font-semibold">${ver}<span class="material-symbols-outlined text-[14px]">chevron_right</span></span>
           </div>
-          <span class="font-archivo text-xs text-pink-primary font-bold">Fundas</span>
+          <span class="font-archivo text-xs text-pink-primary font-bold">${etiqueta}</span>
           <h3 class="font-archivo font-bold text-base text-white mt-1 line-clamp-2 group-hover:text-pink-light transition-colors">${g.titulo}</h3>
-          <p class="font-archivo text-xs text-text-muted mt-1">${n} ${n === 1 ? "diseño" : "diseños"}</p>
+          <p class="font-archivo text-xs text-text-muted mt-1">${proximamente ? `<span class="inline-block px-2 py-0.5 rounded-full bg-pink-primary text-white font-archivo text-[10px] font-bold">Próximamente</span>` : cuenta}</p>
         </div>
         <div class="grupo-pie mt-4 pt-3 border-t border-white/10 flex items-center justify-between">
-          <div>
-            <span class="font-unbounded text-lg text-white font-extrabold">desde ${money(g.desde)}</span>
-            <span class="block font-archivo text-[11px] text-text-muted">Precio web</span>
-          </div>
-          <span class="grupo-ver px-3 py-2 rounded-xl bg-pink-primary/10 border border-pink-500/30 text-pink-light font-unbounded text-[11px] font-semibold">Ver diseños</span>
+          ${precio}
+          <span class="grupo-ver px-3 py-2 rounded-xl bg-pink-primary/10 border border-pink-500/30 text-pink-light font-unbounded text-[11px] font-semibold">${ver}</span>
         </div>
       </div>`;
     }
@@ -2968,6 +3078,9 @@ HORARIOS DE ATENCIÓN
       const g = grupoParaVisor(visorSlug); if (!g) return;
       const lista = visorFiltro === "todos" ? g.productos : g.productos.filter(p => etiquetasProducto(p).has(visorFiltro));
       document.getElementById("visor-grid").innerHTML = lista.map(visorCardHTML).join("");
+      /* El estado vacío cambia con el grupo: en fundas es por el filtro,
+         en De cable es que todavía no hay audífonos de cable. */
+      document.getElementById("visor-vacio").textContent = (g.kind === "audifonos" && g.productos.length === 0) ? "Próximamente: audífonos de cable" : "No hay fundas de este estilo para este modelo.";
       document.getElementById("visor-vacio").classList.toggle("hidden", lista.length > 0);
       document.getElementById("visor-grid").classList.toggle("hidden", lista.length === 0);
     }
@@ -2981,13 +3094,20 @@ HORARIOS DE ATENCIÓN
       pmResetZoom();
       const yaAbierto = !document.getElementById("visor-modelo").classList.contains("hidden");
       visorSlug = slug; visorFiltro = "todos";
-      document.getElementById("visor-titulo").textContent = "Fundas para " + g.titulo;
+      const esAud = g.kind === "audifonos";
+      document.getElementById("visor-titulo").textContent = esAud ? "Audífonos " + g.titulo : "Fundas para " + g.titulo;
       document.getElementById("visor-volver").textContent = origenVisor === "busqueda" ? "← Búsqueda" : "← Catálogo";
-      document.getElementById("visor-sub").textContent = g.productos.length + (g.productos.length === 1 ? " diseño" : " diseños") + " · desde " + money(g.desde);
-      pintarFiltrosVisor();
+      const nVisor = g.productos.length;
+      document.getElementById("visor-sub").textContent = nVisor === 0 ? "Próximamente" : nVisor + (esAud ? (nVisor === 1 ? " modelo" : " modelos") : (nVisor === 1 ? " diseño" : " diseños")) + " · desde " + money(g.desde);
+      /* En audífonos no hay píldoras de filtro (los grupos son de 5 o
+         menos); en fundas se pintan como siempre. */
+      const filtrosVisor = document.getElementById("visor-filtros");
+      if (esAud) { filtrosVisor.classList.add("hidden"); filtrosVisor.innerHTML = ""; }
+      else { filtrosVisor.classList.remove("hidden"); pintarFiltrosVisor(); }
       pintarVisor();
       const v = document.getElementById("visor-modelo");
       v.classList.remove("hidden");
+      ajustarVistaAlEncabezado(v);
       if (!yaAbierto) v.scrollTop = 0;
       bloquearScroll();
     }
@@ -3006,8 +3126,19 @@ HORARIOS DE ATENCIÓN
       const v = document.getElementById("visor-modelo");
       if (m) m.classList.add("hidden");
       if (v) v.classList.add("hidden");
+      if (m) m.style.top = "";
+      if (v) v.style.top = "";
       desbloquearScroll();
       pmResetZoom();
+    }
+    /* Cierra la vista sin dejar rastro en el historial: se usa al
+       buscar o limpiar desde el encabezado, donde no hay navegación
+       por hash que la cierre. Igual que la rama directa de
+       volverVista. */
+    function cerrarVistaDirecto() {
+      if (!vistaAbierta()) return;
+      cerrarVistas();
+      history.replaceState(null, "", location.pathname + location.search);
     }
     function volverVista() {
       if (!vistaAbierta()) return;
@@ -3041,7 +3172,7 @@ HORARIOS DE ATENCIÓN
       const vAbierto = document.getElementById("visor-modelo");
       if (vAbierto && !vAbierto.classList.contains("hidden") && visorSlug) {
         const gOrigen = grupoParaVisor(visorSlug);
-        origenDetalle = { tipo: "visor", titulo: gOrigen ? gOrigen.titulo : "" };
+        origenDetalle = { tipo: "visor", titulo: gOrigen ? gOrigen.titulo : "", kind: gOrigen ? gOrigen.kind : "fundas" };
       } else {
         origenDetalle = origenDesdeCatalogo();
       }
@@ -3049,6 +3180,18 @@ HORARIOS DE ATENCIÓN
       else { navegoInterno = true; location.hash = "producto=" + code; }
     }
     window.addEventListener("hashchange", aplicarHash);
+    /* Si cambia el tamaño de la ventana con una vista abierta (giro
+       del teléfono), la vista se vuelve a ajustar al encabezado. */
+    window.addEventListener("resize", reajustarVistasAbiertas);
+    /* El encabezado queda visible encima de las vistas: al tocar un
+       enlace del menú con una vista abierta, la vista se cierra antes
+       de que el navegador salte a la sección (con el body fijo el
+       salto se pierde y el usuario quedaría donde estaba). El salto
+       mismo lo hace el navegador, como siempre. */
+    document.querySelector("header")?.addEventListener("click", e => {
+      if (!e.target.closest("a[href^=\"#\"]")) return;
+      if (vistaAbierta()) cerrarVistas();
+    });
 
     /* ---------- Asesoría guiada ---------- */
     let currentBrand = "";
@@ -3395,7 +3538,7 @@ HORARIOS DE ATENCIÓN
         });
       });
       document.getElementById("model-input")?.addEventListener("input", updateSuggestion);
-      document.getElementById("catalog-search")?.addEventListener("input", applySearch);
+      document.getElementById("catalog-search")?.addEventListener("input", () => { cerrarVistaDirecto(); applySearch(); });
       document.getElementById("btn-show-suggestions")?.addEventListener("click", showSuggestions);
       document.getElementById("btn-reset-advisor")?.addEventListener("click", resetAdvisor);
 
@@ -3492,6 +3635,9 @@ function toggleMenuMovil(){
   var btn=document.getElementById('menu-btn-movil');
   var abierto=nav.classList.toggle('menu-open');
   btn.classList.toggle('abierto',abierto);
+  /* Si hay una vista abierta, se vuelve a ajustar al encabezado (el
+     menú desplegado cambia su altura). */
+  reajustarVistasAbiertas();
 }
 document.querySelectorAll('#main-nav a, #main-nav button').forEach(function(el){
   el.addEventListener('click',function(){
