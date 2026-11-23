@@ -1266,6 +1266,25 @@
   .grupo-pie .grupo-ver{text-align:center}
 }
 </style>
+<style id="detalle-ai-studio">
+/* Muestra: detalle con el lenguaje de la referencia de AI Studio.
+   Solo toca la vista de detalle (#product-modal): título en Archivo
+   Black (la misma fuente del hero), más aire, foto con borde y sombra,
+   botones píldora y la sección "Construcción y materiales" debajo de
+   la ficha. El encabezado, el catálogo, el visor y el carrito no cambian. */
+#product-modal .pm-panel{background:linear-gradient(180deg,#150b12 0%,#0a0608 55%)}
+.pm-nombre{font-family:'Archivo Black',Archivo,sans-serif;font-weight:400;font-size:1.65rem;line-height:1.15;letter-spacing:-.01em}
+@media (min-width:640px){.pm-nombre{font-size:2rem}}
+#pm-price{font-size:2.25rem;line-height:1}
+#pm-zoom-wrap{border:1px solid rgba(255,255,255,.1);box-shadow:0 18px 40px rgba(0,0,0,.45)}
+.pm-chip{display:inline-flex;align-items:center;padding:.4rem .8rem;border-radius:9999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.85);font-family:Archivo,sans-serif;font-size:.75rem;font-weight:600;white-space:nowrap}
+.pm-chip-cat{border-color:rgba(255,46,147,.4);color:#ff8ac2}
+#pm-materiales,#pm-recomienda{max-width:1080px;margin-left:auto;margin-right:auto}
+.pm-agregar{background:#ff2e93;color:#fff}
+.pm-agregar:hover{background:#ff4da6}
+.pm-mat-grid{display:grid;gap:1rem}
+@media (min-width:768px){.pm-mat-grid{grid-template-columns:repeat(3,1fr)}}
+</style>
 
 </head>
 <body class="bg-cyber-dark font-archivo text-[#f1e9ed] antialiased selection:bg-pink-primary selection:text-white">
@@ -2828,7 +2847,18 @@ HORARIOS DE ATENCIÓN
       const thumbs = document.getElementById("pm-thumbs");
       thumbs.innerHTML = imgs.map((s, i) => `<button type="button" class="pm-thumb w-16 h-16 rounded-xl overflow-hidden border border-pink-500/25 ${i === 0 ? "ring-2 ring-pink-primary" : ""}" onclick="pmSetImg('${s}', this)"><img class="w-full h-full object-cover" loading="lazy" alt="" src="${s}"/></button>`).join("");
       thumbs.classList.toggle("hidden", imgs.length < 2);
-      document.getElementById("pm-cat").textContent = p.catLabel;
+      /* Chips sobre el título: categoría + Aro MagSafe (solo si la
+         funda lo tiene) + material real o inferido. Nada inventado:
+         las etiquetas salen de etiquetasProducto (campo real primero,
+         inferencia del nombre como respaldo) y el tipo de audífonos
+         de tipoAudifono. */
+      const etq = etiquetasProducto(p);
+      const chipsTop = [p.catLabel];
+      if (p.cat === "fundas" && etq.has("magsafe")) chipsTop.push("Aro MagSafe");
+      const matChip = etq.has("transparente") ? "Transparente" : etq.has("piel") ? "Tipo piel" : etq.has("espejo") ? "Espejo" : etq.has("mate") ? "Mate" : "";
+      if (matChip) chipsTop.push(matChip);
+      else if (p.cat === "audifonos") { const tAud = tipoAudifono(p); if (tAud) chipsTop.push(tAud); }
+      document.getElementById("pm-chips").innerHTML = chipsTop.map((c, i) => `<span class="pm-chip${i === 0 ? " pm-chip-cat" : ""}">${c}</span>`).join("");
       /* Origen en la línea de la barra y destino en el botón Volver. */
       const orgD = origenDetalle || { tipo: "catalogo" };
       let lineaOrigen = "Catálogo", textoVolver = "← Catálogo";
@@ -2858,6 +2888,8 @@ HORARIOS DE ATENCIÓN
       const pp = document.querySelector("#product-modal .pm-panel"); if (pp) pp.scrollTop = 0;
       bloquearScroll();
       refreshCardButtons();
+      pintarMateriales(p);
+      pintarRecomendaciones();
       pintarNavegador();
     }
     function closeProduct() { volverVista(); }
@@ -2922,6 +2954,126 @@ HORARIOS DE ATENCIÓN
         actual.scrollIntoView({ inline: "center", block: "nearest" });
         if (pp) pp.scrollTop = st;
       }
+    }
+
+    /* ---------- Sección "Construcción y materiales" (muestra) ---------- */
+    /* Bloques por categoría, armados solo con datos reales del producto
+       (sub, line, model, etiquetas). Si la categoría no tiene nada que
+       decir (servicios), devuelve [] y la sección se oculta. El texto
+       es BORRADOR para que Axel lo corrija: no afirma materiales que
+       no constan en los datos. */
+    function bloquesMateriales(p) {
+      const etq = etiquetasProducto(p);
+      const sub = (p.sub || "").trim();
+      const line = (p.line || "").trim();
+      if (p.cat === "fundas") {
+        const b = [];
+        if (etq.has("magsafe")) b.push({ t: "Fijación MagSafe", x: "El aro magnético alinea el celular con cargadores y soportes MagSafe, sin quitar la funda." });
+        else {
+          const ms = (p.modelos && p.modelos.length) ? p.modelos : (p.model ? [p.model] : []);
+          const msTxt = ms.join(", ");
+          if (/universal/i.test(msTxt)) b.push({ t: "Universal", x: "Sirve para cualquier modelo." });
+          else b.push({ t: "Ajuste", x: "Hecha a la medida de " + p.brand + " " + msTxt + "; cubre la parte de atrás y los bordes." });
+        }
+        const matTxt = etq.has("transparente") ? "Acabado transparente: se ve el color del celular." : etq.has("piel") ? "Tacto tipo piel, suave al agarrar y sin resbalar." : etq.has("espejo") ? "Acabado espejo que refleja la luz." : etq.has("mate") ? "Acabado mate, sin brillo." : "Cubre la parte de atrás y los bordes del celular.";
+        b.push({ t: "Textura exterior", x: matTxt });
+        b.push({ t: "Módulo de cámara", x: "El recorte deja libre la cámara para tomar fotos sin quitar la funda." });
+        return b;
+      }
+      if (p.cat === "micas") {
+        const b = [];
+        if (sub) b.push({ t: "Lo que protege", x: sub });
+        if (line.toLowerCase().includes("instalación gratis")) b.push({ t: "Instalación gratis", x: "La instalamos en la tienda, sin costo." });
+        if (line.toLowerCase().includes("cambio gratis")) b.push({ t: "Un cambio gratis", x: "Incluye 1 cambio gratis en precio actual." });
+        return b;
+      }
+      if (p.cat === "audifonos") {
+        const b = [];
+        if (normText([p.line, p.sub, p.tags].join(" ")).includes("bluetooth")) b.push({ t: "Conexión", x: "Bluetooth: se conectan sin cables a tu celular." });
+        if (sub) b.push({ t: "El modelo", x: sub });
+        const horas = [...(line + " " + (p.model || "")).matchAll(/(\d+)\s*h\b/g)].map(m => Number(m[1]));
+        if (horas.length) b.push({ t: "Batería", x: "Hasta " + Math.max(...horas) + " h de batería." });
+        return b;
+      }
+      if (p.cat === "baterias") {
+        const b = [];
+        const mah = (p.name + " " + (p.model || "")).match(/([\d,]+)\s*mAh/);
+        if (mah) b.push({ t: "Capacidad", x: mah[1] + " mAh." });
+        if (line.toLowerCase().includes("cables integrados")) b.push({ t: "Cables integrados", x: "Trae sus cables integrados, no necesitas llevar otro." });
+        else if (sub) b.push({ t: "Magnética", x: sub });
+        return b;
+      }
+      return [];
+    }
+    function pintarMateriales(p) {
+      const sec = document.getElementById("pm-materiales");
+      const grid = document.getElementById("pm-materiales-grid");
+      if (!sec || !grid) return;
+      const b = bloquesMateriales(p);
+      if (!b.length) { sec.classList.add("hidden"); grid.innerHTML = ""; return; }
+      grid.innerHTML = b.map(x => `<div class="p-4 rounded-2xl bg-surface-2 border border-white/10"><h5 class="font-archivo text-sm font-bold text-white">${x.t}</h5><p class="font-archivo text-sm text-text-muted leading-relaxed mt-1">${x.x}</p></div>`).join("");
+      sec.classList.remove("hidden");
+    }
+
+    /* ---------- Sección "Te puede interesar" (muestra) ---------- */
+    /* Recomienda UN producto de cada OTRA categoría: el primer producto
+       visible de esa categoría en el orden del catálogo (PRODUCTS).
+       Determinista, sin azar: siempre son 4 tarjetas y nunca se repite
+       la categoría del producto actual ni el producto mismo. La tarjeta
+       abre el producto en el detalle (replaceState, como la tira del
+       navegador); el botón Agregar mete a la lista sin abrir el detalle. */
+    function etiquetaCompatibilidad(p) {
+      if (p.cat === "fundas") { const ms = (p.modelos && p.modelos.length) ? p.modelos : (p.model ? [p.model] : []); return ms.length ? p.brand + " " + ms.join(" · ") : ""; }
+      if (p.cat === "audifonos") { return tipoAudifono(p) || ""; }
+      return "";
+    }
+    function pintarRecomendaciones() {
+      const sec = document.getElementById("pm-recomienda");
+      const grid = document.getElementById("pm-recomienda-grid");
+      if (!sec || !grid) return;
+      const actual = byCode[pmCode];
+      const otros = [];
+      ["fundas", "micas", "audifonos", "baterias", "servicios"].forEach(c => {
+        if (actual && c === actual.cat) return;
+        /* visible ausente = visible: el puente público no trae el campo. */
+        const primero = PRODUCTS.find(p => p.cat === c && p.visible !== 0 && p.visible !== "0" && p.code !== pmCode);
+        if (primero) otros.push(primero);
+      });
+      if (otros.length === 0) { sec.classList.add("hidden"); grid.innerHTML = ""; return; }
+      /* La tarjeta reusa el patrón de visorCardHTML (foto cuadrada con
+         zoom al pasar, insignia Nuevo, nombre, precio) y suma la
+         etiqueta de compatibilidad, la descripción corta y el botón
+         Agregar. El botón NO lleva la clase add-btn: refreshCardButtons
+         reescribiría su texto a "+ Carrito"; su estado (Agregar / En
+         tu lista) lo pinta esta función desde inquiryItems y se
+         repinta tras cada toque. */
+      grid.innerHTML = otros.map(p => {
+        const etq = etiquetaCompatibilidad(p);
+        const desc = (p.sub || p.line || "").trim();
+        const nuevo = etiquetasProducto(p).has("nuevos");
+        const enLista = inquiryItems.some(i => i.code === p.code);
+        const btnCls = enLista
+          ? "px-3 py-2 rounded-full bg-pink-primary/10 border border-pink-500/30 text-pink-light"
+          : "pm-agregar px-3 py-2 rounded-full";
+        const btnTxt = enLista
+          ? '<span class="material-symbols-outlined text-[17px]">check</span><span>En tu lista</span>'
+          : '<span class="material-symbols-outlined text-[17px]">add_shopping_cart</span><span>Agregar</span>';
+        return `<div class="product-card group p-3 rounded-2xl bg-surface-1 hover:bg-surface-2 border border-pink-500/15 hover:border-pink-500/40 transition-all cursor-pointer flex flex-col" onclick="irAProductoEnDetalle('${p.code}')">
+          <div class="relative w-full aspect-square rounded-xl overflow-hidden bg-surface-3 mb-3">
+            <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" alt="${p.name}" src="${p.img}"/>
+            ${nuevo ? '<span class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-pink-primary text-white font-archivo text-[10px] font-bold">Nuevo</span>' : ""}
+          </div>
+          <span class="font-archivo text-xs text-pink-primary font-bold">${etq || p.catLabel}</span>
+          <h3 class="font-archivo font-bold text-sm text-white line-clamp-2 group-hover:text-pink-light transition-colors mt-1">${p.name}</h3>
+          ${desc ? `<p class="font-archivo text-xs text-text-muted mt-1 line-clamp-2">${desc}</p>` : ""}
+          <div class="flex-1"></div>
+          <div class="mt-3 pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+            <span class="font-unbounded text-base text-white font-extrabold">${money(p.price)}</span>
+            <button class="${btnCls} transition-all flex items-center gap-1.5 font-unbounded text-[11px] font-semibold" data-code="${p.code}" onclick="event.stopPropagation(); toggleInquiry('${p.code}'); pintarRecomendaciones();" title="Añadir a mi lista" type="button">${btnTxt}</button>
+          </div>
+        </div>`;
+      }).join("");
+      sec.classList.remove("hidden");
     }
 
     /* ---------- Fundas agrupadas por modelo + audífonos por tipo + vista a pantalla completa ---------- */
@@ -3705,7 +3857,7 @@ HORARIOS DE ATENCIÓN
 <!-- min-w-0: en teléfono la rejilla es de una columna implícita y sin
      esto la tira del navegador ensancha la columna (y el panel se
      desplaza de lado); en escritorio md:grid-cols-2 ya trae minmax(0,1fr). -->
-<div class="p-4 sm:p-6 min-w-0">
+<div class="p-5 sm:p-8 min-w-0">
 <div class="relative w-full aspect-square rounded-2xl overflow-hidden bg-surface-3 cursor-zoom-in" id="pm-zoom-wrap" onclick="pmToggleZoom(event)" onmousemove="pmMoveZoom(event)">
 <img class="w-full h-full object-cover transition-transform duration-200" id="pm-img" alt=""/>
 <span class="absolute bottom-3 left-3 px-2.5 py-1 rounded-full bg-cyber-dark/85 backdrop-blur-md border border-pink-500/30 text-white font-archivo text-[11px] font-semibold pointer-events-none">Toca la foto para acercar</span>
@@ -3713,25 +3865,34 @@ HORARIOS DE ATENCIÓN
 <div class="hidden flex gap-2 mt-3" id="pm-thumbs"></div>
 <div class="hidden mt-3" id="pm-nav"></div>
 </div>
-<div class="p-4 sm:p-6 pt-0 md:pt-6 flex flex-col gap-3">
-<span class="font-archivo text-xs text-pink-primary font-bold uppercase tracking-wide" id="pm-cat"></span>
-<h3 class="font-unbounded text-xl sm:text-2xl font-bold text-white leading-snug" id="pm-name"></h3>
+<div class="p-5 sm:p-8 pt-0 md:pt-8 flex flex-col gap-5">
+<div class="flex flex-wrap gap-2" id="pm-chips"></div>
+<h3 class="pm-nombre text-white" id="pm-name"></h3>
 <p class="font-archivo text-sm text-pink-light font-semibold" id="pm-line"></p>
 <p class="font-archivo text-sm text-text-muted leading-relaxed" id="pm-sub"></p>
 <div class="p-4 rounded-xl bg-surface-2 border border-pink-500/20">
 <span class="font-unbounded text-3xl text-white font-extrabold" id="pm-price"></span>
 <span class="block font-archivo text-[11px] text-text-muted mt-0.5">Precio web</span>
+<span class="mt-2 flex items-center gap-1.5 font-archivo text-xs text-white/85"><svg class="w-4 h-4 text-pink-primary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Recoge hoy en Ixtlahuaca Centro</span>
 </div>
 <div id="pm-models-wrap">
 <span class="font-archivo text-xs text-text-muted font-semibold">Compatible con:</span>
 <div class="flex flex-wrap gap-1.5 mt-1.5" id="pm-models"></div>
 </div>
 <div class="flex flex-col sm:flex-row gap-2.5 mt-1">
-<button class="add-btn flex-1 px-4 py-3 rounded-xl bg-pink-primary/10 hover:bg-pink-primary border border-pink-500/30 text-pink-light hover:text-white transition-all flex items-center justify-center gap-1.5 font-unbounded text-xs font-semibold" data-code="" id="pm-add" onclick="if (pmCode) toggleInquiry(pmCode)" type="button"><span class="material-symbols-outlined text-[17px]">add_shopping_cart</span><span>Agregar a mi lista</span></button>
-<a class="flex-1 px-4 py-3 rounded-xl bg-whatsapp hover:bg-[#20bd5a] text-[#0a0608] font-unbounded text-xs font-bold transition-all flex items-center justify-center gap-1.5" href="#" id="pm-wa" rel="noopener" target="_blank"><span class="material-symbols-outlined text-[17px]">chat</span><span>Preguntar por WhatsApp</span></a>
+<button class="add-btn flex-1 px-4 py-3 rounded-full bg-pink-primary/10 hover:bg-pink-primary border border-pink-500/30 text-pink-light hover:text-white transition-all flex items-center justify-center gap-1.5 font-unbounded text-xs font-semibold" data-code="" id="pm-add" onclick="if (pmCode) toggleInquiry(pmCode)" type="button"><span class="material-symbols-outlined text-[17px]">add_shopping_cart</span><span>Agregar a mi lista</span></button>
+<a class="flex-1 px-4 py-3 rounded-full bg-whatsapp hover:bg-[#20bd5a] text-[#0a0608] font-unbounded text-xs font-bold transition-all flex items-center justify-center gap-1.5" href="#" id="pm-wa" rel="noopener" target="_blank"><span class="material-symbols-outlined text-[17px]">chat</span><span>Preguntar por WhatsApp</span></a>
 </div>
-<p class="font-archivo text-[11px] text-text-muted">Precio de mostrador; confirma existencias y colores por WhatsApp antes de venir.</p>
+<p class="font-archivo text-[11px] text-text-muted">Precio en tienda, confirma existencias y colores por WhatsApp antes de venir.</p>
 </div>
+</div>
+<div class="hidden px-5 sm:px-8 pb-8" id="pm-materiales">
+<h4 class="font-archivo text-sm font-bold text-white uppercase tracking-wide">Construcción y materiales</h4>
+<div class="pm-mat-grid mt-4" id="pm-materiales-grid"></div>
+</div>
+<div class="hidden px-5 sm:px-8 pb-8" id="pm-recomienda">
+<h4 class="font-archivo text-sm font-bold text-white uppercase tracking-wide">Te puede interesar</h4>
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-4" id="pm-recomienda-grid"></div>
 </div>
 </div>
 </div>
