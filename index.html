@@ -1232,6 +1232,20 @@
   .titulo-capa{animation:none!important;opacity:0!important}
 }
 </style>
+<style id="vista-producto">
+/* Vista de detalle a pantalla completa + visor de fundas por modelo.
+   El panel del modal pasa a cubrir toda la pantalla (sin márgenes ni radio). */
+#product-modal .pm-panel{top:0!important;right:0!important;bottom:0!important;left:0!important;width:auto!important;transform:none!important;border-radius:0!important;border-left:0!important;border-right:0!important}
+#product-modal .pm-panel>.grid{max-width:1080px;margin-left:auto;margin-right:auto}
+#product-modal #pm-zoom-wrap{width:100%!important;margin-left:0!important;margin-right:0!important}
+.vp-barra{position:sticky;top:0;z-index:10;background:rgba(19,11,16,.96);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.1)}
+.vp-volver{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem .95rem;border-radius:9999px;background:#1a0f16;border:1px solid rgba(255,255,255,.18);color:#fff;font-family:Archivo,sans-serif;font-size:.875rem;font-weight:600;cursor:pointer;white-space:nowrap}
+.vp-volver:active{transform:translateY(1px)}
+@media (max-width:639px){
+  .grupo-pie{flex-direction:column!important;align-items:stretch!important;gap:.5rem}
+  .grupo-pie .grupo-ver{text-align:center}
+}
+</style>
 
 </head>
 <body class="bg-cyber-dark font-archivo text-[#f1e9ed] antialiased selection:bg-pink-primary selection:text-white">
@@ -2607,13 +2621,13 @@ HORARIOS DE ATENCIÓN
     const PAGE_SIZE = 6; /* cuántos se agregan con cada toque en "Ver más" */
     const INITIAL_COUNT = 14; /* cuántos se muestran al abrir o al filtrar */
     function renderGrid(list) {
-      currentList = list;
+      currentList = aTarjetas(list);
       shownCount = INITIAL_COUNT;
       paintGrid();
     }
     function paintGrid() {
       const grid = document.getElementById("product-grid");
-      grid.innerHTML = currentList.slice(0, shownCount).map(cardHTML).join("");
+      grid.innerHTML = currentList.slice(0, shownCount).map(it => it.tipo === "grupo" ? grupoCardHTML(it.grupo) : cardHTML(it.p)).join("");
       const emptyEl = document.getElementById("catalog-empty");
       emptyEl.classList.toggle("hidden", currentList.length > 0);
       if (!currentList.length) emptyEl.textContent = activeCat === "buscar" ? "Sin resultados para tu búsqueda. Prueba con el modelo (ej. A36, iPhone 13) o pregúntale a Isabel." : "No hay productos en esta categoría por el momento.";
@@ -2622,7 +2636,7 @@ HORARIOS DE ATENCIÓN
         const quedan = currentList.length - shownCount;
         wrap.classList.toggle("hidden", quedan <= 0);
         const info = document.getElementById("ver-mas-info");
-        if (info) info.textContent = "Mostrando " + Math.min(shownCount, currentList.length) + " de " + currentList.length + " productos";
+        if (info) info.textContent = "Mostrando " + Math.min(shownCount, currentList.length) + " de " + currentList.length + (currentList.some(it => it.tipo === "grupo") ? " tarjetas" : " productos");
       }
       refreshCardButtons();
     }
@@ -2645,6 +2659,7 @@ HORARIOS DE ATENCIÓN
       if (clearBtn) { clearBtn.classList.add("hidden"); clearBtn.classList.remove("flex"); }
     }
     function normText(s) { return (s || "").toString().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, ""); }
+    function matchTok(hay, t) { return hay.includes(t) || (t.length > 3 && t.endsWith("es") && hay.includes(t.slice(0, -2))) || (t.length > 3 && t.endsWith("s") && hay.includes(t.slice(0, -1))); }
     function applySearch() {
       const input = document.getElementById("catalog-search");
       const q = (input?.value || "").trim();
@@ -2659,10 +2674,11 @@ HORARIOS DE ATENCIÓN
       activeCat = "buscar";
       renderFilters();
       const tokens = normText(q).split(/\s+/).filter(Boolean);
-      const matchTok = (hay, t) => hay.includes(t) || (t.length > 3 && t.endsWith("es") && hay.includes(t.slice(0, -2))) || (t.length > 3 && t.endsWith("s") && hay.includes(t.slice(0, -1)));
       const list = PRODUCTS.filter(p => { const hay = normText([p.name, p.brand, p.model, p.catLabel, p.line, p.sub, p.tags, (p.modelos || []).join(" ")].join(" ")); return tokens.every(t => matchTok(hay, t)); });
-      if (info) { info.textContent = list.length + (list.length === 1 ? " resultado para “" : " resultados para “") + q + "”"; info.classList.remove("hidden"); }
       renderGrid(list);
+      /* El renglón cuenta tarjetas, no productos: con la agrupación, las
+         7 fundas de iPhone 15 son 1 resultado. */
+      if (info) { info.textContent = currentList.length + (currentList.length === 1 ? " resultado para “" : " resultados para “") + q + "”"; info.classList.remove("hidden"); }
       /* En cada tecla con texto se baja a los resultados: si ya se está
          viendo la cuadrícula no se mueve nada, y si se borró y se escribe
          otra cosa vuelve a bajar. */
@@ -2690,7 +2706,7 @@ HORARIOS DE ATENCIÓN
     /* ---------- Vista de producto: detalle con zoom y galería (lista para más fotos) ---------- */
     let pmCode = null, pmZoom = false;
     function pmResetZoom() { pmZoom = false; const img = document.getElementById("pm-img"); if (img) { img.style.transform = ""; img.style.transformOrigin = "center center"; } const w = document.getElementById("pm-zoom-wrap"); if (w) { w.classList.add("cursor-zoom-in"); w.classList.remove("cursor-zoom-out"); } }
-    function openProduct(code) {
+    function mostrarDetalle(code) {
       const p = byCode[code]; if (!p) return;
       pmCode = code;
       const imgs = (p.imgs && p.imgs.length) ? p.imgs : [p.img];
@@ -2714,14 +2730,265 @@ HORARIOS DE ATENCIÓN
       document.getElementById("pm-wa").href = "https://wa.me/527122345562?text=" + encodeURIComponent("Hola, me interesa este producto: " + p.name + " (" + money(p.price) + "). ¿Sigue disponible?\nVer el producto: " + prodLink);
       pmResetZoom();
       document.getElementById("product-modal").classList.remove("hidden");
+      const pp = document.querySelector("#product-modal .pm-panel"); if (pp) pp.scrollTop = 0;
       document.body.style.overflow = "hidden";
       refreshCardButtons();
     }
-    function closeProduct() { const m = document.getElementById("product-modal"); if (m) m.classList.add("hidden"); document.body.style.overflow = ""; pmResetZoom(); }
+    function closeProduct() { volverVista(); }
     function pmSetImg(src, btn) { const img = document.getElementById("pm-img"); if (img) img.src = src; pmResetZoom(); document.querySelectorAll(".pm-thumb").forEach(b => b.classList.toggle("ring-2", b === btn)); }
     function pmToggleZoom(ev) { const img = document.getElementById("pm-img"); const w = document.getElementById("pm-zoom-wrap"); if (!img || !w) return; pmZoom = !pmZoom; img.style.transform = pmZoom ? "scale(2)" : ""; w.classList.toggle("cursor-zoom-out", pmZoom); w.classList.toggle("cursor-zoom-in", !pmZoom); if (pmZoom) pmMoveZoom(ev); }
     function pmMoveZoom(ev) { if (!pmZoom || !ev || ev.clientX === undefined) return; const w = document.getElementById("pm-zoom-wrap"); const img = document.getElementById("pm-img"); if (!w || !img) return; const r = w.getBoundingClientRect(); const x = Math.min(100, Math.max(0, ((ev.clientX - r.left) / r.width) * 100)); const y = Math.min(100, Math.max(0, ((ev.clientY - r.top) / r.height) * 100)); img.style.transformOrigin = x + "% " + y + "%"; }
-    document.addEventListener("keydown", e => { if (e.key === "Escape") closeProduct(); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") { const cart = document.getElementById("cart-drawer"); if (cart && !cart.classList.contains("hidden")) return; closeProduct(); } });
+
+
+    /* ---------- Fundas agrupadas por modelo + vista a pantalla completa ---------- */
+    /* Agrupación: una tarjeta por modelo. Los modelos se toman del campo
+       "modelos" de cada funda (una funda puede estar en varios modelos);
+       el título es marca + modelo. Los grupos se ordenan por cantidad de
+       diseños (más primero) y los de un solo diseño quedan al final. */
+    function tituloModelo(brand, m) {
+      if (/universal/i.test(m)) return "Universal";
+      const bonito = m.split(" ").map(w => w ? w.charAt(0).toUpperCase() + w.slice(1) : w).join(" ");
+      if (bonito.toLowerCase().startsWith((brand || "").toLowerCase())) return bonito;
+      return (brand ? brand + " " : "") + bonito;
+    }
+    function slugModelo(titulo) { return titulo.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""); }
+    function modelosDe(p) {
+      /* La funda "Funda Tansparente Magsafe" trae datos
+         inconsistentes (model "17 pro max" pero modelos "iphone 18
+         promax"); se agrupa por su campo model. El dato real hay que
+         corregirlo en la hoja/panel. */
+      if (p.code === "funda-tansparente-magsaf") return [p.model];
+      return (p.modelos && p.modelos.length) ? p.modelos : (p.model ? [p.model] : []);
+    }
+    function gruposDeFundas(fundas) {
+      /* Sin argumento agrupa todas las fundas del catálogo; con una
+         lista, solo las de esa lista (así en búsqueda el grupo trae
+         solo las fundas que coincidieron con lo buscado). */
+      const lista = fundas || PRODUCTS.filter(p => p.cat === "fundas");
+      const mapa = new Map();
+      lista.forEach(p => {
+        modelosDe(p).forEach(m => {
+          const titulo = tituloModelo(p.brand, m);
+          const key = titulo.toLowerCase();
+          if (!mapa.has(key)) mapa.set(key, { titulo, slug: slugModelo(titulo), productos: [] });
+          const g = mapa.get(key);
+          if (!g.productos.some(x => x.code === p.code)) g.productos.push(p);
+        });
+      });
+      const grupos = [...mapa.values()].map(g => ({ ...g, desde: Math.min(...g.productos.map(p => p.price)), foto: g.productos[0].img }));
+      grupos.sort(compararGrupos);
+      return grupos;
+    }
+    /* Orden de las tarjetas por modelo: primero las de más diseños; en
+       empate, por título descendente (iPhone 14 antes que iPhone 13);
+       los modelos de una sola funda quedan al final. */
+    function compararGrupos(a, b) {
+      if (b.productos.length !== a.productos.length) return b.productos.length - a.productos.length;
+      const ta = a.titulo.toLowerCase(), tb = b.titulo.toLowerCase();
+      return tb > ta ? 1 : tb < ta ? -1 : 0;
+    }
+    function grupoPorSlug(slug) { return gruposDeFundas().find(g => g.slug === slug); }
+    /* Grupos tal como se pintaron en la última cuadrícula (en búsqueda,
+       cada grupo trae solo las fundas que coincidieron). El visor
+       enseña exactamente las fundas de la tarjeta que se tocó; por
+       enlace directo enseña el modelo completo. */
+    let gruposVisibles = new Map();
+    function grupoParaVisor(slug) { return gruposVisibles.get(slug) || grupoPorSlug(slug); }
+    function aTarjetas(list) {
+      /* Se agrupa en "Ver todo", en "Fundas" y en búsqueda. En las
+         sugerencias del asesor y en las demás categorías se muestran
+         los productos uno por uno. */
+      if (activeCat !== "all" && activeCat !== "fundas" && activeCat !== "buscar") {
+        gruposVisibles = new Map();
+        return list.map(p => ({ tipo: "producto", p }));
+      }
+      let grupos = gruposDeFundas(list.filter(p => p.cat === "fundas"));
+      if (activeCat === "buscar") {
+        /* Si lo buscado nombra uno o más modelos (las palabras que
+           aparecen en títulos de modelo), solo se enseñan esos modelos:
+           "iphone 15" da solo la tarjeta de iPhone 15, aunque 4 de sus
+           fundas también sean para 13 y 14. Si no nombra ningún modelo
+           ("transparente", "magsafe"), se agrupan todas las fundas que
+           coincidieron. */
+        const tokens = normText(document.getElementById("catalog-search")?.value || "").split(/\s+/).filter(Boolean);
+        const titulos = grupos.map(g => normText(g.titulo));
+        const tokensModelo = tokens.filter(t => titulos.some(tit => matchTok(tit, t)));
+        if (tokensModelo.length) {
+          const soloModelos = grupos.filter(g => { const tit = normText(g.titulo); return tokensModelo.every(t => matchTok(tit, t)); });
+          if (soloModelos.length) grupos = soloModelos;
+        }
+      }
+      gruposVisibles = new Map(grupos.map(g => [g.slug, g]));
+      const resto = list.filter(p => p.cat !== "fundas").map(p => ({ tipo: "producto", p }));
+      const soloGrupos = grupos.map(g => ({ tipo: "grupo", grupo: g }));
+      soloGrupos.sort((a, b) => compararGrupos(a.grupo, b.grupo));
+      return [...soloGrupos, ...resto];
+    }
+    function grupoCardHTML(g) {
+      const n = g.productos.length;
+      return `
+      <div class="product-card group p-4 rounded-2xl bg-surface-1 hover:bg-surface-2 border border-pink-500/15 hover:border-pink-500/40 transition-all flex flex-col justify-between shadow-lg cursor-pointer" onclick="irAModelo('${g.slug}')">
+        <div>
+          <div class="relative w-full aspect-square rounded-xl overflow-hidden bg-surface-3 mb-4">
+            <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" alt="Fundas para ${g.titulo}" src="${g.foto}"/>
+            <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-cyber-dark/85 backdrop-blur-md border border-pink-500/20 text-pink-light font-archivo text-[11px] font-semibold">Fundas</span>
+            <span class="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-cyber-dark/85 backdrop-blur-md border border-pink-500/30 text-white font-archivo text-[11px] font-semibold">Ver diseños<span class="material-symbols-outlined text-[14px]">chevron_right</span></span>
+          </div>
+          <span class="font-archivo text-xs text-pink-primary font-bold">Fundas</span>
+          <h3 class="font-archivo font-bold text-base text-white mt-1 line-clamp-2 group-hover:text-pink-light transition-colors">${g.titulo}</h3>
+          <p class="font-archivo text-xs text-text-muted mt-1">${n} ${n === 1 ? "diseño" : "diseños"}</p>
+        </div>
+        <div class="grupo-pie mt-4 pt-3 border-t border-white/10 flex items-center justify-between">
+          <div>
+            <span class="font-unbounded text-lg text-white font-extrabold">desde ${money(g.desde)}</span>
+            <span class="block font-archivo text-[11px] text-text-muted">Precio web</span>
+          </div>
+          <span class="grupo-ver px-3 py-2 rounded-xl bg-pink-primary/10 border border-pink-500/30 text-pink-light font-unbounded text-[11px] font-semibold">Ver diseños</span>
+        </div>
+      </div>`;
+    }
+
+    /* Filtros del visor: cada etiqueta se lee primero del campo real
+       del producto (material, dama, nuevo) cuando el puente lo trae;
+       si el campo no existe todavía (producto sin etiquetar en el
+       panel), se infiere del nombre y la descripción como respaldo.
+       Así el visor funciona antes y después de etiquetar. El campo
+       "tipo" es de audífonos (Diadema/Inalámbricos/De cable), no de
+       fundas: el aro MagSafe se sigue infiriendo del nombre, y solo
+       se toma del tipo si algún día lo menciona. */
+    const NUEVOS_RESPALDO = ["f-28", "f-29", "f-30"];
+    function campoSi(p, campo) {
+      /* "Sí" tolerante para dama/nuevo: 1, true, "sí"/"si"/"1"/"true".
+         Devuelve null si el campo no existe o está vacío, para usar
+         el respaldo inferido. */
+      const v = p[campo];
+      if (v === undefined || v === null || v === "") return null;
+      if (v === true || v === 1) return true;
+      if (v === false || v === 0) return false;
+      return ["si", "1", "true", "x", "dama", "nuevo"].includes(normText(v));
+    }
+    function etiquetasProducto(p) {
+      const t = normText([p.name, p.sub, p.line, p.tags].join(" "));
+      const et = new Set();
+      /* Material: el campo real si existe (Transparente, Tipo piel,
+         Mate, Espejo, Otro); si no, se infiere del nombre. "Otro" no
+         da etiqueta de material: no es transparente ni tipo piel. */
+      const mat = (p.material === undefined || p.material === null) ? "" : normText(Array.isArray(p.material) ? p.material.join(" ") : p.material);
+      const fuenteMat = mat || t;
+      if (fuenteMat.includes("transparente") || fuenteMat.includes("translucid")) et.add("transparente");
+      if (fuenteMat.includes("tipo piel") || fuenteMat.includes("piel")) et.add("piel");
+      if (fuenteMat.includes("espejo")) et.add("espejo");
+      if (fuenteMat.includes("mate")) et.add("mate");
+      /* Aro MagSafe: se infiere del nombre (no hay campo real para
+         fundas); también vale si el campo tipo lo menciona. */
+      const tipo = (p.tipo === undefined || p.tipo === null) ? "" : normText(p.tipo);
+      if (t.includes("magsafe") || t.includes("magnetico") || t.includes("magnetica") || tipo.includes("magsafe") || tipo.includes("magnetico") || tipo.includes("magnetica")) et.add("magsafe");
+      /* Dama y nuevo: el campo real si existe; si no, se infieren. */
+      const dama = campoSi(p, "dama");
+      if (dama === null ? (t.includes("flor") || t.includes("rosas") || t.includes("rosita") || t.includes("coraz")) : dama) et.add("dama");
+      const nuevo = campoSi(p, "nuevo");
+      if (nuevo === null ? NUEVOS_RESPALDO.includes(p.code) : nuevo) et.add("nuevos");
+      return et;
+    }
+    const FILTROS_VISOR = [["todos", "Todos"], ["transparente", "Transparente"], ["piel", "Tipo piel"], ["magsafe", "Con aro MagSafe"], ["dama", "Dama"], ["nuevos", "Nuevos"]];
+    let visorSlug = null, visorFiltro = "todos";
+    function pintarFiltrosVisor() {
+      const g = grupoParaVisor(visorSlug); if (!g) return;
+      const wrap = document.getElementById("visor-filtros");
+      wrap.innerHTML = FILTROS_VISOR.map(([key, label]) => {
+        const n = key === "todos" ? g.productos.length : g.productos.filter(p => etiquetasProducto(p).has(key)).length;
+        const active = key === visorFiltro;
+        return `<button class="cat-chip ${active ? "active bg-pink-primary text-white border border-pink-primary" : "bg-surface-2 border border-white/10 text-white"} px-5 py-3 rounded-full hover:bg-surface-3 hover:text-white font-archivo text-lg font-semibold whitespace-nowrap transition-all flex items-center gap-2.5" onclick="filtrarVisor('${key}')" type="button"><span>${label}</span><span class="cat-punto" aria-hidden="true">·</span><span class="cat-num">${n}</span></button>`;
+      }).join("");
+    }
+    function filtrarVisor(key) { visorFiltro = key; pintarFiltrosVisor(); pintarVisor(); }
+    function visorCardHTML(p) {
+      const nuevo = etiquetasProducto(p).has("nuevos");
+      return `
+      <div class="product-card group p-3 rounded-2xl bg-surface-1 hover:bg-surface-2 border border-pink-500/15 hover:border-pink-500/40 transition-all cursor-pointer" onclick="openProduct('${p.code}')">
+        <div class="relative w-full aspect-square rounded-xl overflow-hidden bg-surface-3 mb-3">
+          <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" alt="${p.name}" src="${p.img}"/>
+          ${nuevo ? '<span class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-pink-primary text-white font-archivo text-[10px] font-bold">Nuevo</span>' : ""}
+        </div>
+        <h3 class="font-archivo font-bold text-sm text-white line-clamp-2 group-hover:text-pink-light transition-colors">${p.name}</h3>
+        <span class="font-unbounded text-base text-white font-extrabold">${money(p.price)}</span>
+      </div>`;
+    }
+    function pintarVisor() {
+      const g = grupoParaVisor(visorSlug); if (!g) return;
+      const lista = visorFiltro === "todos" ? g.productos : g.productos.filter(p => etiquetasProducto(p).has(visorFiltro));
+      document.getElementById("visor-grid").innerHTML = lista.map(visorCardHTML).join("");
+      document.getElementById("visor-vacio").classList.toggle("hidden", lista.length > 0);
+      document.getElementById("visor-grid").classList.toggle("hidden", lista.length === 0);
+    }
+    function mostrarVisor(slug) {
+      const g = grupoParaVisor(slug);
+      if (!g) { cerrarVistas(); return; }
+      /* Al volver del detalle al visor, el detalle se oculta (queda el
+         visor arriba); el visor nunca se oculta al abrir el detalle. */
+      const m = document.getElementById("product-modal");
+      if (m) m.classList.add("hidden");
+      pmResetZoom();
+      const yaAbierto = !document.getElementById("visor-modelo").classList.contains("hidden");
+      visorSlug = slug; visorFiltro = "todos";
+      document.getElementById("visor-titulo").textContent = "Fundas para " + g.titulo;
+      document.getElementById("visor-sub").textContent = g.productos.length + (g.productos.length === 1 ? " diseño" : " diseños") + " · desde " + money(g.desde);
+      pintarFiltrosVisor();
+      pintarVisor();
+      const v = document.getElementById("visor-modelo");
+      v.classList.remove("hidden");
+      if (!yaAbierto) v.scrollTop = 0;
+      document.body.style.overflow = "hidden";
+    }
+
+    /* Navegación con hash: el botón atrás del navegador cierra la vista.
+       #modelo=<slug> abre el visor; #producto=<code> abre el detalle. */
+    let llegoConVista = location.hash.startsWith("#producto=") || location.hash.startsWith("#modelo=");
+    let navegoInterno = false;
+    function vistaAbierta() {
+      const m = document.getElementById("product-modal");
+      const v = document.getElementById("visor-modelo");
+      return (m && !m.classList.contains("hidden")) || (v && !v.classList.contains("hidden"));
+    }
+    function cerrarVistas() {
+      const m = document.getElementById("product-modal");
+      const v = document.getElementById("visor-modelo");
+      if (m) m.classList.add("hidden");
+      if (v) v.classList.add("hidden");
+      document.body.style.overflow = "";
+      pmResetZoom();
+    }
+    function volverVista() {
+      if (!vistaAbierta()) return;
+      if (llegoConVista && !navegoInterno) {
+        history.replaceState(null, "", location.pathname + location.search);
+        aplicarHash();
+      } else {
+        history.back();
+      }
+    }
+    function aplicarHash() {
+      const h = location.hash;
+      if (h.startsWith("#producto=")) {
+        const code = decodeURIComponent(h.slice(10)); // '#producto=' mide 10
+        if (byCode[code]) mostrarDetalle(code); else cerrarVistas();
+      } else if (h.startsWith("#modelo=")) {
+        mostrarVisor(decodeURIComponent(h.slice(8)));
+      } else {
+        cerrarVistas();
+      }
+    }
+    function irAModelo(slug) {
+      if (location.hash === "#modelo=" + slug) mostrarVisor(slug);
+      else { navegoInterno = true; location.hash = "modelo=" + slug; }
+    }
+    function openProduct(code) {
+      if (!byCode[code]) return;
+      if (location.hash === "#producto=" + code) mostrarDetalle(code);
+      else { navegoInterno = true; location.hash = "producto=" + code; }
+    }
+    window.addEventListener("hashchange", aplicarHash);
 
     /* ---------- Asesoría guiada ---------- */
     let currentBrand = "";
@@ -2913,9 +3180,10 @@ HORARIOS DE ATENCIÓN
     function refreshCardButtons() {
       document.querySelectorAll(".add-btn").forEach(btn => {
         const inList = inquiryItems.some(i => i.code === btn.dataset.code);
+        const esDetalle = btn.id === "pm-add";
         btn.innerHTML = inList
-          ? '<span class="material-symbols-outlined text-[17px]">check</span><span>En tu carrito</span>'
-          : '<span class="material-symbols-outlined text-[17px]">add_shopping_cart</span><span>+ Carrito</span>';
+          ? '<span class="material-symbols-outlined text-[17px]">check</span><span>' + (esDetalle ? "En tu lista" : "En tu carrito") + "</span>"
+          : '<span class="material-symbols-outlined text-[17px]">add_shopping_cart</span><span>' + (esDetalle ? "Agregar a mi lista" : "+ Carrito") + "</span>";
         btn.classList.toggle("bg-pink-primary", inList);
         btn.classList.toggle("text-white", inList);
         btn.classList.toggle("bg-pink-primary/10", !inList);
@@ -2965,7 +3233,7 @@ HORARIOS DE ATENCIÓN
       if (!root || root.classList.contains("hidden")) return;
       root.querySelector(".cart-backdrop")?.classList.remove("open");
       root.querySelector(".cart-panel")?.classList.remove("open");
-      document.body.style.overflow = "";
+      document.body.style.overflow = vistaAbierta() ? "hidden" : "";
       cartCloseTimer = setTimeout(() => { root.classList.add("hidden"); }, 400);
     }
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeCart(); });
@@ -3073,7 +3341,12 @@ HORARIOS DE ATENCIÓN
 
       const gridEl = document.getElementById("product-grid");
       function datosListos(data) { setProducts(data); startApp(); }
-      const EMBEBIDOS = [{"code": "f-01", "name": "Funda MagSafe translúcida ahumada", "line": "Para iPhone 13, 14 y 15", "sub": "Borde morado, aro magnético y acabado ahumado", "cat": "fundas", "catLabel": "Fundas", "brand": "iPhone", "model": "13, 14 y 15", "price": 180, "img": "assets/funda-01.jpg", "imgs": ["assets/funda-01.jpg"], "modelos": ["13", "14", "15"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono iman magnetico magnetica aro anillo magneticos apple iphone ios iphone13 iphone14 iphone15 iphone13 iphone14 iphone15"}, {"code": "f-02", "name": "Funda tipo piel blanca hueso", "line": "Para iPhone 13, 14 y 15", "sub": "Aro MagSafe, tacto tipo piel", "cat": "fundas", "catLabel": "Fundas", "brand": "iPhone", "model": "13, 14 y 15", "price": 180, "img": "assets/funda-02.jpg", "imgs": ["assets/funda-02.jpg"], "modelos": ["13", "14", "15"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono iman magnetico magnetica aro anillo magneticos cuero tipo piel apple iphone ios iphone13 iphone14 iphone15 iphone13 iphone14 iphone15"}, {"code": "f-03", "name": "Funda transparente tornasol SIMER", "line": "Para iPhone 13, 14 y 15", "sub": "Efecto arcoíris con aro MagSafe", "cat": "fundas", "catLabel": "Fundas", "brand": "iPhone", "model": "13, 14 y 15", "price": 150, "img": "assets/funda-03.jpg", "imgs": ["assets/funda-03.jpg"], "modelos": ["13", "14", "15"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono iman magnetico magnetica aro anillo magneticos apple iphone ios iphone13 iphone14 iphone15 iphone13 iphone14 iphone15"}, {"code": "f-04", "name": "Fundas con anillo magnético en empaque", "line": "Para iPhone 13 y 15", "sub": "Varios diseños en tienda (foto del equipo con empaques SIMER)", "cat": "fundas", "catLabel": "Fundas", "brand": "iPhone", "model": "13 y 15", "price": 180, "img": "assets/funda-04.jpg", "imgs": ["assets/funda-04.jpg"], "modelos": ["13", "15"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono apple iphone ios iphone13 iphone15 iphone13 iphone15"}, {"code": "f-05", "name": "Funda acabado espejo con rositas", "line": "Para Motorola Moto G85", "sub": "Diseño HAPPY de rosas rosas y moradas", "cat": "fundas", "catLabel": "Fundas", "brand": "Motorola", "model": "Moto G85", "price": 150, "img": "assets/funda-05.jpg", "imgs": ["assets/funda-05.jpg"], "modelos": ["Moto G85"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono motorola moto motorolamoto motorolag85 motorolamoto motorolag85"}, {"code": "f-06", "name": "Funda transparente con cerezas", "line": "Para Samsung Galaxy A36", "sub": "Cerezas rojas y dije de corazón", "cat": "fundas", "catLabel": "Fundas", "brand": "Samsung", "model": "Galaxy A36", "price": 150, "img": "assets/funda-06.jpg", "imgs": ["assets/funda-06.jpg"], "modelos": ["Galaxy A36"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono samsung galaxy samsunggalaxy samsunga36 samsunggalaxy samsunga36"}, {"code": "f-07", "name": "Funda tipo piel azul rey", "line": "Para Samsung S25 Ultra", "sub": "Aro magnético, color azul rey", "cat": "fundas", "catLabel": "Fundas", "brand": "Samsung", "model": "S25 Ultra", "price": 180, "img": "assets/funda-07.jpg", "imgs": ["assets/funda-07.jpg"], "modelos": ["S25 Ultra"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono cuero tipo piel samsung galaxy samsungs25 samsungultra samsungs25 samsungultra"}, {"code": "f-08", "name": "Funda translúcida degradado", "line": "Para iPhone 16", "sub": "Degradado blanco a negro con aro MagSafe", "cat": "fundas", "catLabel": "Fundas", "brand": "iPhone", "model": "16", "price": 150, "img": "assets/funda-08.jpg", "imgs": ["assets/funda-08.jpg"], "modelos": ["16"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono iman magnetico magnetica aro anillo magneticos apple iphone ios iphone16 iphone16"}, {"code": "f-09", "name": "Funda rosa mate KIMO", "line": "La más pedida", "sub": "Marco de cámara metálico morado", "cat": "fundas", "catLabel": "Fundas", "brand": "Samsung", "model": "Galaxy A36", "price": 150, "img": "assets/funda-09.jpg", "imgs": ["assets/funda-09.jpg"], "modelos": ["Galaxy A36"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono samsung galaxy samsunggalaxy samsunga36 samsunggalaxy samsunga36"}, {"code": "f-10", "name": "Funda transparente aro MagSafe rosa", "line": "Para Samsung Galaxy S24", "sub": "Aro magnético rosa", "cat": "fundas", "catLabel": "Fundas", "brand": "Samsung", "model": "Galaxy S24", "price": 180, "img": "assets/funda-10.jpg", "imgs": ["assets/funda-10.jpg"], "modelos": ["Galaxy S24"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono iman magnetico magnetica aro anillo magneticos samsung galaxy samsunggalaxy samsungs24 samsunggalaxy samsungs24"}, {"code": "f-11", "name": "Funda gris mate con aro MagSafe", "line": "Para iPhone 14", "sub": "Acabado mate, aro magnético", "cat": "fundas", "catLabel": "Fundas", "brand": "iPhone", "model": "14", "price": 180, "img": "assets/funda-11.jpg", "imgs": ["assets/funda-11.jpg"], "modelos": ["14"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono iman magnetico magnetica aro anillo magneticos apple iphone ios iphone14 iphone14"}, {"code": "f-12", "name": "Funda translúcida borde azul", "line": "Para iPhone 14 Pro", "sub": "Aro MagSafe, borde azul", "cat": "fundas", "catLabel": "Fundas", "brand": "iPhone", "model": "14 Pro", "price": 150, "img": "assets/funda-12.jpg", "imgs": ["assets/funda-12.jpg"], "modelos": ["14 Pro"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono iman magnetico magnetica aro anillo magneticos apple iphone ios iphone14 iphonepro iphone14 iphonepro"}, {"code": "f-25", "name": "Funda transparente con florecitas", "line": "Para Honor X9b", "sub": "Florecitas rosas, cámara circular", "cat": "fundas", "catLabel": "Fundas", "brand": "Honor", "model": "X9b", "price": 150, "img": "assets/funda-25.jpg", "imgs": ["assets/funda-25.jpg"], "modelos": ["X9b"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono honor honorx9b honorx9b"}, {"code": "f-27", "name": "Funda transparente SIMER aro amarillo", "line": "Para iPhone 16e", "sub": "Aro MagSafe amarillo/verde", "cat": "fundas", "catLabel": "Fundas", "brand": "iPhone", "model": "16e", "price": 150, "img": "assets/funda-27.jpg", "imgs": ["assets/funda-27.jpg"], "modelos": ["16e"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono iman magnetico magnetica aro anillo magneticos apple iphone ios iphone16e iphone16e"}, {"code": "f-28", "name": "Funda transparente SIMER aro azul", "line": "Para iPhone 15", "sub": "Aro MagSafe azul", "cat": "fundas", "catLabel": "Fundas", "brand": "iPhone", "model": "15", "price": 150, "img": "assets/funda-28.jpg", "imgs": ["assets/funda-28.jpg"], "modelos": ["15"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono iman magnetico magnetica aro anillo magneticos apple iphone ios iphone15 iphone15"}, {"code": "f-29", "name": "Funda transparente SIMER aro negro", "line": "Para iPhone 15", "sub": "Aro MagSafe negro", "cat": "fundas", "catLabel": "Fundas", "brand": "iPhone", "model": "15", "price": 150, "img": "assets/funda-29.jpg", "imgs": ["assets/funda-29.jpg"], "modelos": ["15"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono iman magnetico magnetica aro anillo magneticos apple iphone ios iphone15 iphone15"}, {"code": "f-30", "name": "Funda transparente SIMER aro rosa", "line": "Para iPhone 15", "sub": "Aro MagSafe rosa", "cat": "fundas", "catLabel": "Fundas", "brand": "iPhone", "model": "15", "price": 150, "img": "assets/funda-30.jpg", "imgs": ["assets/funda-30.jpg"], "modelos": ["15"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono iman magnetico magnetica aro anillo magneticos apple iphone ios iphone15 iphone15"}, {"code": "acuatica", "name": "Funda-bolsa impermeable KBOD", "line": "Para cualquier modelo", "sub": "Tornasol, con correa; protege del agua", "cat": "fundas", "catLabel": "Fundas", "brand": "KBOD", "model": "Bolsa impermeable universal", "price": 150, "img": "assets/accesorio-02.jpg", "imgs": ["assets/accesorio-02.jpg"], "modelos": ["Bolsa impermeable universal"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono agua bolsa playa alberca acuatica contra agua kbodbolsa kbodimpermeable kboduniversal kbodbolsa kbodimpermeable kboduniversal"}, {"code": "mica-sencilla", "name": "Mica de cristal templado", "line": "Instalación gratis · 1 cambio gratis en precio actual", "sub": "La básica que nunca falla: protege de rayones y golpes leves", "cat": "micas", "catLabel": "Micas de Protección", "brand": "Universal", "model": "Según modelo del cliente", "price": 40, "img": "assets/mica-03.jpg", "imgs": ["assets/mica-03.jpg"], "tags": "mica micas cristal cristales vidrio vidrios templado protector protectores pantalla lamina laminas cubierta celular universalseg universalmodelo universaldel universalcliente"}, {"code": "mica-completa", "name": "Mica completa 9D", "line": "Instalación gratis · 1 cambio gratis en precio actual", "sub": "Cristal full glue, cubre borde a borde", "cat": "micas", "catLabel": "Micas de Protección", "brand": "Universal", "model": "Según modelo del cliente", "price": 80, "img": "assets/mica-04.jpg", "imgs": ["assets/mica-04.jpg"], "tags": "mica micas cristal cristales vidrio vidrios templado protector protectores pantalla lamina laminas cubierta celular completa full glue borde a borde universalseg universalmodelo universaldel universalcliente"}, {"code": "mica-ceramica", "name": "Mica de cerámica mate 9D", "line": "Instalación gratis · 1 cambio gratis en precio actual", "sub": "Flexible, anti-huellas, ideal para jugar", "cat": "micas", "catLabel": "Micas de Protección", "brand": "Universal", "model": "Según modelo del cliente", "price": 80, "img": "assets/mica-05.jpg", "imgs": ["assets/mica-05.jpg"], "tags": "mica micas cristal cristales vidrio vidrios templado protector protectores pantalla lamina laminas cubierta celular universalseg universalmodelo universaldel universalcliente"}, {"code": "mica-privacidad", "name": "Mica de cristal de privacidad 9D", "line": "Instalación gratis · 1 cambio gratis en precio actual", "sub": "Anti-espía: nadie ve tu pantalla de lado", "cat": "micas", "catLabel": "Micas de Protección", "brand": "Universal", "model": "Según modelo del cliente", "price": 90, "img": "assets/mica-06.jpg", "imgs": ["assets/mica-06.jpg"], "tags": "mica micas cristal cristales vidrio vidrios templado protector protectores pantalla lamina laminas cubierta celular privado privada antispy espia anti chismoso universalseg universalmodelo universaldel universalcliente"}, {"code": "mica-hidro-hd", "name": "Mica de hidrogel HD", "line": "Instalación gratis · 1 cambio gratis en precio actual", "sub": "Se corta a la medida en el local, para cualquier modelo", "cat": "micas", "catLabel": "Micas de Protección", "brand": "DRAGON", "model": "Corte a la medida en el local", "price": 160, "img": "assets/hidrogel-01.jpg", "imgs": ["assets/hidrogel-01.jpg"], "tags": "mica micas cristal cristales vidrio vidrios templado protector protectores pantalla lamina laminas cubierta celular hydrogel gel medida corte cortada dragoncorte dragonla dragonmedida dragonen dragonel dragonlocal"}, {"code": "mica-hidro-priv", "name": "Mica de hidrogel privacidad", "line": "Instalación gratis · 1 cambio gratis en precio actual", "sub": "Hidrogel con filtro de privacidad, corte a la medida", "cat": "micas", "catLabel": "Micas de Protección", "brand": "DRAGON", "model": "Corte a la medida en el local", "price": 260, "img": "assets/hidrogel-01.jpg", "imgs": ["assets/hidrogel-01.jpg"], "tags": "mica micas cristal cristales vidrio vidrios templado protector protectores pantalla lamina laminas cubierta celular hydrogel gel medida corte cortada privado privada antispy espia anti chismoso dragoncorte dragonla dragonmedida dragonen dragonel dragonlocal"}, {"code": "a-hora-azul", "name": "Audífonos TWS 1HORA azules", "line": "Bluetooth", "sub": "Estuche redondo; 17 h totales con estuche", "cat": "audifonos", "catLabel": "Audífonos", "brand": "1HORA", "model": "TWS estuche redondo (5 h / 17 h con estuche)", "price": 299, "img": "assets/audifonos-26.jpg", "imgs": ["assets/audifonos-26.jpg"], "tags": "audifonos audifono auriculares auricular earbuds cascos casco diadema diademas headphones bluetooth inalambricos inalambrico manos libres musica 1horatws 1horaestuche 1horaredondo 1hora17 1horacon 1horaestuche"}, {"code": "a-corazon", "name": "Audífonos TWS FUTUREM FM-520", "line": "Bluetooth", "sub": "Estuche en forma de corazón rosa/dorado", "cat": "audifonos", "catLabel": "Audífonos", "brand": "FUTUREM", "model": "FM-520 (estuche corazón)", "price": 299, "img": "assets/audifonos-18.jpg", "imgs": ["assets/audifonos-18.jpg"], "tags": "audifonos audifono auriculares auricular earbuds cascos casco diadema diademas headphones bluetooth inalambricos inalambrico manos libres musica futuremfm futurem520 futuremestuche futuremcoraz"}, {"code": "a-consola", "name": "Audífonos TWS KT-01", "line": "Bluetooth", "sub": "Con funda estilo Nintendo Switch", "cat": "audifonos", "catLabel": "Audífonos", "brand": "Genérica", "model": "KT-01 (funda tipo Nintendo Switch)", "price": 299, "img": "assets/audifonos-20.jpg", "imgs": ["assets/audifonos-20.jpg"], "tags": "audifonos audifono auriculares auricular earbuds cascos casco diadema diademas headphones bluetooth inalambricos inalambrico manos libres musica genéricakt genérica01 genéricafunda genéricatipo genéricanintendo genéricaswitch"}, {"code": "a-j67", "name": "Audífonos TWS J67", "line": "Bluetooth", "sub": "Estuche tipo cámara retro con display de batería", "cat": "audifonos", "catLabel": "Audífonos", "brand": "Genérica", "model": "J67 Stereo Earbuds", "price": 299, "img": "assets/audifonos-29.jpg", "imgs": ["assets/audifonos-29.jpg"], "tags": "audifonos audifono auriculares auricular earbuds cascos casco diadema diademas headphones bluetooth inalambricos inalambrico manos libres musica pantalla rota cambio reparacion estrellada genéricaj67 genéricastereo genéricaearbuds"}, {"code": "a-hora-rosa", "name": "Audífonos TWS 1HORA rosas", "line": "Bluetooth", "sub": "Estuche redondo; 17 h totales con estuche", "cat": "audifonos", "catLabel": "Audífonos", "brand": "1HORA", "model": "TWS estuche redondo (5 h / 17 h con estuche)", "price": 299, "img": "assets/audifonos-37.jpg", "imgs": ["assets/audifonos-37.jpg"], "tags": "audifonos audifono auriculares auricular earbuds cascos casco diadema diademas headphones bluetooth inalambricos inalambrico manos libres musica 1horatws 1horaestuche 1horaredondo 1hora17 1horacon 1horaestuche"}, {"code": "a-diadema-negra", "name": "Diadema 1HORA Deep Bass", "line": "Hasta 33 h de batería", "sub": "Negra, bajos profundos", "cat": "audifonos", "catLabel": "Audífonos", "brand": "1HORA", "model": "Diadema Deep Bass 33H", "price": 349, "img": "assets/audifonos-01.jpg", "imgs": ["assets/audifonos-01.jpg"], "tags": "audifonos audifono auriculares auricular earbuds cascos casco diadema diademas headphones bluetooth inalambricos inalambrico manos libres musica cascos grandes over ear acolchonados 1horadiadema 1horadeep 1horabass 1hora33h"}, {"code": "a-diadema-rosa", "name": "Diadema rosa pastel", "line": "Bluetooth", "sub": "Detalles menta", "cat": "audifonos", "catLabel": "Audífonos", "brand": "Genérica", "model": "Diadema rosa pastel (sin marca visible)", "price": 349, "img": "assets/audifonos-02.jpg", "imgs": ["assets/audifonos-02.jpg"], "tags": "audifonos audifono auriculares auricular earbuds cascos casco diadema diademas headphones bluetooth inalambricos inalambrico manos libres musica cascos grandes over ear acolchonados genéricadiadema genéricarosa genéricapastel genéricasin genéricamarca genéricavisible"}, {"code": "a-diadema-luz", "name": "Diadema Samsung Level BT750", "line": "Luz RGB", "sub": "Blanca, Bluetooth con luz RGB", "cat": "audifonos", "catLabel": "Audífonos", "brand": "Samsung", "model": "Level BT750 (luz RGB)", "price": 399, "img": "assets/audifonos-31.jpg", "imgs": ["assets/audifonos-31.jpg"], "tags": "audifonos audifono auriculares auricular earbuds cascos casco diadema diademas headphones bluetooth inalambricos inalambrico manos libres musica cascos grandes over ear acolchonados samsung galaxy samsunglevel samsungbt750 samsungluz samsungrgb"}, {"code": "a-diadema-led", "name": "Diadema Samsung Level", "line": "Luz LED", "sub": "Luz LED azul, Bluetooth", "cat": "audifonos", "catLabel": "Audífonos", "brand": "Samsung", "model": "Level (luz LED azul)", "price": 399, "img": "assets/audifonos-43.jpg", "imgs": ["assets/audifonos-43.jpg"], "tags": "audifonos audifono auriculares auricular earbuds cascos casco diadema diademas headphones bluetooth inalambricos inalambrico manos libres musica cascos grandes over ear acolchonados samsung galaxy samsunglevel samsungluz samsungled samsungazul"}, {"code": "bat-10000", "name": "Power bank 1HORA 10,000 mAh", "line": "Cables integrados", "sub": "Carga para todo el día", "cat": "baterias", "catLabel": "Baterías", "brand": "1HORA", "model": "Power bank 10,000 mAh con cables integrados", "price": 299, "img": "assets/accesorio-31.jpg", "imgs": ["assets/accesorio-31.jpg"], "tags": "bateria baterias pila pilas power bank powerbank banco de energia cargador portatil carga recargable celular bateria pila banco de energia portatil 1horapower 1horabank 1hora10 1hora000 1horamah 1horacon 1horacables 1horaintegrados"}, {"code": "bat-20000", "name": "Power bank 1HORA 20,000 mAh", "line": "Cables integrados", "sub": "Negra y roja; para varios días", "cat": "baterias", "catLabel": "Baterías", "brand": "1HORA", "model": "Power bank 20,000 mAh con cables integrados", "price": 449, "img": "assets/accesorio-10.jpg", "imgs": ["assets/accesorio-10.jpg"], "tags": "bateria baterias pila pilas power bank powerbank banco de energia cargador portatil carga recargable celular bateria pila banco de energia portatil 1horapower 1horabank 1hora20 1hora000 1horamah 1horacon 1horacables 1horaintegrados"}, {"code": "bat-20000-negra", "name": "Power bank 1HORA 20,000 mAh negra", "line": "Cables integrados", "sub": "Color negro; para varios días", "cat": "baterias", "catLabel": "Baterías", "brand": "1HORA", "model": "Power bank 20,000 mAh con cables integrados", "price": 449, "img": "assets/accesorio-30.jpg", "imgs": ["assets/accesorio-30.jpg"], "tags": "bateria baterias pila pilas power bank powerbank banco de energia cargador portatil carga recargable celular bateria pila banco de energia portatil 1horapower 1horabank 1hora20 1hora000 1horamah 1horacon 1horacables 1horaintegrados"}, {"code": "bat-magnetica", "name": "Power bank magnética 1HORA 5,000 mAh", "line": "Tipo MagSafe", "sub": "Se pega a tu celular, sin cables", "cat": "baterias", "catLabel": "Baterías", "brand": "1HORA", "model": "Power bank magnética 5,000 mAh", "price": 349, "img": "assets/accesorio-29.jpg", "imgs": ["assets/accesorio-29.jpg"], "tags": "bateria baterias pila pilas power bank powerbank banco de energia cargador portatil carga recargable celular bateria pila banco de energia portatil 1horapower 1horabank 1horamagn 1horatica 1hora000 1horamah"}, {"code": "reloj", "name": "Reloj inteligente (kit)", "line": "Accesorio", "sub": "4 correas y cargador magnético", "cat": "servicios", "catLabel": "Servicios y Más", "brand": "Genérica", "model": "Smartwatch kit con 4 correas", "price": 599, "img": "assets/accesorio-08.jpg", "imgs": ["assets/accesorio-08.jpg"], "tags": "servicio servicios reparacion reparaciones arreglo instalacion local smartwatch reloj inteligente watch pulsera correas carga cable cargadores turbo genéricasmartwatch genéricakit genéricacon genéricacorreas"}, {"code": "consola-retro", "name": "Consola retro FURIOUS SU-8", "line": "Accesorio", "sub": "Con volante, para jugar en tu TV", "cat": "servicios", "catLabel": "Servicios y Más", "brand": "FURIOUS", "model": "SU-8 (consola con volante)", "price": 499, "img": "assets/accesorio-24.jpg", "imgs": ["assets/accesorio-24.jpg"], "tags": "servicio servicios reparacion reparaciones arreglo instalacion local videojuegos videojuego retro juegos juego tv furioussu furiousconsola furiouscon furiousvolante"}, {"code": "ser-display", "name": "Cambio de display", "line": "Servicio en el local", "sub": "Pregunta por el modelo de tu equipo", "cat": "servicios", "catLabel": "Servicios y Más", "brand": "No aplica", "model": "Servicio", "price": 350, "img": "assets/servicio-display.jpg", "imgs": ["assets/servicio-display.jpg"], "tags": "servicio servicios reparacion reparaciones arreglo instalacion local pantalla rota cambio reparacion estrellada no aplicaservicio"}, {"code": "ser-vinculacion", "name": "Vinculación de línea / express", "line": "Servicio en el local", "sub": "Activa o vincula tu línea con nosotros", "cat": "servicios", "catLabel": "Servicios y Más", "brand": "No aplica", "model": "Servicio", "price": 30, "img": "assets/servicio-vinculacion.jpg", "imgs": ["assets/servicio-vinculacion.jpg"], "tags": "servicio servicios reparacion reparaciones arreglo instalacion local linea telcel numero portabilidad activar activacion no aplicaservicio"}, {"code": "chip-telcel", "name": "Chip Express Telcel", "line": "Telcel", "sub": "Chip nuevo, actívalo en el local", "cat": "servicios", "catLabel": "Servicios y Más", "brand": "Telcel", "model": "Chip Express", "price": 50, "img": "assets/servicio-chip.jpg", "imgs": ["assets/servicio-chip.jpg"], "tags": "servicio servicios reparacion reparaciones arreglo instalacion local telcel sim linea numero chips telcelchip telcelexpress"}, {"code": "decodificador", "name": "Decodificador", "line": "Para tu TV", "sub": "Con su control remoto", "cat": "servicios", "catLabel": "Servicios y Más", "brand": "Por confirmar", "model": "Decodificador", "price": 700, "img": "assets/servicio-decodificador.jpg", "imgs": ["assets/servicio-decodificador.jpg"], "tags": "servicio servicios reparacion reparaciones arreglo instalacion local tv television senal codificador por confirmardecodificador"}];
+      const EMBEBIDOS = [{"code": "f-01", "name": "Funda MagSafe translúcida ahumada", "line": "Para iPhone 13, 14 y 15", "sub": "Borde morado, aro magnético y acabado ahumado", "cat": "fundas", "catLabel": "Fundas", "brand": "iPhone", "model": "13, 14 y 15", "price": 180, "img": "assets/funda-01.jpg", "imgs": ["assets/funda-01.jpg"], "modelos": ["13", "14", "15"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono iman magnetico magnetica aro anillo magneticos apple iphone ios iphone13 iphone14 iphone15 iphone13 iphone14 iphone15"}, {"code": "f-02", "name": "Funda tipo piel blanca hueso", "line": "Para iPhone 13, 14 y 15", "sub": "Aro MagSafe, tacto tipo piel", "cat": "fundas", "catLabel": "Fundas", "brand": "iPhone", "model": "13, 14 y 15", "price": 180, "img": "assets/funda-02.jpg", "imgs": ["assets/funda-02.jpg"], "modelos": ["13", "14", "15"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono iman magnetico magnetica aro anillo magneticos cuero tipo piel apple iphone ios iphone13 iphone14 iphone15 iphone13 iphone14 iphone15"}, {"code": "f-03", "name": "Funda transparente tornasol SIMER", "line": "Para iPhone 13, 14 y 15", "sub": "Efecto arcoíris con aro MagSafe", "cat": "fundas", "catLabel": "Fundas", "brand": "iPhone", "model": "13, 14 y 15", "price": 150, "img": "assets/funda-03.jpg", "imgs": ["assets/funda-03.jpg"], "modelos": ["13", "14", "15"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono iman magnetico magnetica aro anillo magneticos apple iphone ios iphone13 iphone14 iphone15 iphone13 iphone14 iphone15"}, {"code": "f-04", "name": "Fundas con anillo magnético en empaque", "line": "Para iPhone 13 y 15", "sub": "Varios diseños en tienda (foto del equipo con empaques SIMER)", "cat": "fundas", "catLabel": "Fundas", "brand": "iPhone", "model": "13 y 15", "price": 180, "img": "assets/funda-04.jpg", "imgs": ["assets/funda-04.jpg"], "modelos": ["13", "15"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono apple iphone ios iphone13 iphone15 iphone13 iphone15"}, {"code": "f-05", "name": "Funda acabado espejo con rositas", "line": "Para Motorola Moto G85", "sub": "Diseño HAPPY de rosas rosas y moradas", "cat": "fundas", "catLabel": "Fundas", "brand": "Motorola", "model": "Moto G85", "price": 150, "img": "assets/funda-05.jpg", "imgs": ["assets/funda-05.jpg"], "modelos": ["Moto G85"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono motorola moto motorolamoto motorolag85 motorolamoto motorolag85"}, {"code": "f-06", "name": "Funda transparente con cerezas", "line": "Para Samsung Galaxy A36", "sub": "Cerezas rojas y dije de corazón", "cat": "fundas", "catLabel": "Fundas", "brand": "Samsung", "model": "Galaxy A36", "price": 150, "img": "assets/funda-06.jpg", "imgs": ["assets/funda-06.jpg"], "modelos": ["Galaxy A36"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono samsung galaxy samsunggalaxy samsunga36 samsunggalaxy samsunga36"}, {"code": "f-07", "name": "Funda tipo piel azul rey", "line": "Para Samsung S25 Ultra", "sub": "Aro magnético, color azul rey", "cat": "fundas", "catLabel": "Fundas", "brand": "Samsung", "model": "S25 Ultra", "price": 180, "img": "assets/funda-07.jpg", "imgs": ["assets/funda-07.jpg"], "modelos": ["S25 Ultra"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono cuero tipo piel samsung galaxy samsungs25 samsungultra samsungs25 samsungultra"}, {"code": "f-08", "name": "Funda translúcida degradado", "line": "Para iPhone 16", "sub": "Degradado blanco a negro con aro MagSafe", "cat": "fundas", "catLabel": "Fundas", "brand": "iPhone", "model": "16", "price": 150, "img": "assets/funda-08.jpg", "imgs": ["assets/funda-08.jpg"], "modelos": ["16"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono iman magnetico magnetica aro anillo magneticos apple iphone ios iphone16 iphone16"}, {"code": "f-09", "name": "Funda rosa mate KIMO", "line": "La más pedida", "sub": "Marco de cámara metálico morado", "cat": "fundas", "catLabel": "Fundas", "brand": "Samsung", "model": "Galaxy A36", "price": 150, "img": "assets/funda-09.jpg", "imgs": ["assets/funda-09.jpg"], "modelos": ["Galaxy A36"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono samsung galaxy samsunggalaxy samsunga36 samsunggalaxy samsunga36"}, {"code": "f-10", "name": "Funda transparente aro MagSafe rosa", "line": "Para Samsung Galaxy S24", "sub": "Aro magnético rosa", "cat": "fundas", "catLabel": "Fundas", "brand": "Samsung", "model": "Galaxy S24", "price": 180, "img": "assets/funda-10.jpg", "imgs": ["assets/funda-10.jpg"], "modelos": ["Galaxy S24"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono iman magnetico magnetica aro anillo magneticos samsung galaxy samsunggalaxy samsungs24 samsunggalaxy samsungs24"}, {"code": "f-11", "name": "Funda gris mate con aro MagSafe", "line": "Para iPhone 14", "sub": "Acabado mate, aro magnético", "cat": "fundas", "catLabel": "Fundas", "brand": "iPhone", "model": "14", "price": 180, "img": "assets/funda-11.jpg", "imgs": ["assets/funda-11.jpg"], "modelos": ["14"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono iman magnetico magnetica aro anillo magneticos apple iphone ios iphone14 iphone14"}, {"code": "f-12", "name": "Funda translúcida borde azul", "line": "Para iPhone 14 Pro", "sub": "Aro MagSafe, borde azul", "cat": "fundas", "catLabel": "Fundas", "brand": "iPhone", "model": "14 Pro", "price": 150, "img": "assets/funda-12.jpg", "imgs": ["assets/funda-12.jpg"], "modelos": ["14 Pro"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono iman magnetico magnetica aro anillo magneticos apple iphone ios iphone14 iphonepro iphone14 iphonepro"}, {"code": "f-25", "name": "Funda transparente con florecitas", "line": "Para Honor X9b", "sub": "Florecitas rosas, cámara circular", "cat": "fundas", "catLabel": "Fundas", "brand": "Honor", "model": "X9b", "price": 150, "img": "assets/funda-25.jpg", "imgs": ["assets/funda-25.jpg"], "modelos": ["X9b"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono honor honorx9b honorx9b"}, {"code": "f-27", "name": "Funda transparente SIMER aro amarillo", "line": "Para iPhone 16e", "sub": "Aro MagSafe amarillo/verde", "cat": "fundas", "catLabel": "Fundas", "brand": "iPhone", "model": "16e", "price": 150, "img": "assets/funda-27.jpg", "imgs": ["assets/funda-27.jpg"], "modelos": ["16e"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono iman magnetico magnetica aro anillo magneticos apple iphone ios iphone16e iphone16e"}, {"code": "f-28", "name": "Funda transparente SIMER aro azul", "line": "Para iPhone 15", "sub": "Aro MagSafe azul", "cat": "fundas", "catLabel": "Fundas", "brand": "iPhone", "model": "15", "price": 150, "img": "assets/funda-28.jpg", "imgs": ["assets/funda-28.jpg"], "modelos": ["15"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono iman magnetico magnetica aro anillo magneticos apple iphone ios iphone15 iphone15"}, {"code": "f-29", "name": "Funda transparente SIMER aro negro", "line": "Para iPhone 15", "sub": "Aro MagSafe negro", "cat": "fundas", "catLabel": "Fundas", "brand": "iPhone", "model": "15", "price": 150, "img": "assets/funda-29.jpg", "imgs": ["assets/funda-29.jpg"], "modelos": ["15"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono iman magnetico magnetica aro anillo magneticos apple iphone ios iphone15 iphone15"}, {"code": "f-30", "name": "Funda transparente SIMER aro rosa", "line": "Para iPhone 15", "sub": "Aro MagSafe rosa", "cat": "fundas", "catLabel": "Fundas", "brand": "iPhone", "model": "15", "price": 150, "img": "assets/funda-30.jpg", "imgs": ["assets/funda-30.jpg"], "modelos": ["15"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono iman magnetico magnetica aro anillo magneticos apple iphone ios iphone15 iphone15"}, {"code": "acuatica", "name": "Funda-bolsa impermeable KBOD", "line": "Para cualquier modelo", "sub": "Tornasol, con correa; protege del agua", "cat": "fundas", "catLabel": "Fundas", "brand": "KBOD", "model": "Bolsa impermeable universal", "price": 150, "img": "assets/accesorio-02.jpg", "imgs": ["assets/accesorio-02.jpg"], "modelos": ["Bolsa impermeable universal"], "tags": "funda fundas protector protectores case carcasa carcasas cubierta cubiertas forro estuche celular telefono agua bolsa playa alberca acuatica contra agua kbodbolsa kbodimpermeable kboduniversal kbodbolsa kbodimpermeable kboduniversal"}, {"code": "mica-sencilla", "name": "Mica de cristal templado", "line": "Instalación gratis · 1 cambio gratis en precio actual", "sub": "La básica que nunca falla: protege de rayones y golpes leves", "cat": "micas", "catLabel": "Micas de Protección", "brand": "Universal", "model": "Según modelo del cliente", "price": 40, "img": "assets/mica-03.jpg", "imgs": ["assets/mica-03.jpg"], "tags": "mica micas cristal cristales vidrio vidrios templado protector protectores pantalla lamina laminas cubierta celular universalseg universalmodelo universaldel universalcliente"}, {"code": "mica-completa", "name": "Mica completa 9D", "line": "Instalación gratis · 1 cambio gratis en precio actual", "sub": "Cristal full glue, cubre borde a borde", "cat": "micas", "catLabel": "Micas de Protección", "brand": "Universal", "model": "Según modelo del cliente", "price": 80, "img": "assets/mica-04.jpg", "imgs": ["assets/mica-04.jpg"], "tags": "mica micas cristal cristales vidrio vidrios templado protector protectores pantalla lamina laminas cubierta celular completa full glue borde a borde universalseg universalmodelo universaldel universalcliente"}, {"code": "mica-ceramica", "name": "Mica de cerámica mate 9D", "line": "Instalación gratis · 1 cambio gratis en precio actual", "sub": "Flexible, anti-huellas, ideal para jugar", "cat": "micas", "catLabel": "Micas de Protección", "brand": "Universal", "model": "Según modelo del cliente", "price": 80, "img": "assets/mica-05.jpg", "imgs": ["assets/mica-05.jpg"], "tags": "mica micas cristal cristales vidrio vidrios templado protector protectores pantalla lamina laminas cubierta celular universalseg universalmodelo universaldel universalcliente"}, {"code": "mica-privacidad", "name": "Mica de cristal de privacidad 9D", "line": "Instalación gratis · 1 cambio gratis en precio actual", "sub": "Anti-espía: nadie ve tu pantalla de lado", "cat": "micas", "catLabel": "Micas de Protección", "brand": "Universal", "model": "Según modelo del cliente", "price": 90, "img": "assets/mica-06.jpg", "imgs": ["assets/mica-06.jpg"], "tags": "mica micas cristal cristales vidrio vidrios templado protector protectores pantalla lamina laminas cubierta celular privado privada antispy espia anti chismoso universalseg universalmodelo universaldel universalcliente"}, {"code": "mica-hidro-hd", "name": "Mica de hidrogel HD", "line": "Instalación gratis · 1 cambio gratis en precio actual", "sub": "Se corta a la medida en el local, para cualquier modelo", "cat": "micas", "catLabel": "Micas de Protección", "brand": "DRAGON", "model": "Corte a la medida en el local", "price": 160, "img": "assets/hidrogel-01.jpg", "imgs": ["assets/hidrogel-01.jpg"], "tags": "mica micas cristal cristales vidrio vidrios templado protector protectores pantalla lamina laminas cubierta celular hydrogel gel medida corte cortada dragoncorte dragonla dragonmedida dragonen dragonel dragonlocal"}, {"code": "mica-hidro-priv", "name": "Mica de hidrogel privacidad", "line": "Instalación gratis · 1 cambio gratis en precio actual", "sub": "Hidrogel con filtro de privacidad, corte a la medida", "cat": "micas", "catLabel": "Micas de Protección", "brand": "DRAGON", "model": "Corte a la medida en el local", "price": 260, "img": "assets/hidrogel-01.jpg", "imgs": ["assets/hidrogel-01.jpg"], "tags": "mica micas cristal cristales vidrio vidrios templado protector protectores pantalla lamina laminas cubierta celular hydrogel gel medida corte cortada privado privada antispy espia anti chismoso dragoncorte dragonla dragonmedida dragonen dragonel dragonlocal"}, {"code": "a-hora-azul", "name": "Audífonos TWS 1HORA azules", "line": "Bluetooth", "sub": "Estuche redondo; 17 h totales con estuche", "cat": "audifonos", "catLabel": "Audífonos", "brand": "1HORA", "model": "TWS estuche redondo (5 h / 17 h con estuche)", "price": 299, "img": "assets/audifonos-26.jpg", "imgs": ["assets/audifonos-26.jpg"], "tags": "audifonos audifono auriculares auricular earbuds cascos casco diadema diademas headphones bluetooth inalambricos inalambrico manos libres musica 1horatws 1horaestuche 1horaredondo 1hora17 1horacon 1horaestuche"}, {"code": "a-corazon", "name": "Audífonos TWS FUTUREM FM-520", "line": "Bluetooth", "sub": "Estuche en forma de corazón rosa/dorado", "cat": "audifonos", "catLabel": "Audífonos", "brand": "FUTUREM", "model": "FM-520 (estuche corazón)", "price": 299, "img": "assets/audifonos-18.jpg", "imgs": ["assets/audifonos-18.jpg"], "tags": "audifonos audifono auriculares auricular earbuds cascos casco diadema diademas headphones bluetooth inalambricos inalambrico manos libres musica futuremfm futurem520 futuremestuche futuremcoraz"}, {"code": "a-consola", "name": "Audífonos TWS KT-01", "line": "Bluetooth", "sub": "Con funda estilo Nintendo Switch", "cat": "audifonos", "catLabel": "Audífonos", "brand": "Genérica", "model": "KT-01 (funda tipo Nintendo Switch)", "price": 299, "img": "assets/audifonos-20.jpg", "imgs": ["assets/audifonos-20.jpg"], "tags": "audifonos audifono auriculares auricular earbuds cascos casco diadema diademas headphones bluetooth inalambricos inalambrico manos libres musica genéricakt genérica01 genéricafunda genéricatipo genéricanintendo genéricaswitch"}, {"code": "a-j67", "name": "Audífonos TWS J67", "line": "Bluetooth", "sub": "Estuche tipo cámara retro con display de batería", "cat": "audifonos", "catLabel": "Audífonos", "brand": "Genérica", "model": "J67 Stereo Earbuds", "price": 299, "img": "assets/audifonos-29.jpg", "imgs": ["assets/audifonos-29.jpg"], "tags": "audifonos audifono auriculares auricular earbuds cascos casco diadema diademas headphones bluetooth inalambricos inalambrico manos libres musica pantalla rota cambio reparacion estrellada genéricaj67 genéricastereo genéricaearbuds"}, {"code": "a-hora-rosa", "name": "Audífonos TWS 1HORA rosas", "line": "Bluetooth", "sub": "Estuche redondo; 17 h totales con estuche", "cat": "audifonos", "catLabel": "Audífonos", "brand": "1HORA", "model": "TWS estuche redondo (5 h / 17 h con estuche)", "price": 299, "img": "assets/audifonos-37.jpg", "imgs": ["assets/audifonos-37.jpg"], "tags": "audifonos audifono auriculares auricular earbuds cascos casco diadema diademas headphones bluetooth inalambricos inalambrico manos libres musica 1horatws 1horaestuche 1horaredondo 1hora17 1horacon 1horaestuche"}, {"code": "a-diadema-negra", "name": "Diadema 1HORA Deep Bass", "line": "Hasta 33 h de batería", "sub": "Negra, bajos profundos", "cat": "audifonos", "catLabel": "Audífonos", "brand": "1HORA", "model": "Diadema Deep Bass 33H", "price": 349, "img": "assets/audifonos-01.jpg", "imgs": ["assets/audifonos-01.jpg"], "tags": "audifonos audifono auriculares auricular earbuds cascos casco diadema diademas headphones bluetooth inalambricos inalambrico manos libres musica cascos grandes over ear acolchonados 1horadiadema 1horadeep 1horabass 1hora33h"}, {"code": "a-diadema-rosa", "name": "Diadema rosa pastel", "line": "Bluetooth", "sub": "Detalles menta", "cat": "audifonos", "catLabel": "Audífonos", "brand": "Genérica", "model": "Diadema rosa pastel (sin marca visible)", "price": 349, "img": "assets/audifonos-02.jpg", "imgs": ["assets/audifonos-02.jpg"], "tags": "audifonos audifono auriculares auricular earbuds cascos casco diadema diademas headphones bluetooth inalambricos inalambrico manos libres musica cascos grandes over ear acolchonados genéricadiadema genéricarosa genéricapastel genéricasin genéricamarca genéricavisible"}, {"code": "a-diadema-luz", "name": "Diadema Samsung Level BT750", "line": "Luz RGB", "sub": "Blanca, Bluetooth con luz RGB", "cat": "audifonos", "catLabel": "Audífonos", "brand": "Samsung", "model": "Level BT750 (luz RGB)", "price": 399, "img": "assets/audifonos-31.jpg", "imgs": ["assets/audifonos-31.jpg"], "tags": "audifonos audifono auriculares auricular earbuds cascos casco diadema diademas headphones bluetooth inalambricos inalambrico manos libres musica cascos grandes over ear acolchonados samsung galaxy samsunglevel samsungbt750 samsungluz samsungrgb"}, {"code": "a-diadema-led", "name": "Diadema Samsung Level", "line": "Luz LED", "sub": "Luz LED azul, Bluetooth", "cat": "audifonos", "catLabel": "Audífonos", "brand": "Samsung", "model": "Level (luz LED azul)", "price": 399, "img": "assets/audifonos-43.jpg", "imgs": ["assets/audifonos-43.jpg"], "tags": "audifonos audifono auriculares auricular earbuds cascos casco diadema diademas headphones bluetooth inalambricos inalambrico manos libres musica cascos grandes over ear acolchonados samsung galaxy samsunglevel samsungluz samsungled samsungazul"}, {"code": "bat-10000", "name": "Power bank 1HORA 10,000 mAh", "line": "Cables integrados", "sub": "Carga para todo el día", "cat": "baterias", "catLabel": "Baterías", "brand": "1HORA", "model": "Power bank 10,000 mAh con cables integrados", "price": 299, "img": "assets/accesorio-31.jpg", "imgs": ["assets/accesorio-31.jpg"], "tags": "bateria baterias pila pilas power bank powerbank banco de energia cargador portatil carga recargable celular bateria pila banco de energia portatil 1horapower 1horabank 1hora10 1hora000 1horamah 1horacon 1horacables 1horaintegrados"}, {"code": "bat-20000", "name": "Power bank 1HORA 20,000 mAh", "line": "Cables integrados", "sub": "Negra y roja; para varios días", "cat": "baterias", "catLabel": "Baterías", "brand": "1HORA", "model": "Power bank 20,000 mAh con cables integrados", "price": 449, "img": "assets/accesorio-10.jpg", "imgs": ["assets/accesorio-10.jpg"], "tags": "bateria baterias pila pilas power bank powerbank banco de energia cargador portatil carga recargable celular bateria pila banco de energia portatil 1horapower 1horabank 1hora20 1hora000 1horamah 1horacon 1horacables 1horaintegrados"}, {"code": "bat-20000-negra", "name": "Power bank 1HORA 20,000 mAh negra", "line": "Cables integrados", "sub": "Color negro; para varios días", "cat": "baterias", "catLabel": "Baterías", "brand": "1HORA", "model": "Power bank 20,000 mAh con cables integrados", "price": 449, "img": "assets/accesorio-30.jpg", "imgs": ["assets/accesorio-30.jpg"], "tags": "bateria baterias pila pilas power bank powerbank banco de energia cargador portatil carga recargable celular bateria pila banco de energia portatil 1horapower 1horabank 1hora20 1hora000 1horamah 1horacon 1horacables 1horaintegrados"}, {"code": "bat-magnetica", "name": "Power bank magnética 1HORA 5,000 mAh", "line": "Tipo MagSafe", "sub": "Se pega a tu celular, sin cables", "cat": "baterias", "catLabel": "Baterías", "brand": "1HORA", "model": "Power bank magnética 5,000 mAh", "price": 349, "img": "assets/accesorio-29.jpg", "imgs": ["assets/accesorio-29.jpg"], "tags": "bateria baterias pila pilas power bank powerbank banco de energia cargador portatil carga recargable celular bateria pila banco de energia portatil 1horapower 1horabank 1horamagn 1horatica 1hora000 1horamah"}, {"code": "reloj", "name": "Reloj inteligente (kit)", "line": "Accesorio", "sub": "4 correas y cargador magnético", "cat": "servicios", "catLabel": "Servicios y Más", "brand": "Genérica", "model": "Smartwatch kit con 4 correas", "price": 599, "img": "assets/accesorio-08.jpg", "imgs": ["assets/accesorio-08.jpg"], "tags": "servicio servicios reparacion reparaciones arreglo instalacion local smartwatch reloj inteligente watch pulsera correas carga cable cargadores turbo genéricasmartwatch genéricakit genéricacon genéricacorreas"}, {"code": "consola-retro", "name": "Consola retro FURIOUS SU-8", "line": "Accesorio", "sub": "Con volante, para jugar en tu TV", "cat": "servicios", "catLabel": "Servicios y Más", "brand": "FURIOUS", "model": "SU-8 (consola con volante)", "price": 499, "img": "assets/accesorio-24.jpg", "imgs": ["assets/accesorio-24.jpg"], "tags": "servicio servicios reparacion reparaciones arreglo instalacion local videojuegos videojuego retro juegos juego tv furioussu furiousconsola furiouscon furiousvolante"}, {"code": "ser-display", "name": "Cambio de display", "line": "Servicio en el local", "sub": "Pregunta por el modelo de tu equipo", "cat": "servicios", "catLabel": "Servicios y Más", "brand": "No aplica", "model": "Servicio", "price": 350, "img": "assets/servicio-display.jpg", "imgs": ["assets/servicio-display.jpg"], "tags": "servicio servicios reparacion reparaciones arreglo instalacion local pantalla rota cambio reparacion estrellada no aplicaservicio"}, {"code": "ser-vinculacion", "name": "Vinculación de línea / express", "line": "Servicio en el local", "sub": "Activa o vincula tu línea con nosotros", "cat": "servicios", "catLabel": "Servicios y Más", "brand": "No aplica", "model": "Servicio", "price": 30, "img": "assets/servicio-vinculacion.jpg", "imgs": ["assets/servicio-vinculacion.jpg"], "tags": "servicio servicios reparacion reparaciones arreglo instalacion local linea telcel numero portabilidad activar activacion no aplicaservicio"}, {"code": "chip-telcel", "name": "Chip Express Telcel", "line": "Telcel", "sub": "Chip nuevo, actívalo en el local", "cat": "servicios", "catLabel": "Servicios y Más", "brand": "Telcel", "model": "Chip Express", "price": 50, "img": "assets/servicio-chip.jpg", "imgs": ["assets/servicio-chip.jpg"], "tags": "servicio servicios reparacion reparaciones arreglo instalacion local telcel sim linea numero chips telcelchip telcelexpress"}, {"code": "decodificador", "name": "Decodificador", "line": "Para tu TV", "sub": "Con su control remoto", "cat": "servicios", "catLabel": "Servicios y Más", "brand": "Por confirmar", "model": "Decodificador", "price": 700, "img": "assets/servicio-decodificador.jpg", "imgs": ["assets/servicio-decodificador.jpg"], "tags": "servicio servicios reparacion reparaciones arreglo instalacion local tv television senal codificador por confirmardecodificador"}, /* Producto 44 del puente: su foto vive en Drive y se guardó una copia
+       en assets/ como respaldo embebido (si el puente no responde, la
+       tienda la enseña desde aquí). OJO: trae datos inconsistentes:
+       model dice "17 pro max" pero modelos dice "iphone 18 promax"
+       (ver modelosDe() abajo). */
+      {"code": "funda-tansparente-magsaf", "name": "Funda Tansparente Magsafe", "line": "Iphone 17 Pro MAx", "sub": "", "cat": "fundas", "catLabel": "Fundas", "brand": "iPhone", "model": "17 pro max", "price": 150, "img": "assets/funda-tansparente-magsaf.jpg", "imgs": ["assets/funda-tansparente-magsaf.jpg"], "modelos": ["iphone 18 promax"], "tags": "17 18 funda tansparente magsafe iphone pro max fundas promax protector protectores case carcasa celular telefono"}];
       if (Array.isArray(EMBEBIDOS) && EMBEBIDOS.length) {
         datosListos(EMBEBIDOS);
       } else {
@@ -3088,6 +3361,7 @@ HORARIOS DE ATENCIÓN
         renderFilters();
         renderGrid(PRODUCTS);
         renderInquiry();
+        aplicarHash();
         if (fromShared) setTimeout(openCart, 450);
         refrescarCatalogo();
       }
@@ -3097,7 +3371,12 @@ HORARIOS DE ATENCIÓN
 <div class="hidden fixed inset-0 z-[60]" id="product-modal" role="dialog" aria-modal="true">
 <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeProduct()"></div>
 <div class="pm-panel absolute inset-x-0 bottom-0 top-10 sm:inset-6 lg:inset-y-10 lg:left-1/2 lg:-translate-x-1/2 lg:w-[880px] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-surface-1 border border-pink-500/25 shadow-2xl">
-<button class="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-cyber-dark/85 backdrop-blur border border-white/20 text-white text-lg leading-none flex items-center justify-center" onclick="closeProduct()" title="Cerrar" type="button">×</button>
+<div class="vp-barra">
+<div class="max-w-[1080px] mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
+<button class="vp-volver" onclick="volverVista()" type="button">← Volver</button>
+<span class="font-archivo text-xs text-text-muted">Detalle del producto</span>
+</div>
+</div>
 <div class="grid md:grid-cols-2">
 <div class="p-4 sm:p-6">
 <div class="relative w-full aspect-square rounded-2xl overflow-hidden bg-surface-3 cursor-zoom-in" id="pm-zoom-wrap" onclick="pmToggleZoom(event)" onmousemove="pmMoveZoom(event)">
@@ -3120,12 +3399,30 @@ HORARIOS DE ATENCIÓN
 <div class="flex flex-wrap gap-1.5 mt-1.5" id="pm-models"></div>
 </div>
 <div class="flex flex-col sm:flex-row gap-2.5 mt-1">
-<button class="add-btn flex-1 px-4 py-3 rounded-xl bg-pink-primary/10 hover:bg-pink-primary border border-pink-500/30 text-pink-light hover:text-white transition-all flex items-center justify-center gap-1.5 font-unbounded text-xs font-semibold" data-code="" id="pm-add" onclick="if (pmCode) toggleInquiry(pmCode)" type="button"><span class="material-symbols-outlined text-[17px]">add_shopping_cart</span><span>+ Carrito</span></button>
+<button class="add-btn flex-1 px-4 py-3 rounded-xl bg-pink-primary/10 hover:bg-pink-primary border border-pink-500/30 text-pink-light hover:text-white transition-all flex items-center justify-center gap-1.5 font-unbounded text-xs font-semibold" data-code="" id="pm-add" onclick="if (pmCode) toggleInquiry(pmCode)" type="button"><span class="material-symbols-outlined text-[17px]">add_shopping_cart</span><span>Agregar a mi lista</span></button>
 <a class="flex-1 px-4 py-3 rounded-xl bg-whatsapp hover:bg-[#20bd5a] text-[#0a0608] font-unbounded text-xs font-bold transition-all flex items-center justify-center gap-1.5" href="#" id="pm-wa" rel="noopener" target="_blank"><span class="material-symbols-outlined text-[17px]">chat</span><span>Preguntar por WhatsApp</span></a>
 </div>
 <p class="font-archivo text-[11px] text-text-muted">Precio de mostrador; confirma existencias y colores por WhatsApp antes de venir.</p>
 </div>
 </div>
+</div>
+</div>
+
+<!-- Visor de fundas por modelo -->
+<div class="hidden fixed inset-0 bg-cyber-dark overflow-y-auto" id="visor-modelo" style="z-index:55" role="dialog" aria-modal="true">
+<div class="vp-barra">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-3">
+<button class="vp-volver" onclick="volverVista()" type="button">← Volver</button>
+<div>
+<h2 class="font-unbounded text-base sm:text-xl font-bold text-white leading-tight" id="visor-titulo"></h2>
+<p class="font-archivo text-xs text-text-muted" id="visor-sub"></p>
+</div>
+</div>
+</div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6">
+<div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none" id="visor-filtros"></div>
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-2" id="visor-grid"></div>
+<p class="hidden font-archivo text-sm text-text-muted text-center py-10" id="visor-vacio">No hay fundas de este estilo para este modelo.</p>
 </div>
 </div>
 
