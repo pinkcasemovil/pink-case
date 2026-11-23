@@ -3743,16 +3743,29 @@ HORARIOS DE ATENCIÓN
       let message = "¡Hola Pink Case! Quiero consultar disponibilidad en Ixtlahuaca Centro de estos artículos:\n\n";
       message += `• Mi equipo: ${currentBrand} · ${model}\n`;
       message += `• Folio: ${folio || newFolio()}\n\nMi lista:\n`;
-      inquiryItems.forEach((item, idx) => {
+      let n = 0;
+      inquiryItems.forEach((item) => {
         const p = byCode[item.code];
+        if (!p) return;
         const sub = p.price * item.qty;
         total += sub;
-        message += `${idx + 1}. ${p.name} (${p.line}) x${item.qty} — ${money(sub)}\n`;
+        n += 1;
+        message += `${n}. ${p.name} (${p.line}) x${item.qty} — ${money(sub)}\n`;
       });
       message += `\n★ Total informativo: ${money(total)} MXN\n`;
       message += `Liga de mi lista: ${location.origin + location.pathname + shareHash()}\n`;
       message += "¿Los tienen en existencia para pasar a la tienda? ¡Gracias!";
-      window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`, "_blank");
+      /* Se abre con un enlace real (<a target="_blank">), como el botón
+         del detalle: en navegadores de teléfono y en vistas dentro de
+         otras apps, window.open se bloquea en silencio con facilidad. */
+      const a = document.createElement("a");
+      a.href = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`;
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
     }
 
     function loadFromHash() {
