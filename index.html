@@ -1068,6 +1068,23 @@
 </style>
 
 
+<style id="menu-vistas">
+/* Con una vista abierta (detalle o visor), en escritorio (≥640 px) la
+   fila del menú se esconde y aparece el botón de 3 barras junto al
+   carrito, como en teléfono. El desplegable reusa el aspecto del menú
+   del teléfono: 2 columnas (2 + 2 + Acerca de nosotros a todo lo
+   ancho), enlaces de 44 px. En teléfono no cambia nada: el botón ya
+   existe y el menú ya es desplegable. */
+@media (min-width:640px){
+  header.vista-abierta #main-nav{display:none!important}
+  header.vista-abierta #menu-btn-movil{display:inline-flex!important}
+  header.vista-abierta #main-nav.menu-open{display:grid!important;grid-template-columns:1fr 1fr;gap:0;column-gap:1rem;align-items:start;overflow:visible;padding-top:.25rem}
+  header.vista-abierta #main-nav.menu-open .nav-link{display:flex!important;align-items:center;min-height:44px;padding:.5rem .25rem;border-bottom:1px solid rgba(255,255,255,.08);font-size:1rem}
+  header.vista-abierta #main-nav.menu-open .nav-link:last-child{grid-column:span 2}
+}
+</style>
+
+
 <style id="hero-2col-movil">
 /* Hero en 2 columnas en teléfono (<640 px), con elementos más pequeños para que no se vea amontonado. */
 @media (max-width:639px){
@@ -2758,6 +2775,28 @@ HORARIOS DE ATENCIÓN
       if (m && !m.classList.contains("hidden")) ajustarVistaAlEncabezado(m);
       if (v && !v.classList.contains("hidden")) ajustarVistaAlEncabezado(v);
     }
+    /* Con una vista abierta, el encabezado se colapsa en escritorio: la
+       fila del menú se esconde y aparece el botón de 3 barras junto al
+       carrito (en teléfono el botón ya existe y nada cambia). La clase
+       va en el encabezado y el CSS hace el resto; la vista se mide
+       después del cambio, con la altura ya colapsada. */
+    function colapsarEncabezado() {
+      const h = document.querySelector("header");
+      if (h) h.classList.add("vista-abierta");
+    }
+    function expandirEncabezado() {
+      const h = document.querySelector("header");
+      if (h) h.classList.remove("vista-abierta");
+    }
+    /* Cierra el desplegable del menú (las 3 barras) y vuelve a medir la
+       vista, porque el encabezado se hace más bajo al cerrarse. */
+    function cerrarMenu() {
+      const nav = document.getElementById("main-nav");
+      const btn = document.getElementById("menu-btn-movil");
+      if (nav) nav.classList.remove("menu-open");
+      if (btn) btn.classList.remove("abierto");
+      reajustarVistasAbiertas();
+    }
     /* Origen de la vista: de dónde se vino al abrirla, para mostrarlo
        en la vista y para que el botón Volver diga a dónde va. */
     let origenDetalle = null; /* {tipo:"visor", titulo, kind} | {tipo:"busqueda", texto} | {tipo:"catalogo"} */
@@ -2814,6 +2853,7 @@ HORARIOS DE ATENCIÓN
       document.getElementById("pm-wa").href = "https://wa.me/527122345562?text=" + encodeURIComponent("Hola, me interesa este producto: " + p.name + " (" + money(p.price) + "). ¿Sigue disponible?\nVer el producto: " + prodLink);
       pmResetZoom();
       document.getElementById("product-modal").classList.remove("hidden");
+      colapsarEncabezado();
       ajustarVistaAlEncabezado(document.getElementById("product-modal"));
       const pp = document.querySelector("#product-modal .pm-panel"); if (pp) pp.scrollTop = 0;
       bloquearScroll();
@@ -2824,7 +2864,7 @@ HORARIOS DE ATENCIÓN
     function pmSetImg(src, btn) { const img = document.getElementById("pm-img"); if (img) img.src = src; pmResetZoom(); document.querySelectorAll(".pm-thumb").forEach(b => b.classList.toggle("ring-2", b === btn)); }
     function pmToggleZoom(ev) { const img = document.getElementById("pm-img"); const w = document.getElementById("pm-zoom-wrap"); if (!img || !w) return; pmZoom = !pmZoom; img.style.transform = pmZoom ? "scale(2)" : ""; w.classList.toggle("cursor-zoom-out", pmZoom); w.classList.toggle("cursor-zoom-in", !pmZoom); if (pmZoom) pmMoveZoom(ev); }
     function pmMoveZoom(ev) { if (!pmZoom || !ev || ev.clientX === undefined) return; const w = document.getElementById("pm-zoom-wrap"); const img = document.getElementById("pm-img"); if (!w || !img) return; const r = w.getBoundingClientRect(); const x = Math.min(100, Math.max(0, ((ev.clientX - r.left) / r.width) * 100)); const y = Math.min(100, Math.max(0, ((ev.clientY - r.top) / r.height) * 100)); img.style.transformOrigin = x + "% " + y + "%"; }
-    document.addEventListener("keydown", e => { if (e.key === "Escape") { const cart = document.getElementById("cart-drawer"); if (cart && !cart.classList.contains("hidden")) return; closeProduct(); } });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") { const cart = document.getElementById("cart-drawer"); if (cart && !cart.classList.contains("hidden")) return; const nav = document.getElementById("main-nav"); if (nav && nav.classList.contains("menu-open")) { cerrarMenu(); return; } closeProduct(); } });
 
     /* ---------- Navegador anterior/siguiente en el detalle ---------- */
     /* El grupo se deriva del producto mismo (fundas por sus modelos,
@@ -3180,6 +3220,7 @@ HORARIOS DE ATENCIÓN
       pintarVisor();
       const v = document.getElementById("visor-modelo");
       v.classList.remove("hidden");
+      colapsarEncabezado();
       ajustarVistaAlEncabezado(v);
       if (!yaAbierto) v.scrollTop = 0;
       bloquearScroll();
@@ -3202,6 +3243,8 @@ HORARIOS DE ATENCIÓN
       if (v) v.classList.add("hidden");
       if (m) m.style.top = "";
       if (v) v.style.top = "";
+      expandirEncabezado();
+      cerrarMenu();
       desbloquearScroll();
       pmResetZoom();
     }
@@ -3719,9 +3762,19 @@ function toggleMenuMovil(){
 }
 document.querySelectorAll('#main-nav a, #main-nav button').forEach(function(el){
   el.addEventListener('click',function(){
-    document.getElementById('main-nav').classList.remove('menu-open');
-    document.getElementById('menu-btn-movil').classList.remove('abierto');
+    cerrarMenu();
   });
+});
+/* Con una vista abierta, tocar fuera del encabezado cierra el
+   desplegable del menú. Sin vista abierta, en teléfono, el menú se
+   cierra solo con el botón o al elegir una opción, como hoy. */
+document.addEventListener('click',function(e){
+  var h=document.querySelector('header');
+  var nav=document.getElementById('main-nav');
+  if(!h||!nav||!nav.classList.contains('menu-open'))return;
+  if(!h.classList.contains('vista-abierta'))return;
+  if(h.contains(e.target))return;
+  cerrarMenu();
 });
 </script>
 
