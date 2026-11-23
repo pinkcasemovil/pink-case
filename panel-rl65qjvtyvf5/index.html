@@ -243,6 +243,22 @@
         <label class="check-row"><input id="f-dama" type="checkbox"/> Diseño para dama</label>
         <label class="check-row"><input id="f-nuevo" type="checkbox"/> Producto nuevo</label>
       </div>
+      <label class="check-row"><input id="f-recomendado" type="checkbox"/> Recomendado en «Te puede interesar»</label>
+      <div id="row-materiales">
+        <p class="hint" style="margin-top:18px">Textos de «Construcción y materiales» en la ficha del producto. Si un campo queda vacío, la tienda muestra el texto automático.</p>
+        <div class="field" id="field-mat1">
+          <label for="f-mat1" id="lbl-mat1">Bloque 1</label>
+          <textarea id="f-mat1" maxlength="500" placeholder="Texto del bloque 1"></textarea>
+        </div>
+        <div class="field" id="field-mat2">
+          <label for="f-mat2" id="lbl-mat2">Bloque 2</label>
+          <textarea id="f-mat2" maxlength="500" placeholder="Texto del bloque 2"></textarea>
+        </div>
+        <div class="field" id="field-mat3">
+          <label for="f-mat3" id="lbl-mat3">Bloque 3</label>
+          <textarea id="f-mat3" maxlength="500" placeholder="Texto del bloque 3"></textarea>
+        </div>
+      </div>
       <label class="check-row"><input id="f-visible" type="checkbox" checked/> Visible en la tienda</label>
       <p class="error" id="editor-error"></p>
       <div class="form-actions">
@@ -414,7 +430,7 @@ function imgUrl(u) {
 function toggleVisible(code) {
   var p = productos.filter(function (x) { return x.code === code; })[0];
   if (!p) return;
-  var payload = { action: 'guardarProducto', token: token(), code: p.code, name: p.name, line: p.line || '', sub: p.sub || '', cat: p.cat, brand: p.brand || '', model: p.model || '', modelos: (p.modelos || []).join(','), price: p.price, img: p.img, material: p.material || '', tipo: p.tipo || '', dama: Number(p.dama) ? 1 : 0, nuevo: Number(p.nuevo) ? 1 : 0, visible: p.visible ? 0 : 1 };
+  var payload = { action: 'guardarProducto', token: token(), code: p.code, name: p.name, line: p.line || '', sub: p.sub || '', cat: p.cat, brand: p.brand || '', model: p.model || '', modelos: (p.modelos || []).join(','), price: p.price, img: p.img, material: p.material || '', tipo: p.tipo || '', dama: Number(p.dama) ? 1 : 0, nuevo: Number(p.nuevo) ? 1 : 0, recomendado: Number(p.recomendado) ? 1 : 0, mat1: p.mat1 || '', mat2: p.mat2 || '', mat3: p.mat3 || '', visible: p.visible ? 0 : 1 };
   remotePost(payload).then(function (res) {
     if (!res || !res.ok) { toast(errText(res && res.error ? res.error : 'sin_respuesta'), true); return; }
     p.visible = !p.visible;
@@ -451,7 +467,7 @@ function openEditor(code) {
     $('editor-code').textContent = 'El código se genera solo del nombre al guardar.';
     $('f-name').value = ''; $('f-line').value = ''; $('f-sub').value = '';
     $('f-cat').value = 'fundas'; $('f-price').value = ''; $('f-brand').value = '';
-    $('f-model').value = ''; $('f-modelos').value = ''; $('f-material').value = ''; $('f-tipo').value = ''; $('f-dama').checked = false; $('f-nuevo').checked = false; $('f-visible').checked = true;
+    $('f-model').value = ''; $('f-modelos').value = ''; $('f-material').value = ''; $('f-tipo').value = ''; $('f-dama').checked = false; $('f-nuevo').checked = false; $('f-recomendado').checked = false; $('f-mat1').value = ''; $('f-mat2').value = ''; $('f-mat3').value = ''; $('f-visible').checked = true;
     currentImg = '';
     $('photo-preview').src = '';
     $('btn-delete').classList.add('hidden');
@@ -462,7 +478,7 @@ function openEditor(code) {
     $('editor-code').textContent = 'Código: ' + p.code;
     $('f-name').value = p.name; $('f-line').value = p.line || ''; $('f-sub').value = p.sub || '';
     $('f-cat').value = p.cat; $('f-price').value = p.price; $('f-brand').value = p.brand || '';
-    $('f-model').value = p.model || ''; $('f-modelos').value = (p.modelos || []).join(', '); $('f-material').value = p.material || ''; $('f-tipo').value = p.tipo || ''; $('f-dama').checked = !!Number(p.dama); $('f-nuevo').checked = !!Number(p.nuevo);
+    $('f-model').value = p.model || ''; $('f-modelos').value = (p.modelos || []).join(', '); $('f-material').value = p.material || ''; $('f-tipo').value = p.tipo || ''; $('f-dama').checked = !!Number(p.dama); $('f-nuevo').checked = !!Number(p.nuevo); $('f-recomendado').checked = !!Number(p.recomendado); $('f-mat1').value = p.mat1 || ''; $('f-mat2').value = p.mat2 || ''; $('f-mat3').value = p.mat3 || '';
     $('f-visible').checked = !!p.visible;
     currentImg = p.img || '';
     $('photo-preview').src = imgUrl(currentImg);
@@ -473,12 +489,23 @@ function openEditor(code) {
 }
 
 /* Los campos de filtros solo se muestran en su categoría: material, dama y
-   nuevo en fundas; tipo en audífonos. */
+   nuevo en fundas; tipo en audífonos. Los textos de materiales también:
+   cada bloque lleva su etiqueta según la categoría (servicios no tiene
+   sección y baterías solo tiene 2 bloques). */
+var MAT_ETIQUETAS = { fundas: ['Fijación', 'Textura', 'Cámara'], micas: ['Protección', 'Instalación', 'Cambio'], audifonos: ['Bluetooth', 'Modelo', 'Batería'], baterias: ['Capacidad', 'Cables', ''], servicios: ['', '', ''] };
 function updateFilterFields() {
   var cat = $('f-cat').value;
   $('field-material').classList.toggle('hidden', cat !== 'fundas');
   $('row-dama-nuevo').classList.toggle('hidden', cat !== 'fundas');
   $('field-tipo').classList.toggle('hidden', cat !== 'audifonos');
+  var etq = MAT_ETIQUETAS[cat] || ['', '', ''];
+  $('lbl-mat1').textContent = etq[0];
+  $('lbl-mat2').textContent = etq[1];
+  $('lbl-mat3').textContent = etq[2];
+  $('field-mat1').classList.toggle('hidden', !etq[0]);
+  $('field-mat2').classList.toggle('hidden', !etq[1]);
+  $('field-mat3').classList.toggle('hidden', !etq[2]);
+  $('row-materiales').classList.toggle('hidden', !etq[0] && !etq[1] && !etq[2]);
 }
 
 /* ---------- Recorte de foto ----------
@@ -600,6 +627,10 @@ function saveProduct() {
       tipo: cat === 'audifonos' ? $('f-tipo').value : '',
       dama: cat === 'fundas' && $('f-dama').checked ? 1 : 0,
       nuevo: cat === 'fundas' && $('f-nuevo').checked ? 1 : 0,
+      recomendado: $('f-recomendado').checked ? 1 : 0,
+      mat1: (MAT_ETIQUETAS[cat] || [])[0] ? $('f-mat1').value.trim() : '',
+      mat2: (MAT_ETIQUETAS[cat] || [])[1] ? $('f-mat2').value.trim() : '',
+      mat3: (MAT_ETIQUETAS[cat] || [])[2] ? $('f-mat3').value.trim() : '',
       visible: $('f-visible').checked ? 1 : 0
     };
     remotePost(payload).then(function (res) {
