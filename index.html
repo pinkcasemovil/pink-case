@@ -1241,6 +1241,9 @@
 .vp-barra{position:sticky;top:0;z-index:10;background:rgba(19,11,16,.96);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.1)}
 .vp-volver{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem .95rem;border-radius:9999px;background:#1a0f16;border:1px solid rgba(255,255,255,.18);color:#fff;font-family:Archivo,sans-serif;font-size:.875rem;font-weight:600;cursor:pointer;white-space:nowrap}
 .vp-volver:active{transform:translateY(1px)}
+/* Navegador anterior/siguiente del detalle: la flecha deshabilitada
+   (en los extremos del grupo) se atenúa; el resto son utilidades. */
+.nav-flecha:disabled{opacity:.35;cursor:default}
 @media (max-width:639px){
   .grupo-pie{flex-direction:column!important;align-items:stretch!important;gap:.5rem}
   .grupo-pie .grupo-ver{text-align:center}
@@ -2767,10 +2770,20 @@ HORARIOS DE ATENCIÓN
       return { tipo: "catalogo" };
     }
     let pmCode = null, pmZoom = false;
+    /* Navegador del detalle: lista del grupo que se está recorriendo (la
+       del visor si se vino de ahí, con su filtro; si no, el grupo
+       completo del producto). Se fija al abrir el detalle y se limpia
+       al cerrar las vistas. */
+    let navLista = null;
     function pmResetZoom() { pmZoom = false; const img = document.getElementById("pm-img"); if (img) { img.style.transform = ""; img.style.transformOrigin = "center center"; } const w = document.getElementById("pm-zoom-wrap"); if (w) { w.classList.add("cursor-zoom-in"); w.classList.remove("cursor-zoom-out"); } }
     function mostrarDetalle(code) {
       const p = byCode[code]; if (!p) return;
       pmCode = code;
+      /* Al abrir el detalle se fija la lista del navegador; al cambiar
+         de producto dentro del detalle (el modal ya está abierto) la
+         lista se conserva tal cual, salvo que el producto no esté en
+         ella (cambio de hash con el detalle abierto). */
+      if (document.getElementById("product-modal").classList.contains("hidden") || !navLista || !navLista.some(p => p.code === code)) navLista = listaNavegador(code);
       const imgs = (p.imgs && p.imgs.length) ? p.imgs : [p.img];
       const img = document.getElementById("pm-img"); img.src = imgs[0]; img.alt = p.name;
       const thumbs = document.getElementById("pm-thumbs");
@@ -2805,6 +2818,7 @@ HORARIOS DE ATENCIÓN
       const pp = document.querySelector("#product-modal .pm-panel"); if (pp) pp.scrollTop = 0;
       bloquearScroll();
       refreshCardButtons();
+      pintarNavegador();
     }
     function closeProduct() { volverVista(); }
     function pmSetImg(src, btn) { const img = document.getElementById("pm-img"); if (img) img.src = src; pmResetZoom(); document.querySelectorAll(".pm-thumb").forEach(b => b.classList.toggle("ring-2", b === btn)); }
@@ -2812,6 +2826,63 @@ HORARIOS DE ATENCIÓN
     function pmMoveZoom(ev) { if (!pmZoom || !ev || ev.clientX === undefined) return; const w = document.getElementById("pm-zoom-wrap"); const img = document.getElementById("pm-img"); if (!w || !img) return; const r = w.getBoundingClientRect(); const x = Math.min(100, Math.max(0, ((ev.clientX - r.left) / r.width) * 100)); const y = Math.min(100, Math.max(0, ((ev.clientY - r.top) / r.height) * 100)); img.style.transformOrigin = x + "% " + y + "%"; }
     document.addEventListener("keydown", e => { if (e.key === "Escape") { const cart = document.getElementById("cart-drawer"); if (cart && !cart.classList.contains("hidden")) return; closeProduct(); } });
 
+    /* ---------- Navegador anterior/siguiente en el detalle ---------- */
+    /* El grupo se deriva del producto mismo (fundas por sus modelos,
+       audífonos por su tipo); los sueltos (micas, baterías, servicios)
+       y los audífonos sin tipo no tienen grupo y no llevan navegador. */
+    function grupoDeProducto(p) {
+      if (p.cat === "fundas") return gruposDeFundas().find(g => g.productos.some(x => x.code === p.code)) || null;
+      if (p.cat === "audifonos") { const t = tipoAudifono(p); if (!t) return null; return gruposDeAudifonos().find(g => g.titulo === t) || null; }
+      return null;
+    }
+    /* Lista que recorre el navegador: si el detalle se abrió desde el
+       visor, la lista que el visor está enseñando (con el filtro activo
+       aplicado); si se abrió directo (hash, sugerencias), el grupo
+       completo del producto. */
+    function listaNavegador(code) {
+      const p = byCode[code]; if (!p) return null;
+      const v = document.getElementById("visor-modelo");
+      if (v && !v.classList.contains("hidden") && visorSlug && visorListaActual && visorListaActual.some(x => x.code === code)) return visorListaActual;
+      const g = grupoDeProducto(p);
+      return g ? g.productos : null;
+    }
+    /* Cambia de producto dentro del detalle, en su lugar: el contenido
+       se repinta con mostrarDetalle (foto con su zoom, nombre, línea,
+       precio, chips, origen) y el hash cambia con replaceState, no
+       pushState, así el atrás del navegador sigue sacando del detalle
+       en vez de ir producto por producto. */
+    function irAProductoEnDetalle(code) {
+      if (!byCode[code] || code === pmCode) return;
+      history.replaceState(null, "", "#producto=" + code);
+      mostrarDetalle(code);
+    }
+    function navIndice() { return navLista ? navLista.findIndex(p => p.code === pmCode) : -1; }
+    function navAnterior() { const i = navIndice(); if (i > 0) irAProductoEnDetalle(navLista[i - 1].code); }
+    function navSiguiente() { const i = navIndice(); if (i >= 0 && i < navLista.length - 1) irAProductoEnDetalle(navLista[i + 1].code); }
+    /* Tira de miniaturas + flechas debajo de la foto. Las miniaturas
+       reusan el patrón de #pm-thumbs (misma medida y mismo anillo rosa
+       en la actual) con otra clase: pmSetImg consulta .pm-thumb en
+       todo el documento y tocaría la marca. Sin grupo o con un solo
+       producto no se muestra nada. */
+    function pintarNavegador() {
+      const wrap = document.getElementById("pm-nav");
+      if (!wrap) return;
+      const lista = navLista;
+      if (!lista || lista.length < 2) { wrap.classList.add("hidden"); wrap.innerHTML = ""; return; }
+      const idx = lista.findIndex(p => p.code === pmCode);
+      const mini = (p, i) => `<button type="button" class="nav-mini shrink-0 w-16 h-16 rounded-xl overflow-hidden border border-pink-500/25 ${i === idx ? "ring-2 ring-pink-primary" : ""}" onclick="irAProductoEnDetalle('${p.code}')"${i === idx ? ' data-nav-actual="1"' : ""}><img class="w-full h-full object-cover" loading="lazy" alt="" src="${p.img}"/></button>`;
+      wrap.innerHTML = `<div class="flex items-center gap-2"><button type="button" class="nav-flecha shrink-0 w-11 h-11 rounded-full bg-surface-2 border border-white/10 text-white font-archivo text-lg font-semibold flex items-center justify-center" onclick="navAnterior()"${idx <= 0 ? " disabled" : ""} aria-label="Producto anterior">←</button><div class="flex-1 min-w-0 flex gap-2 overflow-x-auto pb-2 scrollbar-none">${lista.map(mini).join("")}</div><button type="button" class="nav-flecha shrink-0 w-11 h-11 rounded-full bg-surface-2 border border-white/10 text-white font-archivo text-lg font-semibold flex items-center justify-center" onclick="navSiguiente()"${idx < 0 || idx >= lista.length - 1 ? " disabled" : ""} aria-label="Producto siguiente">→</button></div>`;
+      wrap.classList.remove("hidden");
+      /* La miniatura actual queda visible (centrada en la tira) sin
+         mover el resto de la vista. */
+      const actual = wrap.querySelector("[data-nav-actual]");
+      if (actual) {
+        const pp = document.querySelector("#product-modal .pm-panel");
+        const st = pp ? pp.scrollTop : 0;
+        actual.scrollIntoView({ inline: "center", block: "nearest" });
+        if (pp) pp.scrollTop = st;
+      }
+    }
 
     /* ---------- Fundas agrupadas por modelo + audífonos por tipo + vista a pantalla completa ---------- */
     /* Agrupación: una tarjeta por modelo. Los modelos se toman del campo
@@ -3052,6 +3123,7 @@ HORARIOS DE ATENCIÓN
     }
     const FILTROS_VISOR = [["todos", "Todos"], ["transparente", "Transparente"], ["piel", "Tipo piel"], ["magsafe", "Con aro MagSafe"], ["dama", "Dama"], ["nuevos", "Nuevos"]];
     let visorSlug = null, visorFiltro = "todos";
+    let visorListaActual = null; /* lista que el visor está enseñando (con el filtro aplicado) */
     function pintarFiltrosVisor() {
       const g = grupoParaVisor(visorSlug); if (!g) return;
       const wrap = document.getElementById("visor-filtros");
@@ -3077,6 +3149,7 @@ HORARIOS DE ATENCIÓN
     function pintarVisor() {
       const g = grupoParaVisor(visorSlug); if (!g) return;
       const lista = visorFiltro === "todos" ? g.productos : g.productos.filter(p => etiquetasProducto(p).has(visorFiltro));
+      visorListaActual = lista;
       document.getElementById("visor-grid").innerHTML = lista.map(visorCardHTML).join("");
       /* El estado vacío cambia con el grupo: en fundas es por el filtro,
          en De cable es que todavía no hay audífonos de cable. */
@@ -3122,6 +3195,7 @@ HORARIOS DE ATENCIÓN
       return (m && !m.classList.contains("hidden")) || (v && !v.classList.contains("hidden"));
     }
     function cerrarVistas() {
+      navLista = null;
       const m = document.getElementById("product-modal");
       const v = document.getElementById("visor-modelo");
       if (m) m.classList.add("hidden");
@@ -3581,12 +3655,16 @@ HORARIOS DE ATENCIÓN
 </div>
 </div>
 <div class="grid md:grid-cols-2">
-<div class="p-4 sm:p-6">
+<!-- min-w-0: en teléfono la rejilla es de una columna implícita y sin
+     esto la tira del navegador ensancha la columna (y el panel se
+     desplaza de lado); en escritorio md:grid-cols-2 ya trae minmax(0,1fr). -->
+<div class="p-4 sm:p-6 min-w-0">
 <div class="relative w-full aspect-square rounded-2xl overflow-hidden bg-surface-3 cursor-zoom-in" id="pm-zoom-wrap" onclick="pmToggleZoom(event)" onmousemove="pmMoveZoom(event)">
 <img class="w-full h-full object-cover transition-transform duration-200" id="pm-img" alt=""/>
 <span class="absolute bottom-3 left-3 px-2.5 py-1 rounded-full bg-cyber-dark/85 backdrop-blur-md border border-pink-500/30 text-white font-archivo text-[11px] font-semibold pointer-events-none">Toca la foto para acercar</span>
 </div>
 <div class="hidden flex gap-2 mt-3" id="pm-thumbs"></div>
+<div class="hidden mt-3" id="pm-nav"></div>
 </div>
 <div class="p-4 sm:p-6 pt-0 md:pt-6 flex flex-col gap-3">
 <span class="font-archivo text-xs text-pink-primary font-bold uppercase tracking-wide" id="pm-cat"></span>
