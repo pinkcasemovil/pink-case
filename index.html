@@ -2704,6 +2704,51 @@ HORARIOS DE ATENCIÓN
     function clearSearch() { const input = document.getElementById("catalog-search"); if (input) input.value = ""; applySearch(); }
 
     /* ---------- Vista de producto: detalle con zoom y galería (lista para más fotos) ---------- */
+    /* Bloqueo de scroll seguro para iOS: al abrir una vista se guarda
+       la posición y el body se fija (position fixed + top negativo);
+       al cerrar la ÚLTIMA vista se restaura todo y se vuelve a la
+       posición guardada de forma instantánea. Solo overflow hidden no
+       basta: en iPhone la página salta arriba al abrir la vista. */
+    let scrollGuardado = null;
+    function bloquearScroll() {
+      if (scrollGuardado !== null) return; /* ya hay una vista abierta */
+      scrollGuardado = window.scrollY;
+      const b = document.body;
+      b.style.position = "fixed";
+      b.style.top = (-scrollGuardado) + "px";
+      b.style.width = "100%";
+      b.style.overflow = "hidden";
+    }
+    function desbloquearScroll() {
+      if (scrollGuardado === null) return;
+      const y = scrollGuardado;
+      scrollGuardado = null;
+      const b = document.body;
+      b.style.position = "";
+      b.style.top = "";
+      b.style.width = "";
+      b.style.overflow = "";
+      /* El CSS pone scroll-behavior: smooth !important en html,body:
+         hay que anularlo con !important en línea para que el regreso
+         sea instantáneo y no un desplazamiento suave. */
+      const raiz = document.documentElement;
+      raiz.style.setProperty("scroll-behavior", "auto", "important");
+      b.style.setProperty("scroll-behavior", "auto", "important");
+      window.scrollTo(0, y);
+      raiz.style.removeProperty("scroll-behavior");
+      b.style.removeProperty("scroll-behavior");
+    }
+    /* Origen de la vista: de dónde se vino al abrirla, para mostrarlo
+       en la vista y para que el botón Volver diga a dónde va. */
+    let origenDetalle = null; /* {tipo:"visor", titulo} | {tipo:"busqueda", texto} | {tipo:"catalogo"} */
+    let origenVisor = "catalogo"; /* "catalogo" | "busqueda" */
+    function origenDesdeCatalogo() {
+      if (activeCat === "buscar") {
+        const texto = (document.getElementById("catalog-search")?.value || "").trim();
+        if (texto) return { tipo: "busqueda", texto };
+      }
+      return { tipo: "catalogo" };
+    }
     let pmCode = null, pmZoom = false;
     function pmResetZoom() { pmZoom = false; const img = document.getElementById("pm-img"); if (img) { img.style.transform = ""; img.style.transformOrigin = "center center"; } const w = document.getElementById("pm-zoom-wrap"); if (w) { w.classList.add("cursor-zoom-in"); w.classList.remove("cursor-zoom-out"); } }
     function mostrarDetalle(code) {
@@ -2715,6 +2760,10 @@ HORARIOS DE ATENCIÓN
       thumbs.innerHTML = imgs.map((s, i) => `<button type="button" class="pm-thumb w-16 h-16 rounded-xl overflow-hidden border border-pink-500/25 ${i === 0 ? "ring-2 ring-pink-primary" : ""}" onclick="pmSetImg('${s}', this)"><img class="w-full h-full object-cover" loading="lazy" alt="" src="${s}"/></button>`).join("");
       thumbs.classList.toggle("hidden", imgs.length < 2);
       document.getElementById("pm-cat").textContent = p.catLabel;
+      /* Origen en la línea de la barra y destino en el botón Volver. */
+      const orgD = origenDetalle || { tipo: "catalogo" };
+      document.getElementById("pm-origen").textContent = orgD.tipo === "visor" ? "Fundas · " + orgD.titulo : orgD.tipo === "busqueda" ? "Búsqueda: " + orgD.texto : "Catálogo";
+      document.getElementById("pm-volver").textContent = orgD.tipo === "visor" ? "← Fundas para " + orgD.titulo : orgD.tipo === "busqueda" ? "← Búsqueda" : "← Catálogo";
       document.getElementById("pm-name").textContent = p.name;
       document.getElementById("pm-line").textContent = p.line || "";
       document.getElementById("pm-sub").textContent = p.sub || "";
@@ -2731,7 +2780,7 @@ HORARIOS DE ATENCIÓN
       pmResetZoom();
       document.getElementById("product-modal").classList.remove("hidden");
       const pp = document.querySelector("#product-modal .pm-panel"); if (pp) pp.scrollTop = 0;
-      document.body.style.overflow = "hidden";
+      bloquearScroll();
       refreshCardButtons();
     }
     function closeProduct() { volverVista(); }
@@ -2933,13 +2982,14 @@ HORARIOS DE ATENCIÓN
       const yaAbierto = !document.getElementById("visor-modelo").classList.contains("hidden");
       visorSlug = slug; visorFiltro = "todos";
       document.getElementById("visor-titulo").textContent = "Fundas para " + g.titulo;
+      document.getElementById("visor-volver").textContent = origenVisor === "busqueda" ? "← Búsqueda" : "← Catálogo";
       document.getElementById("visor-sub").textContent = g.productos.length + (g.productos.length === 1 ? " diseño" : " diseños") + " · desde " + money(g.desde);
       pintarFiltrosVisor();
       pintarVisor();
       const v = document.getElementById("visor-modelo");
       v.classList.remove("hidden");
       if (!yaAbierto) v.scrollTop = 0;
-      document.body.style.overflow = "hidden";
+      bloquearScroll();
     }
 
     /* Navegación con hash: el botón atrás del navegador cierra la vista.
@@ -2956,7 +3006,7 @@ HORARIOS DE ATENCIÓN
       const v = document.getElementById("visor-modelo");
       if (m) m.classList.add("hidden");
       if (v) v.classList.add("hidden");
-      document.body.style.overflow = "";
+      desbloquearScroll();
       pmResetZoom();
     }
     function volverVista() {
@@ -2980,11 +3030,21 @@ HORARIOS DE ATENCIÓN
       }
     }
     function irAModelo(slug) {
+      origenVisor = (activeCat === "buscar" && (document.getElementById("catalog-search")?.value || "").trim()) ? "busqueda" : "catalogo";
       if (location.hash === "#modelo=" + slug) mostrarVisor(slug);
       else { navegoInterno = true; location.hash = "modelo=" + slug; }
     }
     function openProduct(code) {
       if (!byCode[code]) return;
+      /* Origen del detalle: si el visor está abierto se vino de ahí;
+         si no, del catálogo o de la búsqueda. */
+      const vAbierto = document.getElementById("visor-modelo");
+      if (vAbierto && !vAbierto.classList.contains("hidden") && visorSlug) {
+        const gOrigen = grupoParaVisor(visorSlug);
+        origenDetalle = { tipo: "visor", titulo: gOrigen ? gOrigen.titulo : "" };
+      } else {
+        origenDetalle = origenDesdeCatalogo();
+      }
       if (location.hash === "#producto=" + code) mostrarDetalle(code);
       else { navegoInterno = true; location.hash = "producto=" + code; }
     }
@@ -3373,8 +3433,8 @@ HORARIOS DE ATENCIÓN
 <div class="pm-panel absolute inset-x-0 bottom-0 top-10 sm:inset-6 lg:inset-y-10 lg:left-1/2 lg:-translate-x-1/2 lg:w-[880px] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-surface-1 border border-pink-500/25 shadow-2xl">
 <div class="vp-barra">
 <div class="max-w-[1080px] mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
-<button class="vp-volver" onclick="volverVista()" type="button">← Volver</button>
-<span class="font-archivo text-xs text-text-muted">Detalle del producto</span>
+<button class="vp-volver" id="pm-volver" onclick="volverVista()" type="button">← Volver</button>
+<span class="font-archivo text-xs text-text-muted" id="pm-origen">Catálogo</span>
 </div>
 </div>
 <div class="grid md:grid-cols-2">
@@ -3412,7 +3472,7 @@ HORARIOS DE ATENCIÓN
 <div class="hidden fixed inset-0 bg-cyber-dark overflow-y-auto" id="visor-modelo" style="z-index:55" role="dialog" aria-modal="true">
 <div class="vp-barra">
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-3">
-<button class="vp-volver" onclick="volverVista()" type="button">← Volver</button>
+<button class="vp-volver" id="visor-volver" onclick="volverVista()" type="button">← Volver</button>
 <div>
 <h2 class="font-unbounded text-base sm:text-xl font-bold text-white leading-tight" id="visor-titulo"></h2>
 <p class="font-archivo text-xs text-text-muted" id="visor-sub"></p>
