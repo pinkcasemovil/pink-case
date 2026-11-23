@@ -217,6 +217,32 @@
         <label for="f-modelos">Modelos compatibles (separados por comas)</label>
         <input id="f-modelos" type="text" placeholder="Ej. Galaxy A36, Galaxy A35"/>
       </div>
+      <div class="grid2" id="row-material-tipo">
+        <div class="field" id="field-material">
+          <label for="f-material">Material (fundas)</label>
+          <select id="f-material">
+            <option value="">Sin material</option>
+            <option value="Transparente">Transparente</option>
+            <option value="Tipo piel">Tipo piel</option>
+            <option value="Mate">Mate</option>
+            <option value="Espejo">Espejo</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+        <div class="field" id="field-tipo">
+          <label for="f-tipo">Tipo (audífonos)</label>
+          <select id="f-tipo">
+            <option value="">Sin tipo</option>
+            <option value="Diadema">Diadema</option>
+            <option value="Inalámbricos">Inalámbricos</option>
+            <option value="De cable">De cable</option>
+          </select>
+        </div>
+      </div>
+      <div id="row-dama-nuevo">
+        <label class="check-row"><input id="f-dama" type="checkbox"/> Diseño para dama</label>
+        <label class="check-row"><input id="f-nuevo" type="checkbox"/> Producto nuevo</label>
+      </div>
       <label class="check-row"><input id="f-visible" type="checkbox" checked/> Visible en la tienda</label>
       <p class="error" id="editor-error"></p>
       <div class="form-actions">
@@ -388,7 +414,7 @@ function imgUrl(u) {
 function toggleVisible(code) {
   var p = productos.filter(function (x) { return x.code === code; })[0];
   if (!p) return;
-  var payload = { action: 'guardarProducto', token: token(), code: p.code, name: p.name, line: p.line || '', sub: p.sub || '', cat: p.cat, brand: p.brand || '', model: p.model || '', modelos: (p.modelos || []).join(','), price: p.price, img: p.img, visible: p.visible ? 0 : 1 };
+  var payload = { action: 'guardarProducto', token: token(), code: p.code, name: p.name, line: p.line || '', sub: p.sub || '', cat: p.cat, brand: p.brand || '', model: p.model || '', modelos: (p.modelos || []).join(','), price: p.price, img: p.img, material: p.material || '', tipo: p.tipo || '', dama: Number(p.dama) ? 1 : 0, nuevo: Number(p.nuevo) ? 1 : 0, visible: p.visible ? 0 : 1 };
   remotePost(payload).then(function (res) {
     if (!res || !res.ok) { toast(errText(res && res.error ? res.error : 'sin_respuesta'), true); return; }
     p.visible = !p.visible;
@@ -425,7 +451,7 @@ function openEditor(code) {
     $('editor-code').textContent = 'El código se genera solo del nombre al guardar.';
     $('f-name').value = ''; $('f-line').value = ''; $('f-sub').value = '';
     $('f-cat').value = 'fundas'; $('f-price').value = ''; $('f-brand').value = '';
-    $('f-model').value = ''; $('f-modelos').value = ''; $('f-visible').checked = true;
+    $('f-model').value = ''; $('f-modelos').value = ''; $('f-material').value = ''; $('f-tipo').value = ''; $('f-dama').checked = false; $('f-nuevo').checked = false; $('f-visible').checked = true;
     currentImg = '';
     $('photo-preview').src = '';
     $('btn-delete').classList.add('hidden');
@@ -436,13 +462,23 @@ function openEditor(code) {
     $('editor-code').textContent = 'Código: ' + p.code;
     $('f-name').value = p.name; $('f-line').value = p.line || ''; $('f-sub').value = p.sub || '';
     $('f-cat').value = p.cat; $('f-price').value = p.price; $('f-brand').value = p.brand || '';
-    $('f-model').value = p.model || ''; $('f-modelos').value = (p.modelos || []).join(', ');
+    $('f-model').value = p.model || ''; $('f-modelos').value = (p.modelos || []).join(', '); $('f-material').value = p.material || ''; $('f-tipo').value = p.tipo || ''; $('f-dama').checked = !!Number(p.dama); $('f-nuevo').checked = !!Number(p.nuevo);
     $('f-visible').checked = !!p.visible;
     currentImg = p.img || '';
     $('photo-preview').src = imgUrl(currentImg);
     $('btn-delete').classList.remove('hidden');
   }
+  updateFilterFields();
   show('view-editor');
+}
+
+/* Los campos de filtros solo se muestran en su categoría: material, dama y
+   nuevo en fundas; tipo en audífonos. */
+function updateFilterFields() {
+  var cat = $('f-cat').value;
+  $('field-material').classList.toggle('hidden', cat !== 'fundas');
+  $('row-dama-nuevo').classList.toggle('hidden', cat !== 'fundas');
+  $('field-tipo').classList.toggle('hidden', cat !== 'audifonos');
 }
 
 /* ---------- Recorte de foto ----------
@@ -545,6 +581,7 @@ $('photo-input').addEventListener('change', function () {
 function saveProduct() {
   var name = $('f-name').value.trim();
   var price = parseInt($('f-price').value, 10);
+  var cat = $('f-cat').value;
   $('editor-error').textContent = '';
   if (name.length < 2) { $('editor-error').textContent = 'Escribe el nombre del producto.'; return; }
   if (!(price >= 1 && price <= 99999)) { $('editor-error').textContent = 'El precio debe ser un número entero entre 1 y 99999.'; return; }
@@ -557,8 +594,12 @@ function saveProduct() {
     var payload = {
       action: 'guardarProducto', token: token(), code: code,
       name: name, line: $('f-line').value.trim(), sub: $('f-sub').value.trim(),
-      cat: $('f-cat').value, brand: $('f-brand').value.trim(), model: $('f-model').value.trim(),
+      cat: cat, brand: $('f-brand').value.trim(), model: $('f-model').value.trim(),
       modelos: $('f-modelos').value.trim(), price: price, img: imgUrl,
+      material: cat === 'fundas' ? $('f-material').value : '',
+      tipo: cat === 'audifonos' ? $('f-tipo').value : '',
+      dama: cat === 'fundas' && $('f-dama').checked ? 1 : 0,
+      nuevo: cat === 'fundas' && $('f-nuevo').checked ? 1 : 0,
       visible: $('f-visible').checked ? 1 : 0
     };
     remotePost(payload).then(function (res) {
@@ -631,6 +672,7 @@ $('filter-cat').addEventListener('change', renderList);
 $('btn-back-list').addEventListener('click', function () { show('view-main'); });
 $('btn-cancel').addEventListener('click', function () { show('view-main'); });
 $('btn-save').addEventListener('click', saveProduct);
+$('f-cat').addEventListener('change', updateFilterFields);
 $('btn-delete').addEventListener('click', deleteProduct);
 $('crop-view').addEventListener('pointerdown', function (e) {
   if (!cropImg) return;
