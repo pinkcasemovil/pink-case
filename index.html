@@ -2888,7 +2888,7 @@ HORARIOS DE ATENCIÓN
       mw.classList.toggle("hidden", chips.length === 0);
       const addBtn = document.getElementById("pm-add"); addBtn.dataset.code = code;
       const prodLink = location.origin + location.pathname + "#producto=" + p.code;
-      document.getElementById("pm-wa").href = "https://wa.me/527122345562?text=" + encodeURIComponent("Hola, me interesa este producto: " + p.name + " (" + money(p.price) + "). ¿Sigue disponible?\nVer el producto: " + prodLink);
+      document.getElementById("pm-wa").href = "https://wa.me/527122345562?text=" + encodeURIComponent("Hola, ¿tienen este producto? " + p.name + " (" + money(p.price) + "). ¡Gracias!\n" + prodLink);
       pmResetZoom();
       document.getElementById("product-modal").classList.remove("hidden");
       colapsarEncabezado();
