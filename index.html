@@ -3742,11 +3742,17 @@ HORARIOS DE ATENCIÓN
 
     function sendWhatsAppInquiry() {
       if (inquiryItems.length === 0) { alert("Por favor añade al menos un producto a tu lista para consultar existencias."); return; }
-      const model = document.getElementById("model-input")?.value || "No especificado";
+      /* El folio se genera aquí aunque ya no se muestre en el mensaje:
+         va dentro de la liga de la lista. */
+      if (!folio) folio = newFolio();
       let total = 0;
-      let message = "¡Hola Pink Case! Quiero consultar disponibilidad en Ixtlahuaca Centro de estos artículos:\n\n";
-      message += `• Mi equipo: ${currentBrand} · ${model}\n`;
-      message += `• Folio: ${folio || newFolio()}\n\nMi lista:\n`;
+      let message = "Hola Pink Case, ¿tienen estos artículos?\n\n";
+      /* «Mi equipo» solo si el cliente eligió marca o modelo, y solo
+         con las partes que existen. */
+      const marca = (currentBrand || "").trim();
+      const modelo = (document.getElementById("model-input")?.value || "").trim();
+      const equipo = [marca, modelo].filter(Boolean).join(" · ");
+      if (equipo) message += `• Mi equipo: ${equipo}\n\n`;
       let n = 0;
       inquiryItems.forEach((item) => {
         const p = byCode[item.code];
@@ -3754,11 +3760,11 @@ HORARIOS DE ATENCIÓN
         const sub = p.price * item.qty;
         total += sub;
         n += 1;
-        message += `${n}. ${p.name} (${p.line}) x${item.qty} — ${money(sub)}\n`;
+        message += `${n}. ${p.name} x${item.qty} — ${money(sub)}\n`;
       });
-      message += `\n★ Total informativo: ${money(total)} MXN\n`;
-      message += `Liga de mi lista: ${location.origin + location.pathname + shareHash()}\n`;
-      message += "¿Los tienen en existencia para pasar a la tienda? ¡Gracias!";
+      message += `\nTotal estimado: ${money(total)} MXN\n`;
+      message += `Mi lista: ${location.origin + location.pathname + shareHash()}\n`;
+      message += "¡Gracias!";
       /* Se abre con un enlace real (<a target="_blank">), como el botón
          del detalle: en navegadores de teléfono y en vistas dentro de
          otras apps, window.open se bloquea en silencio con facilidad. */
