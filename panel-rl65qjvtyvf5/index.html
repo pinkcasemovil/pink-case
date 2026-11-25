@@ -207,6 +207,16 @@
           <input id="f-price" type="number" min="1" max="99999" step="1" inputmode="numeric" placeholder="150"/>
         </div>
       </div>
+      <div class="grid2" id="row-descuento">
+        <div class="field">
+          <label for="f-anterior">Precio anterior (MXN)</label>
+          <input id="f-anterior" type="number" min="0" max="99999" step="1" inputmode="numeric" placeholder="Vacío = automático"/>
+        </div>
+        <div class="field">
+          <label class="check-row" style="margin-top:24px"><input id="f-rebaja" type="checkbox" checked/> Mostrar en rebaja</label>
+        </div>
+      </div>
+      <p class="hint">Si el precio anterior queda vacío, la tienda calcula el precio anterior sola. Con 0 no se muestra descuento. Sin la marca, el producto no se muestra en rebaja.</p>
       <div class="field">
         <label for="f-line">Línea (se muestra en rosa bajo la foto)</label>
         <input id="f-line" type="text" maxlength="120" placeholder="Ej. Para Samsung Galaxy A36"/>
@@ -262,16 +272,22 @@
       </div>
       <label class="check-row"><input id="f-recomendado" type="checkbox"/> Recomendado en «Te puede interesar»</label>
       <div id="row-materiales">
-        <p class="hint" style="margin-top:18px">Textos de «Construcción y materiales» en la ficha del producto. Si un campo queda vacío, la tienda muestra el texto automático.</p>
+        <p class="hint" style="margin-top:18px">Títulos y textos de «Construcción y materiales» en la ficha del producto. Si un campo queda vacío, la tienda muestra el automático.</p>
         <div class="field" id="field-mat1">
+          <label for="f-tit1">Título del bloque 1</label>
+          <input id="f-tit1" type="text" maxlength="40" placeholder="Fijación"/>
           <label for="f-mat1" id="lbl-mat1">Bloque 1</label>
           <textarea id="f-mat1" maxlength="500" placeholder="Texto del bloque 1"></textarea>
         </div>
         <div class="field" id="field-mat2">
+          <label for="f-tit2">Título del bloque 2</label>
+          <input id="f-tit2" type="text" maxlength="40" placeholder="Textura"/>
           <label for="f-mat2" id="lbl-mat2">Bloque 2</label>
           <textarea id="f-mat2" maxlength="500" placeholder="Texto del bloque 2"></textarea>
         </div>
         <div class="field" id="field-mat3">
+          <label for="f-tit3">Título del bloque 3</label>
+          <input id="f-tit3" type="text" maxlength="40" placeholder="Cámara"/>
           <label for="f-mat3" id="lbl-mat3">Bloque 3</label>
           <textarea id="f-mat3" maxlength="500" placeholder="Texto del bloque 3"></textarea>
         </div>
@@ -480,7 +496,7 @@ function imgUrl(u) {
 function toggleVisible(code) {
   var p = productos.filter(function (x) { return x.code === code; })[0];
   if (!p) return;
-  var payload = { action: 'guardarProducto', token: token(), code: p.code, name: p.name, line: p.line || '', sub: p.sub || '', cat: p.cat, brand: p.brand || '', model: p.model || '', modelos: (p.modelos || []).join(','), price: p.price, img: p.img, material: p.material || '', tipo: p.tipo || '', dama: Number(p.dama) ? 1 : 0, nuevo: Number(p.nuevo) ? 1 : 0, recomendado: Number(p.recomendado) ? 1 : 0, mat1: p.mat1 || '', mat2: p.mat2 || '', mat3: p.mat3 || '', caballero: Number(p.caballero) ? 1 : 0, compat: p.compat || '', visible: p.visible ? 0 : 1 };
+  var payload = { action: 'guardarProducto', token: token(), code: p.code, name: p.name, line: p.line || '', sub: p.sub || '', cat: p.cat, brand: p.brand || '', model: p.model || '', modelos: (p.modelos || []).join(','), price: p.price, img: p.img, material: p.material || '', tipo: p.tipo || '', dama: Number(p.dama) ? 1 : 0, nuevo: Number(p.nuevo) ? 1 : 0, recomendado: Number(p.recomendado) ? 1 : 0, mat1: p.mat1 || '', mat2: p.mat2 || '', mat3: p.mat3 || '', caballero: Number(p.caballero) ? 1 : 0, compat: p.compat || '', anterior: (p.anterior === '' || p.anterior == null) ? '' : Number(p.anterior), rebaja: Number(p.rebaja) ? 1 : ((p.rebaja === '' || p.rebaja == null) ? '' : 0), tit1: p.tit1 || '', tit2: p.tit2 || '', tit3: p.tit3 || '', visible: p.visible ? 0 : 1 };
   remotePost(payload).then(function (res) {
     if (!res || !res.ok) { toast(errText(res && res.error ? res.error : 'sin_respuesta'), true); return; }
     p.visible = !p.visible;
@@ -517,7 +533,7 @@ function openEditor(code) {
     $('editor-code').textContent = 'El código se genera solo del nombre al guardar.';
     $('f-name').value = ''; $('f-line').value = ''; $('f-sub').value = '';
     $('f-cat').value = 'fundas'; $('f-price').value = ''; $('f-brand').value = '';
-    $('f-model').value = ''; $('f-modelos').value = ''; $('f-material').value = ''; $('f-tipo').value = ''; $('f-dama').checked = false; $('f-nuevo').checked = false; $('f-caballero').checked = false; $('f-recomendado').checked = false; $('f-mat1').value = ''; $('f-mat2').value = ''; $('f-mat3').value = ''; $('f-compat').value = ''; $('f-visible').checked = true;
+    $('f-model').value = ''; $('f-modelos').value = ''; $('f-material').value = ''; $('f-tipo').value = ''; $('f-dama').checked = false; $('f-nuevo').checked = false; $('f-caballero').checked = false; $('f-recomendado').checked = false; $('f-mat1').value = ''; $('f-mat2').value = ''; $('f-mat3').value = ''; $('f-compat').value = ''; $('f-anterior').value = ''; $('f-rebaja').checked = true; $('f-tit1').value = ''; $('f-tit2').value = ''; $('f-tit3').value = ''; $('f-visible').checked = true;
     currentImg = '';
     $('photo-preview').src = '';
     $('btn-delete').classList.add('hidden');
@@ -528,7 +544,7 @@ function openEditor(code) {
     $('editor-code').textContent = 'Código: ' + p.code;
     $('f-name').value = p.name; $('f-line').value = p.line || ''; $('f-sub').value = p.sub || '';
     $('f-cat').value = p.cat; $('f-price').value = p.price; $('f-brand').value = p.brand || '';
-    $('f-model').value = p.model || ''; $('f-modelos').value = (p.modelos || []).join(', '); $('f-material').value = p.material || ''; $('f-tipo').value = p.tipo || ''; $('f-dama').checked = !!Number(p.dama); $('f-nuevo').checked = !!Number(p.nuevo); $('f-caballero').checked = !!Number(p.caballero); $('f-recomendado').checked = !!Number(p.recomendado); $('f-mat1').value = p.mat1 || ''; $('f-mat2').value = p.mat2 || ''; $('f-mat3').value = p.mat3 || ''; $('f-compat').value = p.compat || '';
+    $('f-model').value = p.model || ''; $('f-modelos').value = (p.modelos || []).join(', '); $('f-material').value = p.material || ''; $('f-tipo').value = p.tipo || ''; $('f-dama').checked = !!Number(p.dama); $('f-nuevo').checked = !!Number(p.nuevo); $('f-caballero').checked = !!Number(p.caballero); $('f-recomendado').checked = !!Number(p.recomendado); $('f-mat1').value = p.mat1 || ''; $('f-mat2').value = p.mat2 || ''; $('f-mat3').value = p.mat3 || ''; $('f-compat').value = p.compat || ''; $('f-anterior').value = (p.anterior === '' || p.anterior == null) ? '' : p.anterior; $('f-rebaja').checked = !(p.rebaja === 0 || p.rebaja === '0'); $('f-tit1').value = p.tit1 || ''; $('f-tit2').value = p.tit2 || ''; $('f-tit3').value = p.tit3 || '';
     $('f-visible').checked = !!p.visible;
     currentImg = p.img || '';
     $('photo-preview').src = imgUrl(currentImg);
@@ -540,7 +556,7 @@ function openEditor(code) {
 
 /* Los campos de filtros solo se muestran en su categoría: material, dama,
    nuevo y caballero en fundas; tipo en audífonos; compat en micas. Los
-   textos de materiales también:
+   textos de materiales también (con su título arriba de cada texto):
    cada bloque lleva su etiqueta según la categoría (servicios no tiene
    sección y baterías solo tiene 2 bloques). */
 var MAT_ETIQUETAS = { fundas: ['Fijación', 'Textura', 'Cámara'], micas: ['Protección', 'Instalación', 'Cambio'], audifonos: ['Bluetooth', 'Modelo', 'Batería'], baterias: ['Capacidad', 'Cables', ''], servicios: ['', '', ''] };
@@ -557,6 +573,9 @@ function updateFilterFields() {
   $('field-mat1').classList.toggle('hidden', !etq[0]);
   $('field-mat2').classList.toggle('hidden', !etq[1]);
   $('field-mat3').classList.toggle('hidden', !etq[2]);
+  $('f-tit1').placeholder = etq[0] || 'Título del bloque 1';
+  $('f-tit2').placeholder = etq[1] || 'Título del bloque 2';
+  $('f-tit3').placeholder = etq[2] || 'Título del bloque 3';
   $('row-materiales').classList.toggle('hidden', !etq[0] && !etq[1] && !etq[2]);
 }
 
@@ -664,6 +683,9 @@ function saveProduct() {
   $('editor-error').textContent = '';
   if (name.length < 2) { $('editor-error').textContent = 'Escribe el nombre del producto.'; return; }
   if (!(price >= 1 && price <= 99999)) { $('editor-error').textContent = 'El precio debe ser un número entero entre 1 y 99999.'; return; }
+  var antRaw = $('f-anterior').value.trim();
+  var antNum = antRaw === '' ? '' : parseInt(antRaw, 10);
+  if (antRaw !== '' && !(antNum === 0 || (antNum >= 1 && antNum <= 99999 && antNum > price))) { $('editor-error').textContent = 'El precio anterior debe ser 0 o mayor que el precio.'; return; }
   if (!editingCode && !newPhotoData) { $('editor-error').textContent = 'Elige una foto para el producto nuevo.'; return; }
   var code = editingCode || nextCode(name);
   var btn = $('btn-save');
@@ -685,6 +707,11 @@ function saveProduct() {
       mat1: (MAT_ETIQUETAS[cat] || [])[0] ? $('f-mat1').value.trim() : '',
       mat2: (MAT_ETIQUETAS[cat] || [])[1] ? $('f-mat2').value.trim() : '',
       mat3: (MAT_ETIQUETAS[cat] || [])[2] ? $('f-mat3').value.trim() : '',
+      anterior: antNum,
+      rebaja: $('f-rebaja').checked ? 1 : 0,
+      tit1: (MAT_ETIQUETAS[cat] || [])[0] ? $('f-tit1').value.trim() : '',
+      tit2: (MAT_ETIQUETAS[cat] || [])[1] ? $('f-tit2').value.trim() : '',
+      tit3: (MAT_ETIQUETAS[cat] || [])[2] ? $('f-tit3').value.trim() : '',
       visible: $('f-visible').checked ? 1 : 0
     };
     remotePost(payload).then(function (res) {
