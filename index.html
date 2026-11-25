@@ -1198,6 +1198,21 @@
 /* Pin del visor a la derecha también cuando baja de línea en teléfono. */
 #visor-modelo .tc-ubicacion{margin-left:auto}
 </style>
+<style id="tc-cargando">
+/* Esqueleto de carga del catálogo (2026-11-25, pedido por Axel): copia la
+   geometría de .tc-card para que el cambio a las tarjetas reales no mueva
+   el diseño. En teléfono solo se ven 4 tarjetas. */
+.tc-carga-linea{display:block;height:.75rem;border-radius:9999px;background:rgba(255,255,255,.08)}
+.tc-carga-titulo{height:1.125rem;margin:0}
+.tc-carga-brillo{position:relative;overflow:hidden}
+.tc-carga-brillo:after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.07) 50%,transparent 80%);animation:tc-carga-brillo 1.4s infinite}
+@keyframes tc-carga-brillo{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.tc-carga-rueda{width:1rem;height:1rem;flex:none;border-radius:9999px;border:2px solid rgba(232,67,147,.25);border-top-color:#E84393;animation:tc-giro .8s linear infinite}
+@keyframes tc-giro{to{transform:rotate(360deg)}}
+.tc-carga-pildora{display:block;flex:none;height:2.125rem;width:6rem;border-radius:.75rem;background:rgba(255,255,255,.07)}
+@media (max-width:639px){.tc-carga-tarjeta:nth-child(n+6){display:none}}
+@media (prefers-reduced-motion:reduce){.tc-carga-brillo:after,.tc-carga-rueda{animation:none}}
+</style>
 
 
 <style id="titulo-ciclo">
@@ -2801,14 +2816,25 @@ HORARIOS DE ATENCIÓN
     // con los embebidos: la tienda nunca se queda sin catálogo.
     const BRIDGE_URL = 'https://script.google.com/macros/s/AKfycbxaLju4YnKKt5C55CTo4B4N01A0WacpsdVKw_QcWmu0D7GJjqYxNud2NaihwrVeDUjInw/exec';
     let catalogoActualizado = false;
+    /* Tope de espera del puente en el primer pintado (opción B, 2026-11-25):
+       la tienda espera como máximo esto a que el puente responda; si no
+       llega, pinta los embebidos y el refresco corrige al llegar. Axel
+       la tienda espera al puente antes de pintar (opción B, 2026-11-25).
+       Regla pedida por Axel: NADA de destello que luego corrija. El tope
+       es solo una red de seguridad; en la práctica manda el aborto del
+       fetch (8 s): si el puente no responde en 8 s, se pinta el respaldo
+       embebido una sola vez y no se vuelve a intentar hasta recargar. */
+    const ESPERA_PUENTE_MS = 10000;
+    /* Si el catálogo ya se pintó una vez (por el puente o por el respaldo). */
+    let catalogoPintado = false;
     /* Texto del carrito vacío (cadena C): el embebido es el respaldo;
        el puente (acción ajustes) lo actualiza si trae texto. */
     let textoCarritoVacio = "Aprovecha los mega descuentos y agrega tus accesorios favoritos";
     function refrescarCatalogo() {
-      if (catalogoActualizado) return;
+      if (catalogoActualizado) return Promise.resolve(true);
       const ctrl = (typeof AbortController === 'function') ? new AbortController() : null;
-      const timer = ctrl ? setTimeout(() => { try { ctrl.abort(); } catch (e) {} }, 4000) : null;
-      fetch(BRIDGE_URL + '?action=productos', ctrl ? { signal: ctrl.signal } : {})
+      const timer = ctrl ? setTimeout(() => { try { ctrl.abort(); } catch (e) {} }, 8000) : null;
+      return fetch(BRIDGE_URL + '?action=productos', ctrl ? { signal: ctrl.signal } : {})
         .then(r => { if (timer) clearTimeout(timer); if (!r.ok) throw new Error('http'); return r.json(); })
         .then(res => {
           if (!res || !res.ok || !Array.isArray(res.productos)) return;
@@ -2821,9 +2847,13 @@ HORARIOS DE ATENCIÓN
           // siempre parecería distinta y el catálogo se repintaría en
           // cada visita.
           const canon = l => JSON.stringify(l.map(p => { const c = {}; for (const k in p) { const v = p[k]; if (v === '' || (Array.isArray(v) && !v.length)) continue; c[k] = v; } return c; }));
-          if (canon(lista) === canon(PRODUCTS)) { catalogoActualizado = true; return; }
+          if (canon(lista) === canon(PRODUCTS)) { catalogoActualizado = true; return true; }
           catalogoActualizado = true;
           setProducts(lista);
+          /* En el primer pintado startApp pinta una sola vez al terminar
+             la espera: aquí solo se actualiza PRODUCTS. Si el catálogo
+             ya estaba pintado (el puente llegó tarde), sí se repinta. */
+          if (!catalogoPintado) return true;
           renderFilters();
           if (activeCat === 'buscar') applySearch();
           else renderGrid(activeCat === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.cat === activeCat));
@@ -2844,8 +2874,9 @@ HORARIOS DE ATENCIÓN
             else cerrarVistas();
           }
           if (detalleAbierto && pmCode && !byCode[pmCode]) cerrarVistas();
+          return true;
         })
-        .catch(() => { if (timer) clearTimeout(timer); /* sin puente: quedan los embebidos */ });
+        .catch(() => { if (timer) clearTimeout(timer); return false; /* sin puente: quedan los embebidos */ });
     }
     /* Texto del carrito vacío desde el puente (cadena C). Si el puente
        falla o trae el texto vacío, se queda el embebido de arriba. */
@@ -4418,14 +4449,27 @@ HORARIOS DE ATENCIÓN
           .then(datosListos)
           .catch(() => { if (gridEl) gridEl.innerHTML = '<p class="col-span-full text-center font-archivo text-sm text-text-muted py-10">No se pudo cargar el catálogo. Revisa tu conexión y recarga la página.</p>'; });
       }
-      function startApp() {
+      async function startApp() {
         const fromShared = loadFromHash();
+        /* Opción B (2026-11-25, pedida por Axel): el catálogo no se
+           pinta con los embebidos hasta saber lo que dice el puente.
+           Se espera su respuesta con un tope de ESPERA_PUENTE_MS; si
+           no llega, se pinta el respaldo embebido y el refresco de
+           fondo lo corrige al llegar (con la corrección del visor).
+           Así no hay destello en ningún sentido: lo primero que se
+           pinta es lo que dice el puente. */
+        const gridEl = document.getElementById("product-grid");
+        const tarjetaCarga = '<article class="tc-card tc-carga-tarjeta" aria-hidden="true"><div class="tc-card-foto tc-carga-brillo"></div><div class="tc-card-cuerpo"><div><div class="tc-card-fila"><span class="tc-carga-linea" style="width:34%"></span><span class="tc-carga-linea" style="width:26%"></span></div><h3 class="tc-carga-linea tc-carga-titulo" style="width:62%"></h3></div><div class="tc-card-precio"><div class="tc-carga-linea" style="width:48%"></div><div class="tc-carga-linea" style="width:70%"></div></div></div></article>';
+        if (gridEl) gridEl.innerHTML = '<p class="col-span-full flex items-center justify-center gap-3 font-archivo text-sm text-text-muted py-6"><span class="tc-carga-rueda" aria-hidden="true"></span>Cargando el catálogo…</p>' + Array(8).fill(tarjetaCarga).join("");
+        const filtrosEl = document.getElementById("catalog-filters");
+        if (filtrosEl) filtrosEl.innerHTML = Array(5).fill('<span class="tc-carga-pildora" aria-hidden="true"></span>').join("");
+        await Promise.race([refrescarCatalogo(), new Promise(r => setTimeout(() => r(false), ESPERA_PUENTE_MS))]);
         renderFilters();
         renderGrid(PRODUCTS);
+        catalogoPintado = true;
         renderInquiry();
         aplicarHash();
         if (fromShared) setTimeout(openCart, 450);
-        refrescarCatalogo();
         refrescarAjustes();
       }
     });
