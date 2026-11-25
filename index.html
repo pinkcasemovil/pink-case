@@ -1408,6 +1408,15 @@
 .tc-selector-boton.activo{color:#fff}
 .tc-selector-boton span{position:relative;z-index:10}
 .tc-selector-pill{position:absolute;top:.25rem;bottom:.25rem;border-radius:.5rem;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);transition:left .25s ease,width .25s ease;z-index:0}
+.tc-mica-wrap{margin-top:1.75rem}
+.tc-mica-etq{display:block;font-size:.75rem;font-weight:500;color:#D8CEDF}
+.tc-mica-input{margin-top:.5rem;width:100%;border-radius:.5rem;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);padding:.5rem .75rem;font-size:.875rem;color:#E5DEE9;outline:none}
+.tc-mica-input::placeholder{color:#7D7388}
+.tc-mica-input:focus{border-color:rgba(232,67,147,.6)}
+.tc-mica-input:disabled{opacity:.45}
+.tc-mica-ayuda{margin-top:.625rem;display:flex;align-items:flex-start;gap:.5rem;font-size:.75rem;line-height:1.5;color:#D8CEDF;cursor:pointer}
+.tc-mica-ayuda input{margin-top:.125rem;accent-color:#E84393}
+.tc-mica-nota{margin-top:.625rem;font-size:.75rem;line-height:1.5;color:#A99FB2}
 .tc-nota-combo{margin-top:1.5rem;display:flex;align-items:center;gap:.625rem;font-size:.75rem;color:#D8CEDF;line-height:1.5}
 .tc-nota-combo svg{height:.875rem;width:.875rem;flex-shrink:0;color:#F472B6}
 .tc-nota-combo strong{color:#fff}
@@ -1491,6 +1500,8 @@
 .tc-stepper{display:inline-flex;align-items:center;border-radius:.5rem;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04)}
 .tc-stepper button{display:inline-flex;height:2rem;width:2rem;align-items:center;justify-content:center;color:#D8CEDF;background:none;border:none;cursor:pointer}
 .tc-stepper button:hover{color:#fff}
+.tc-stepper button:disabled{opacity:.35;cursor:not-allowed}
+.tc-stepper button:disabled:hover{color:#D8CEDF}
 .tc-stepper button svg{height:.75rem;width:.75rem}
 .tc-stepper .cant{width:1.75rem;text-align:center;font-family:'JetBrains Mono',monospace;font-size:.75rem;font-variant-numeric:tabular-nums;color:#fff}
 .tc-fila-precio{text-align:right}
@@ -3216,8 +3227,26 @@ HORARIOS DE ATENCIÓN
       } else {
         wrapSel.classList.add("hidden");
       }
-      /* Botón Agregar: vuelve a su estado normal al abrir otro producto. */
-      document.getElementById("tc-add").innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span>Agregar a mi lista</span>`;
+      /* Micas (opción C, 2026-11-25): campo opcional del teléfono +
+         checkbox de ayuda + nota de compatibilidad por tipo. Solo
+         se muestra en micas; en el resto no cambia nada. */
+      const wrapMica = document.getElementById("tc-mica-wrap");
+      const notaMica = document.getElementById("tc-mica-nota");
+      const campoMica = document.getElementById("tc-mica-modelo");
+      const ayudaMica = document.getElementById("tc-mica-ayuda");
+      if (p.cat === "micas") {
+        if (campoMica) { campoMica.value = ""; campoMica.disabled = false; }
+        if (ayudaMica) ayudaMica.checked = false;
+        if (notaMica) notaMica.textContent = (p.code === "mica-hidro-hd" || p.code === "mica-hidro-priv")
+          ? "Compatible con cualquier pantalla, incluidas las curvas."
+          : "No compatible con pantallas curvas.";
+        if (wrapMica) wrapMica.classList.remove("hidden");
+      } else if (wrapMica) {
+        wrapMica.classList.add("hidden");
+      }
+      /* Botón Agregar: se pinta según si el producto (con el
+         dispositivo elegido) ya está en la lista, como la tarjeta. */
+      tcPintarAgregar();
       const prodLink = location.origin + location.pathname + "#producto=" + p.code;
       document.getElementById("pm-wa").href = "https://wa.me/527122345562?text=" + encodeURIComponent("Hola, ¿tienen este producto? " + p.name + " (" + money(p.price) + "). ¡Gracias!\n" + prodLink);
       modalDetalle.classList.remove("hidden");
@@ -3268,6 +3297,7 @@ HORARIOS DE ATENCIÓN
         b.setAttribute("aria-pressed", on ? "true" : "false");
       });
       tcMoverPill();
+      tcPintarAgregar();
     }
     function tcMoverPill() {
       const pill = document.getElementById("tc-device-pill");
@@ -3277,17 +3307,75 @@ HORARIOS DE ATENCIÓN
       pill.style.width = activo.offsetWidth + "px";
     }
     window.addEventListener("resize", () => { const w = document.getElementById("tc-selector-wrap"); if (w && !w.classList.contains("hidden")) tcMoverPill(); });
-    let tcAgregadoTimer = null;
+    /* Cantidades solo en micas (2026-11-25): solo cat === "micas"
+       puede tener más de 1 unidad. El detalle es toggle como la
+       tarjeta: si el producto (con el dispositivo elegido) ya está
+       en la lista y NO es mica, el toque lo QUITA; si es mica, suma
+       una unidad como hoy. */
+    /* El modelo escrito (o la ayuda) viaja como dispositivo de la
+       mica: se ve en la fila del carrito y en «Mi equipo» de
+       WhatsApp, como cualquier dispositivo del detalle. Si hay
+       modelo va el modelo; si está marcada la ayuda va su texto;
+       si no hay ni uno ni otro, la mica se agrega sin dispositivo
+       y NUNCA hereda el de la funda vista antes. */
+    function tcMicaDevice() {
+      const ayuda = document.getElementById("tc-mica-ayuda");
+      if (ayuda && ayuda.checked) return "Necesito ayuda para saber qué teléfono es";
+      const campo = document.getElementById("tc-mica-modelo");
+      const v = campo ? campo.value.trim() : "";
+      return v || undefined;
+    }
+    /* La ayuda sustituye al modelo: al marcarla el campo se
+       desactiva (su valor se conserva por si se desmarca). El
+       botón se repinta porque el dispositivo vigente cambió. */
+    function tcMicaAyudaToggle() {
+      const ayuda = document.getElementById("tc-mica-ayuda");
+      const campo = document.getElementById("tc-mica-modelo");
+      if (campo) campo.disabled = !!(ayuda && ayuda.checked);
+      tcPintarAgregar();
+    }
+    /* El dispositivo vigente del detalle: en micas manda el campo
+       (modelo o ayuda); en el resto, el selector de fundas. */
+    function tcDispositivoActual() {
+      const p = byCode[pmCode];
+      if (p && p.cat === "micas") return tcMicaDevice() || "";
+      return tcDevice || "";
+    }
+    function tcEnLista() {
+      if (!pmCode) return false;
+      const dev = tcDispositivoActual();
+      return inquiryItems.some(i => i.code === pmCode && (i.device || "") === dev);
+    }
+    /* El botón del detalle no es .add-btn, así que refreshCardButtons
+       no lo pinta: este pintor lo deja como la tarjeta («En tu lista»
+       cuando está, «Agregar a mi lista» cuando no), con los iconos
+       propios del detalle. Sin flash de 1600 ms: refleja el estado. */
+    function tcPintarAgregar() {
+      const btn = document.getElementById("tc-add");
+      if (!btn || !pmCode) return;
+      btn.innerHTML = tcEnLista()
+        ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>En tu lista</span>`
+        : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span>Agregar a mi lista</span>`;
+    }
     function tcAgregar() {
       if (!pmCode) return;
-      addToInquiry(pmCode, tcDevice || undefined);
-      const btn = document.getElementById("tc-add");
-      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Agregado a tu lista</span>`;
-      if (tcAgregadoTimer) clearTimeout(tcAgregadoTimer);
-      tcAgregadoTimer = setTimeout(() => {
-        const b = document.getElementById("tc-add");
-        if (b) b.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span>Agregar a mi lista</span>`;
-      }, 1600);
+      const p = byCode[pmCode];
+      const dev = tcDispositivoActual();
+      if (tcEnLista()) {
+        if (p && p.cat === "micas") {
+          /* La mica suma una unidad con el modelo escrito (o la
+             ayuda) como dispositivo. */
+          addToInquiry(pmCode, tcMicaDevice());
+        } else {
+          /* Quita la línea que se está viendo (código + dispositivo):
+             la misma funda con dos dispositivos son dos líneas. */
+          const idx = inquiryItems.findIndex(i => i.code === pmCode && (i.device || "") === dev);
+          if (idx > -1) { inquiryItems.splice(idx, 1); renderInquiry(); }
+        }
+      } else {
+        addToInquiry(pmCode, (p && p.cat === "micas") ? tcMicaDevice() : (tcDevice || undefined));
+      }
+      tcPintarAgregar();
     }
     /* Inclinación 3D + foco del cursor del escenario (la app lo hace
        con motion; aquí con JS plano). Sin movimiento reducido. */
@@ -4067,7 +4155,7 @@ HORARIOS DE ATENCIÓN
               <div class="tc-stepper">
                 <button type="button" onclick="updateQty(${index}, -1)" aria-label="Disminuir cantidad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
                 <span class="cant">${item.qty}</span>
-                <button type="button" onclick="updateQty(${index}, 1)" aria-label="Aumentar cantidad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button>
+                <button type="button"${p.cat !== "micas" ? " disabled" : ""} onclick="updateQty(${index}, 1)" aria-label="Aumentar cantidad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button>
               </div>
               <div class="tc-fila-precio">${precio}</div>
             </div>
@@ -4131,6 +4219,7 @@ HORARIOS DE ATENCIÓN
         btn.classList.toggle("bg-pink-primary/10", !inList);
         btn.classList.toggle("text-pink-light", !inList);
       });
+      tcPintarAgregar();
     }
     function resetAdvisor() {
       currentBrand = "";
@@ -4181,7 +4270,10 @@ HORARIOS DE ATENCIÓN
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeCart(); });
     function updateQty(index, change) {
       if (!inquiryItems[index]) return;
+      const p = byCode[inquiryItems[index].code];
       inquiryItems[index].qty += change;
+      /* Solo las micas pueden tener más de 1 unidad por línea. */
+      if (p && p.cat !== "micas" && inquiryItems[index].qty > 1) inquiryItems[index].qty = 1;
       if (inquiryItems[index].qty <= 0) inquiryItems.splice(index, 1);
       renderInquiry();
     }
@@ -4243,12 +4335,13 @@ HORARIOS DE ATENCIÓN
         /* Seguridad: la liga la puede armar cualquiera. El folio solo se
            acepta con el formato real (PC- + 4 caracteres) y cada
            artículo debe ser un producto real del catálogo, con su
-           cantidad forzada a entero entre 1 y 99. Lo demás se ignora. */
+           cantidad forzada a entero entre 1 y 99 (solo las micas pueden
+           pasar de 1). Lo demás se ignora. */
         const folioOk = typeof payload.f === "string" && /^PC-[A-Z0-9]{4}$/.test(payload.f);
         inquiryItems = (payload.items || [])
           .map(([code, qty, device]) => ({ code, qty: parseInt(qty, 10), device: (typeof device === "string" && device) ? device : undefined }))
           .filter(i => Object.prototype.hasOwnProperty.call(byCode, i.code) && Number.isInteger(i.qty) && i.qty >= 1)
-          .map(i => ({ code: i.code, qty: Math.min(99, i.qty), device: i.device }));
+          .map(i => ({ code: i.code, qty: byCode[i.code].cat === "micas" ? Math.min(99, i.qty) : 1, device: i.device }));
         folio = folioOk ? payload.f : newFolio();
         const banner = document.getElementById("shared-banner");
         if (banner && inquiryItems.length) {
@@ -4379,6 +4472,12 @@ HORARIOS DE ATENCIÓN
 <div class="tc-selector-wrap" id="tc-selector-wrap">
 <div class="tc-selector-tit"><span class="etq">Compatible con</span><span class="actual" id="tc-device-actual"></span></div>
 <div class="tc-selector" id="tc-selector"></div>
+</div>
+<div class="tc-mica-wrap hidden" id="tc-mica-wrap">
+<label class="tc-mica-etq" for="tc-mica-modelo">¿Para qué teléfono es?</label>
+<input type="text" id="tc-mica-modelo" class="tc-mica-input" placeholder="Ej. iPhone 13" autocomplete="off" maxlength="60" oninput="tcPintarAgregar()">
+<label class="tc-mica-ayuda"><input type="checkbox" id="tc-mica-ayuda" onchange="tcMicaAyudaToggle()"> <span>Necesito ayuda para saber qué teléfono es</span></label>
+<p class="tc-mica-nota" id="tc-mica-nota"></p>
 </div>
 <div class="tc-nota-combo" id="tc-nota-combo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></svg><span>Combina <strong>2 fundas</strong> en <strong>Mi lista</strong> y ahorra <strong class="verde">-$20 MXN</strong> · <strong>2 audífonos</strong>, <strong class="verde">-$30 MXN</strong>.</span></div>
 <div class="tc-ctas">
