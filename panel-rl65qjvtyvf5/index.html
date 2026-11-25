@@ -242,14 +242,13 @@
       <div class="grid2" id="row-material-tipo">
         <div class="field" id="field-material">
           <label for="f-material">Material (fundas)</label>
-          <select id="f-material">
-            <option value="">Sin material</option>
-            <option value="Transparente">Transparente</option>
-            <option value="Tipo piel">Tipo piel</option>
-            <option value="Mate">Mate</option>
-            <option value="Espejo">Espejo</option>
-            <option value="Otro">Otro</option>
-          </select>
+          <input id="f-material" type="text" maxlength="40" list="dl-material" placeholder="Ej. Transparente o Silicón"/>
+          <datalist id="dl-material">
+            <option value="Transparente"></option>
+            <option value="Tipo piel"></option>
+            <option value="Mate"></option>
+            <option value="Espejo"></option>
+          </datalist>
         </div>
         <div class="field" id="field-tipo">
           <label for="f-tipo">Tipo (audífonos)</label>
@@ -359,6 +358,7 @@ function errText(code) {
     invalid_cat: 'Elige una categoría válida.',
     invalid_brand: 'La marca es demasiado larga (máx. 40 caracteres).',
     invalid_model: 'El modelo es demasiado largo (máx. 80 caracteres).',
+    invalid_material: 'El material es demasiado largo (máx. 40 caracteres).',
     invalid_price: 'El precio debe ser un número entero entre 1 y 99999.',
     invalid_img: 'El producto necesita una foto.',
     missing_foto: 'Elige una foto para el producto.',
@@ -446,6 +446,21 @@ function loadProducts() {
       return;
     }
     productos = res.productos || [];
+    /* Sugerencias de material: los que ya usan las fundas (sin «Otro»). */
+    var dlMat = $('dl-material');
+    if (dlMat) {
+      var vistosMat = {};
+      dlMat.querySelectorAll('option').forEach(function (o) { vistosMat[o.value] = true; });
+      productos.forEach(function (p) {
+        var m = (p.material || '').trim();
+        if (p.cat === 'fundas' && m && m !== 'Otro' && !vistosMat[m]) {
+          vistosMat[m] = true;
+          var op = document.createElement('option');
+          op.value = m;
+          dlMat.appendChild(op);
+        }
+      });
+    }
     renderList();
   }).catch(function () {
     $('loading').classList.add('hidden');
@@ -697,7 +712,7 @@ function saveProduct() {
       name: name, line: $('f-line').value.trim(), sub: $('f-sub').value.trim(),
       cat: cat, brand: $('f-brand').value.trim(), model: $('f-model').value.trim(),
       modelos: $('f-modelos').value.trim(), price: price, img: imgUrl,
-      material: cat === 'fundas' ? $('f-material').value : '',
+      material: cat === 'fundas' ? $('f-material').value.trim() : '',
       tipo: cat === 'audifonos' ? $('f-tipo').value : '',
       dama: cat === 'fundas' && $('f-dama').checked ? 1 : 0,
       nuevo: cat === 'fundas' && $('f-nuevo').checked ? 1 : 0,
