@@ -1390,10 +1390,6 @@
 .tc-franja-pildora{display:inline-flex;align-items:center;gap:.375rem;border-radius:.5rem;border:1px solid rgba(52,211,153,.5);background:rgba(16,185,129,.15);padding:.25rem .75rem;font-family:'JetBrains Mono',monospace;font-size:1.125rem;font-weight:700;font-variant-numeric:tabular-nums;color:#6ee7b7;white-space:nowrap}
 .tc-franja-ahorro{margin-top:.5rem;font-size:.75rem;color:#C5BBD0}
 .tc-franja-ahorro b{font-weight:600;color:#6ee7b7}
-.tc-franja-der{text-align:left}
-@media(min-width:640px){.tc-franja-der{text-align:right}}
-.tc-franja-recoge{font-size:.75rem;font-weight:500;color:#E5DEE9}
-.tc-franja-combo{margin-top:.125rem;font-size:.75rem;color:#F472B6}
 .tc-selector-wrap{margin-top:1.75rem}
 .tc-selector-tit{display:flex;align-items:center;justify-content:space-between;font-size:.75rem}
 .tc-selector-tit .etq{font-weight:500;color:#D8CEDF}
@@ -1418,7 +1414,7 @@
 .tc-btn-wa{display:inline-flex;flex:1;align-items:center;justify-content:center;gap:.5rem;border-radius:.75rem;border:1px solid rgba(16,185,129,.35);background:rgba(16,185,129,.12);padding:.875rem 1.5rem;font-size:.875rem;font-weight:600;color:#a7f3d0;cursor:pointer;white-space:nowrap;text-decoration:none;transition:background .15s,border-color .15s}
 .tc-btn-wa:hover{background:rgba(16,185,129,.2);border-color:rgba(52,211,153,.5)}
 .tc-btn-wa svg{height:1rem;width:1rem;color:#34d399}
-.tc-nota-descuento{margin-top:1rem;font-size:.75rem;line-height:1.625;color:#8A7F95}
+.tc-nota-descuento{margin-top:1rem;font-size:.75rem;line-height:1.625;color:#f87171}
 /* Zoom del escenario (ProductStage). */
 .tc-zoom{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.9);padding:1rem;backdrop-filter:blur(12px)}
 .tc-zoom.hidden{display:none}
@@ -1588,7 +1584,6 @@
 <a class="nav-link active font-archivo text-sm font-medium text-white whitespace-nowrap" href="#">Inicio</a>
 <a class="nav-link font-archivo text-sm font-medium text-[#c4b5bc] hover:text-white transition-colors whitespace-nowrap" href="#catalogo">Accesorios</a>
 <a class="nav-link font-archivo text-sm font-medium text-[#c4b5bc] hover:text-white transition-colors whitespace-nowrap" href="#asesoria-humana">Contáctanos</a>
-<button class="nav-link font-archivo text-sm font-medium text-[#c4b5bc] hover:text-white transition-colors whitespace-nowrap cursor-pointer" onclick="openCart()" type="button">Mi carrito</button>
 <a class="nav-link font-archivo text-sm font-medium text-[#c4b5bc] hover:text-white transition-colors whitespace-nowrap" href="#visitanos">Acerca de nosotros</a>
 </nav>
 </div>
@@ -2892,12 +2887,23 @@ HORARIOS DE ATENCIÓN
       const a = precioAnterior(p);
       return a === null ? 0 : a - p.price;
     }
-    /* Combo por niveles de Axel: 2 artículos -> -$10, 3 o más -> -$20.
-       Cuenta UNIDADES (suma de qty). La app usa -$20 fijo: no aplica. */
-    function descuentoCombo(unidades) {
-      if (unidades >= 3) return 20;
-      if (unidades === 2) return 10;
-      return 0;
+    /* Combo de Axel (2026-11-25): solo fundas y audífonos cuentan, por
+       categoría y por UNIDADES (suma de qty). 2+ fundas -> -$20,
+       2+ audífonos -> -$30; sin nivel de 3 o más. Micas, baterías y
+       servicios no dan combo. La app usa -$20 fijo: no aplica. */
+    function unidadesCombo(items) {
+      let f = 0, a = 0;
+      items.forEach(it => {
+        const p = byCode[it.code];
+        if (!p) return;
+        if (p.cat === "fundas") f += it.qty;
+        else if (p.cat === "audifonos") a += it.qty;
+      });
+      return { fundas: f, audifonos: a };
+    }
+    function descuentoCombo(items) {
+      const u = unidadesCombo(items);
+      return (u.fundas >= 2 ? 20 : 0) + (u.audifonos >= 2 ? 30 : 0);
     }
 
 
@@ -3172,6 +3178,19 @@ HORARIOS DE ATENCIÓN
       document.getElementById("tc-franja-ahorro").innerHTML = tieneDesc
         ? `Precio en línea · <b>En rebaja · Ahorras ${money(ahorro)} MXN</b>`
         : `Precio en línea`;
+      /* Combo en el detalle: solo fundas ($20) y audífonos ($30) con
+         2 o más piezas de la misma categoría; en micas, baterías y
+         servicios no sale la nota. La caja rosa junto al precio se
+         quitó por pedido de Axel (2026-11-25). */
+      const comboCat = p.cat === "fundas" ? 20 : p.cat === "audifonos" ? 30 : 0;
+      const notaCombo = document.getElementById("tc-nota-combo");
+      if (comboCat) {
+        notaCombo.querySelector("span").innerHTML =
+          `Combina <strong>2 ${p.cat === "fundas" ? "fundas" : "audífonos"}</strong> en <strong>Mi lista</strong> y ahorra <strong class="verde">-$${comboCat} MXN</strong>.`;
+        notaCombo.style.display = "";
+      } else {
+        notaCombo.style.display = "none";
+      }
       /* Selector de dispositivo: solo fundas (los únicos con modelos
          reales). El elegido se conserva si el producto lo soporta;
          si no, se usa el modelo de origen (visor) o el primero. */
@@ -3968,8 +3987,8 @@ HORARIOS DE ATENCIÓN
       if (!container) return;
       if (!folio && inquiryItems.length) { folio = newFolio(); }
       /* Totales: tienda = suma de anteriores (o actual si el producto
-         no tiene anterior); en línea = suma de actuales; combo por
-         niveles de Axel sobre las unidades. */
+         no tiene anterior); en línea = suma de actuales; combo de
+         Axel por categoría (solo fundas y audífonos, por unidades). */
       let tienda = 0, enLinea = 0, units = 0;
       inquiryItems.forEach(item => {
         const p = byCode[item.code];
@@ -3979,14 +3998,14 @@ HORARIOS DE ATENCIÓN
         units += item.qty;
       });
       const ahorro = tienda - enLinea;
-      const combo = descuentoCombo(units);
+      const combo = descuentoCombo(inquiryItems);
       const total = enLinea - combo;
       if (inquiryItems.length === 0) {
         container.innerHTML = `
           <div class="tc-vacio">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
             <p class="t1">Tu lista está vacía</p>
-            <p class="t2">Todos los artículos tienen precio exclusivo en línea. Con 2 piezas ahorras $10 MXN extra · con 3 o más, $20 MXN extra.</p>
+            <p class="t2">Todos los artículos tienen precio exclusivo en línea. Con 2 fundas ahorras $20 MXN extra · con 2 audífonos, $30 MXN extra.</p>
           </div>`;
         if (pill) pill.textContent = "";
         if (footerFilled) footerFilled.classList.add("hidden");
@@ -3995,16 +4014,26 @@ HORARIOS DE ATENCIÓN
         refreshCardButtons();
         return;
       }
-      /* Banner de combo por niveles de Axel. Sin botón de agregado
-         rápido: la mica de la app ($120->$90) no existe; la real es
-         $40 sin precio anterior. */
+      /* Banner de combo por categoría de Axel (2026-11-25): solo
+         fundas ($20 con 2+) y audífonos ($30 con 2+) dan combo;
+         micas, baterías y servicios no aparecen ni sugieren. Sin
+         botón de agregado rápido: la mica de la app ($120->$90)
+         no existe; la real es $40 sin precio anterior. */
+      const uc = unidadesCombo(inquiryItems);
       let banner = "";
-      if (units === 1) {
-        banner = `<div class="tc-banner tc-banner-no"><div class="tc-banner-fila"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></svg><p>Agrega 1 pieza más y desbloquea <b>-$10 MXN extra</b> en tu combo.</p></div></div>`;
-      } else if (units === 2) {
-        banner = `<div class="tc-banner tc-banner-ok"><div class="tc-banner-fila"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><div><p><b>Combo en línea desbloqueado (-$10 MXN extra)</b></p><p class="sub">Agrega 1 pieza más y tu combo sube a -$20 MXN extra.</p></div></div></div>`;
+      if (uc.fundas === 0 && uc.audifonos === 0) {
+        banner = "";
+      } else if (combo === 0) {
+        let sug;
+        if (uc.fundas === 1 && uc.audifonos === 1) sug = `Agrega 1 funda más y desbloquea <b>-$20 MXN extra</b> · o 1 audífono más y desbloquea <b>-$30 MXN extra</b>.`;
+        else if (uc.fundas === 1) sug = `Agrega 1 funda más y desbloquea <b>-$20 MXN extra</b> en tu combo.`;
+        else sug = `Agrega 1 audífono más y desbloquea <b>-$30 MXN extra</b> en tu combo.`;
+        banner = `<div class="tc-banner tc-banner-no"><div class="tc-banner-fila"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></svg><p>${sug}</p></div></div>`;
       } else {
-        banner = `<div class="tc-banner tc-banner-ok"><div class="tc-banner-fila"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><div><p><b>Combo en línea desbloqueado (-$20 MXN extra)</b></p><p class="sub">Ya está aplicado en tu total estimado.</p></div></div></div>`;
+        let sub = "Ya está aplicado en tu total estimado.";
+        if (uc.fundas === 1) sub = "Agrega 1 funda más y desbloquea -$20 MXN extra más.";
+        else if (uc.audifonos === 1) sub = "Agrega 1 audífono más y desbloquea -$30 MXN extra más.";
+        banner = `<div class="tc-banner tc-banner-ok"><div class="tc-banner-fila"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><div><p><b>Combo en línea desbloqueado (-$${combo} MXN extra)</b></p><p class="sub">${sub}</p></div></div></div>`;
       }
       const filas = inquiryItems.map((item, index) => {
         const p = byCode[item.code];
@@ -4175,7 +4204,7 @@ HORARIOS DE ATENCIÓN
         n += 1;
         message += `${n}. ${p.name} x${item.qty} — ${money(sub)}\n`;
       });
-      const combo = descuentoCombo(units);
+      const combo = descuentoCombo(inquiryItems);
       const final = total - combo;
       if (combo > 0) message += `\nDescuento combo: -${money(combo)} MXN\n`;
       message += `\nTotal estimado: ${money(final)} MXN\n`;
@@ -4334,17 +4363,13 @@ HORARIOS DE ATENCIÓN
 <div class="tc-franja-precios" id="tc-franja-precios"></div>
 <p class="tc-franja-ahorro" id="tc-franja-ahorro"></p>
 </div>
-<div class="tc-franja-der">
-<p class="tc-franja-recoge">Recoge hoy en Ixtlahuaca Centro</p>
-<p class="tc-franja-combo">Lleva 2 piezas y ahorra $10 MXN extra</p>
-</div>
 </div>
 </div>
 <div class="tc-selector-wrap" id="tc-selector-wrap">
 <div class="tc-selector-tit"><span class="etq">Compatible con</span><span class="actual" id="tc-device-actual"></span></div>
 <div class="tc-selector" id="tc-selector"></div>
 </div>
-<div class="tc-nota-combo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></svg><span>Combina <strong>2 piezas</strong> en <strong>Mi lista</strong> y ahorra <strong class="verde">-$10 MXN</strong> · <strong>3 o más</strong>, <strong class="verde">-$20 MXN</strong>.</span></div>
+<div class="tc-nota-combo" id="tc-nota-combo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></svg><span>Combina <strong>2 fundas</strong> en <strong>Mi lista</strong> y ahorra <strong class="verde">-$20 MXN</strong> · <strong>2 audífonos</strong>, <strong class="verde">-$30 MXN</strong>.</span></div>
 <div class="tc-ctas">
 <button type="button" class="tc-btn-agregar" id="tc-add" onclick="tcAgregar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span>Agregar a mi lista</span></button>
 <a class="tc-btn-wa" href="#" id="pm-wa" rel="noopener" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg><span>Apartar precio en línea</span></a>
