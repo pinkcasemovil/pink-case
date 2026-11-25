@@ -3561,6 +3561,13 @@ HORARIOS DE ATENCIÓN
       if (!byCode[code] || code === pmCode) return;
       history.replaceState(null, "", "#producto=" + code);
       mostrarDetalle(code);
+      /* Al cambiar de producto se sube arriba para VER el producto:
+         mostrarDetalle conserva la posicion (para no saltar al
+         cambiar de protector o de dispositivo), pero aqui el
+         producto es otro y la vista se quedaba abajo, en
+         «Te puede interesar». */
+      const ppSubir = document.querySelector("#product-modal .pm-panel");
+      if (ppSubir) ppSubir.scrollTop = 0;
     }
     function navIndice() { return navLista ? navLista.findIndex(p => p.code === pmCode) : -1; }
     function navAnterior() { const i = navIndice(); if (i > 0) irAProductoEnDetalle(navLista[i - 1].code); }
