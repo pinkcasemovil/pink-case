@@ -144,6 +144,18 @@
     <div id="loading" class="loading">Cargando productos…</div>
     <div id="product-list"></div>
     <div id="empty" class="empty hidden">No hay productos con ese filtro.<br/>Toca «＋ Nuevo producto» para agregar el primero.</div>
+    <div class="card" id="ajustes-card" style="margin-top:24px">
+      <h2 style="margin:0 0 4px">Ajustes</h2>
+      <p class="hint">Texto del carrito vacío en la tienda. Si el puente falla, la tienda usa su texto embebido.</p>
+      <div class="field">
+        <label for="f-ajuste-texto">Texto del carrito vacío</label>
+        <textarea id="f-ajuste-texto" maxlength="200" placeholder="Aprovecha los mega descuentos y agrega tus accesorios favoritos"></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-new" id="btn-save-ajuste" type="button">Guardar ajustes</button>
+        <span class="hint" id="ajuste-msg"></span>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -242,6 +254,11 @@
       <div id="row-dama-nuevo">
         <label class="check-row"><input id="f-dama" type="checkbox"/> Diseño para dama</label>
         <label class="check-row"><input id="f-nuevo" type="checkbox"/> Producto nuevo</label>
+        <label class="check-row"><input id="f-caballero" type="checkbox"/> Diseño para caballero</label>
+      </div>
+      <div class="field" id="field-compat">
+        <label for="f-compat">Nota de compatibilidad (micas)</label>
+        <textarea id="f-compat" maxlength="500" placeholder="Ej. No compatible con pantallas curvas. Si queda vacío, la tienda muestra la nota automática."></textarea>
       </div>
       <label class="check-row"><input id="f-recomendado" type="checkbox"/> Recomendado en «Te puede interesar»</label>
       <div id="row-materiales">
@@ -353,6 +370,7 @@ function doLogin() {
     sessionStorage.setItem(TOKEN_KEY, res.token);
     show('view-main');
     loadProducts();
+    loadAjustes();
   }).catch(function () {
     btn.disabled = false; btn.textContent = 'Entrar';
     $('login-error').textContent = 'No se pudo conectar. Revisa tu internet e inténtalo de nuevo.';
@@ -365,6 +383,38 @@ function doLogout() {
   $('login-pin').value = '';
   $('login-error').textContent = '';
   show('view-login');
+}
+
+/* ---------- Ajustes globales ---------- */
+/* El texto del carrito vacío se lee del puente (acción pública
+   "ajustes") y se guarda con token (acción "guardarAjuste"). */
+function loadAjustes() {
+  remotePost({ action: 'ajustes' }).then(function (res) {
+    if (!res || !res.ok) return;
+    var a = res.ajustes || {};
+    $('f-ajuste-texto').value = a.texto_carrito_vacio || '';
+  }).catch(function () { /* sin conexión: el campo queda vacío */ });
+}
+
+function saveAjuste() {
+  var btn = $('btn-save-ajuste');
+  var valor = $('f-ajuste-texto').value.trim();
+  $('ajuste-msg').textContent = '';
+  if (valor.length > 200) { $('ajuste-msg').textContent = 'El texto tiene más de 200 caracteres.'; return; }
+  btn.disabled = true; btn.textContent = 'Guardando…';
+  remotePost({ action: 'guardarAjuste', token: token(), clave: 'texto_carrito_vacio', valor: valor }).then(function (res) {
+    btn.disabled = false; btn.textContent = 'Guardar ajustes';
+    if (!res || !res.ok) {
+      if (res && res.error === 'unauthorized') { doLogout(); toast('Tu sesión expiró. Vuelve a entrar.', true); return; }
+      $('ajuste-msg').textContent = errText(res && res.error ? res.error : 'sin_respuesta');
+      return;
+    }
+    $('ajuste-msg').textContent = 'Ajustes guardados.';
+    toast('Ajustes guardados.');
+  }).catch(function () {
+    btn.disabled = false; btn.textContent = 'Guardar ajustes';
+    $('ajuste-msg').textContent = 'No se pudo conectar. Revisa tu internet.';
+  });
 }
 
 /* ---------- Lista ---------- */
@@ -430,7 +480,7 @@ function imgUrl(u) {
 function toggleVisible(code) {
   var p = productos.filter(function (x) { return x.code === code; })[0];
   if (!p) return;
-  var payload = { action: 'guardarProducto', token: token(), code: p.code, name: p.name, line: p.line || '', sub: p.sub || '', cat: p.cat, brand: p.brand || '', model: p.model || '', modelos: (p.modelos || []).join(','), price: p.price, img: p.img, material: p.material || '', tipo: p.tipo || '', dama: Number(p.dama) ? 1 : 0, nuevo: Number(p.nuevo) ? 1 : 0, recomendado: Number(p.recomendado) ? 1 : 0, mat1: p.mat1 || '', mat2: p.mat2 || '', mat3: p.mat3 || '', visible: p.visible ? 0 : 1 };
+  var payload = { action: 'guardarProducto', token: token(), code: p.code, name: p.name, line: p.line || '', sub: p.sub || '', cat: p.cat, brand: p.brand || '', model: p.model || '', modelos: (p.modelos || []).join(','), price: p.price, img: p.img, material: p.material || '', tipo: p.tipo || '', dama: Number(p.dama) ? 1 : 0, nuevo: Number(p.nuevo) ? 1 : 0, recomendado: Number(p.recomendado) ? 1 : 0, mat1: p.mat1 || '', mat2: p.mat2 || '', mat3: p.mat3 || '', caballero: Number(p.caballero) ? 1 : 0, compat: p.compat || '', visible: p.visible ? 0 : 1 };
   remotePost(payload).then(function (res) {
     if (!res || !res.ok) { toast(errText(res && res.error ? res.error : 'sin_respuesta'), true); return; }
     p.visible = !p.visible;
@@ -467,7 +517,7 @@ function openEditor(code) {
     $('editor-code').textContent = 'El código se genera solo del nombre al guardar.';
     $('f-name').value = ''; $('f-line').value = ''; $('f-sub').value = '';
     $('f-cat').value = 'fundas'; $('f-price').value = ''; $('f-brand').value = '';
-    $('f-model').value = ''; $('f-modelos').value = ''; $('f-material').value = ''; $('f-tipo').value = ''; $('f-dama').checked = false; $('f-nuevo').checked = false; $('f-recomendado').checked = false; $('f-mat1').value = ''; $('f-mat2').value = ''; $('f-mat3').value = ''; $('f-visible').checked = true;
+    $('f-model').value = ''; $('f-modelos').value = ''; $('f-material').value = ''; $('f-tipo').value = ''; $('f-dama').checked = false; $('f-nuevo').checked = false; $('f-caballero').checked = false; $('f-recomendado').checked = false; $('f-mat1').value = ''; $('f-mat2').value = ''; $('f-mat3').value = ''; $('f-compat').value = ''; $('f-visible').checked = true;
     currentImg = '';
     $('photo-preview').src = '';
     $('btn-delete').classList.add('hidden');
@@ -478,7 +528,7 @@ function openEditor(code) {
     $('editor-code').textContent = 'Código: ' + p.code;
     $('f-name').value = p.name; $('f-line').value = p.line || ''; $('f-sub').value = p.sub || '';
     $('f-cat').value = p.cat; $('f-price').value = p.price; $('f-brand').value = p.brand || '';
-    $('f-model').value = p.model || ''; $('f-modelos').value = (p.modelos || []).join(', '); $('f-material').value = p.material || ''; $('f-tipo').value = p.tipo || ''; $('f-dama').checked = !!Number(p.dama); $('f-nuevo').checked = !!Number(p.nuevo); $('f-recomendado').checked = !!Number(p.recomendado); $('f-mat1').value = p.mat1 || ''; $('f-mat2').value = p.mat2 || ''; $('f-mat3').value = p.mat3 || '';
+    $('f-model').value = p.model || ''; $('f-modelos').value = (p.modelos || []).join(', '); $('f-material').value = p.material || ''; $('f-tipo').value = p.tipo || ''; $('f-dama').checked = !!Number(p.dama); $('f-nuevo').checked = !!Number(p.nuevo); $('f-caballero').checked = !!Number(p.caballero); $('f-recomendado').checked = !!Number(p.recomendado); $('f-mat1').value = p.mat1 || ''; $('f-mat2').value = p.mat2 || ''; $('f-mat3').value = p.mat3 || ''; $('f-compat').value = p.compat || '';
     $('f-visible').checked = !!p.visible;
     currentImg = p.img || '';
     $('photo-preview').src = imgUrl(currentImg);
@@ -488,8 +538,9 @@ function openEditor(code) {
   show('view-editor');
 }
 
-/* Los campos de filtros solo se muestran en su categoría: material, dama y
-   nuevo en fundas; tipo en audífonos. Los textos de materiales también:
+/* Los campos de filtros solo se muestran en su categoría: material, dama,
+   nuevo y caballero en fundas; tipo en audífonos; compat en micas. Los
+   textos de materiales también:
    cada bloque lleva su etiqueta según la categoría (servicios no tiene
    sección y baterías solo tiene 2 bloques). */
 var MAT_ETIQUETAS = { fundas: ['Fijación', 'Textura', 'Cámara'], micas: ['Protección', 'Instalación', 'Cambio'], audifonos: ['Bluetooth', 'Modelo', 'Batería'], baterias: ['Capacidad', 'Cables', ''], servicios: ['', '', ''] };
@@ -498,6 +549,7 @@ function updateFilterFields() {
   $('field-material').classList.toggle('hidden', cat !== 'fundas');
   $('row-dama-nuevo').classList.toggle('hidden', cat !== 'fundas');
   $('field-tipo').classList.toggle('hidden', cat !== 'audifonos');
+  $('field-compat').classList.toggle('hidden', cat !== 'micas');
   var etq = MAT_ETIQUETAS[cat] || ['', '', ''];
   $('lbl-mat1').textContent = etq[0];
   $('lbl-mat2').textContent = etq[1];
@@ -627,6 +679,8 @@ function saveProduct() {
       tipo: cat === 'audifonos' ? $('f-tipo').value : '',
       dama: cat === 'fundas' && $('f-dama').checked ? 1 : 0,
       nuevo: cat === 'fundas' && $('f-nuevo').checked ? 1 : 0,
+      caballero: cat === 'fundas' && $('f-caballero').checked ? 1 : 0,
+      compat: cat === 'micas' ? $('f-compat').value.trim() : '',
       recomendado: $('f-recomendado').checked ? 1 : 0,
       mat1: (MAT_ETIQUETAS[cat] || [])[0] ? $('f-mat1').value.trim() : '',
       mat2: (MAT_ETIQUETAS[cat] || [])[1] ? $('f-mat2').value.trim() : '',
@@ -703,6 +757,7 @@ $('filter-cat').addEventListener('change', renderList);
 $('btn-back-list').addEventListener('click', function () { show('view-main'); });
 $('btn-cancel').addEventListener('click', function () { show('view-main'); });
 $('btn-save').addEventListener('click', saveProduct);
+$('btn-save-ajuste').addEventListener('click', saveAjuste);
 $('f-cat').addEventListener('change', updateFilterFields);
 $('btn-delete').addEventListener('click', deleteProduct);
 $('crop-view').addEventListener('pointerdown', function (e) {
@@ -733,7 +788,7 @@ window.addEventListener('resize', function () {
   if (!$('crop-box').classList.contains('hidden')) cropRender();
 });
 
-if (token()) { show('view-main'); loadProducts(); } else { show('view-login'); }
+if (token()) { show('view-main'); loadProducts(); loadAjustes(); } else { show('view-login'); }
 </script>
 </body>
 </html>
