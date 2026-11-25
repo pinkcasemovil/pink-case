@@ -1263,9 +1263,7 @@
 #product-modal .pm-panel{top:0!important;right:0!important;bottom:0!important;left:0!important;width:auto!important;transform:none!important;border-radius:0!important;border-left:0!important;border-right:0!important}
 #product-modal .pm-panel>.grid{max-width:1080px;margin-left:auto;margin-right:auto}
 #product-modal #pm-zoom-wrap{width:100%!important;margin-left:0!important;margin-right:0!important}
-.vp-barra{position:sticky;top:0;z-index:10;background:rgba(19,11,16,.96);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.1)}
-.vp-volver{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem .95rem;border-radius:9999px;background:#1a0f16;border:1px solid rgba(255,255,255,.18);color:#fff;font-family:Archivo,sans-serif;font-size:.875rem;font-weight:600;cursor:pointer;white-space:nowrap}
-.vp-volver:active{transform:translateY(1px)}
+.vp-barra{position:sticky;top:0;z-index:10;background:rgba(7,5,10,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.06)}
 /* Navegador anterior/siguiente del detalle: la flecha deshabilitada
    (en los extremos del grupo) se atenúa; el resto son utilidades. */
 .nav-flecha:disabled{opacity:.35;cursor:default}
@@ -3826,7 +3824,9 @@ HORARIOS DE ATENCIÓN
          tipo. */
       const etiquetaVisor = g.productos.length ? g.productos[0].catLabel : (esAud ? "Audífonos" : "Fundas");
       document.getElementById("visor-titulo").textContent = etiquetaVisor + " · " + g.titulo;
-      document.getElementById("visor-volver").textContent = origenVisor === "busqueda" ? "← Búsqueda" : "← Volver al catálogo";
+      /* El botón ya trae la flecha como SVG: solo cambia el texto
+         del span (textContent sobre el botón borraría el SVG). */
+      document.getElementById("visor-volver").querySelector("span").textContent = origenVisor === "busqueda" ? "Búsqueda" : "Volver al catálogo";
       /* En audífonos no hay píldoras de filtro (los grupos son de 5 o
          menos); en fundas se pintan como siempre. */
       const filtrosVisor = document.getElementById("visor-filtros");
@@ -4417,10 +4417,10 @@ HORARIOS DE ATENCIÓN
 <div class="hidden fixed inset-0 bg-cyber-dark overflow-y-auto" id="visor-modelo" style="z-index:55" role="dialog" aria-modal="true">
 <div class="vp-barra">
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
-<div class="flex items-center gap-3 min-w-0">
-<button class="vp-volver" id="visor-volver" onclick="volverVista()" type="button">← Volver al catálogo</button>
+<div class="tc-barra-izq">
+<button type="button" class="tc-volver" id="visor-volver" onclick="volverVista()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg><span>Volver al catálogo</span></button>
 <span class="tc-miga-sep" aria-hidden="true">/</span>
-<h2 class="font-unbounded text-base sm:text-xl font-bold text-white leading-tight truncate" id="visor-titulo"></h2>
+<span class="tc-miga" id="visor-titulo"></span>
 </div>
 <div class="tc-ubicacion"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>Ixtlahuaca Centro</span></div>
 </div>
