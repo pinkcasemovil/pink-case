@@ -1559,6 +1559,62 @@
   .tc-sub-precio{display:none}
 }
 </style>
+<style id="tc-detalle-telefono">
+/* Detalle en teléfono sin desplazamiento horizontal (2026-11-25):
+   la tira de miniaturas medía 612 px y empujaba toda la columna a 612
+   en una pantalla de 390. En teléfono la rejilla puede encogerse y las
+   minis reparten el ancho (7 x 33 px en iPhone 15); la vista se ve tal
+   cual pero más pequeña y solo baja en vertical. Escritorio intacto. */
+@media (max-width: 639px) {
+  .tc-detalle-grid { grid-template-columns: minmax(0, 1fr); }
+  .tc-stage-col, .tc-ficha { min-width: 0; }
+  .tc-dock-mini { flex: 1 1 0; min-width: 0; width: auto; height: auto; aspect-ratio: 1 / 1; }
+  .tc-dock-minis { gap: .375rem; }
+  .tc-dock-flecha { height: 2rem; width: 2rem; }
+}
+</style>
+<style id="tc-recomienda">
+/* «Te puede interesar» al diseño de AI Studio (2026-11-25,
+   ProductDetailView.tsx líneas 305–421). Clases propias porque el
+   CSS de Tailwind está purgado (no existen emerald-*). La insignia
+   y la píldora reutilizan .tc-insignia y .tc-pildora, que ya son
+   las de la app. */
+#pm-recomienda{margin-top:4rem;border-top:1px solid rgba(255,255,255,.08);padding-top:3rem}
+.tc-rec-encabezado{display:flex;flex-direction:column;gap:.75rem}
+@media (min-width:640px){.tc-rec-encabezado{flex-direction:row;align-items:flex-end;justify-content:space-between}}
+.tc-rec-combo{font-size:.75rem;font-weight:500;letter-spacing:.025em;color:#6ee7b7}
+.tc-rec-titulo{margin-top:.375rem;font-family:'Outfit',system-ui,sans-serif;font-size:1.5rem;font-weight:700;letter-spacing:-.025em;color:#fff}
+.tc-rec-ver-todo{display:inline-flex;align-items:center;gap:.375rem;font-size:.75rem;font-weight:500;color:#C5BBD0;background:none;border:0;padding:0;cursor:pointer;align-self:flex-start}
+@media (min-width:640px){.tc-rec-ver-todo{align-self:auto}}
+.tc-rec-ver-todo:hover{color:#fff}
+.tc-rec-ver-todo svg{width:.875rem;height:.875rem;color:#F472B6}
+.tc-rec-grid{display:grid;grid-template-columns:1fr;gap:1.25rem;margin-top:1.75rem}
+@media (min-width:640px){.tc-rec-grid{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:1024px){.tc-rec-grid{grid-template-columns:repeat(4,1fr)}}
+.tc-rec{display:flex;flex-direction:column;overflow:hidden;border-radius:1rem;border:1px solid rgba(255,255,255,.08);background:#0D0A10;cursor:pointer;transition:all .3s}
+.tc-rec:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.2)}
+.tc-rec-foto{position:relative;width:100%;aspect-ratio:1/1;overflow:hidden;background:#0A080E}
+.tc-rec-foto img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.tc-rec:hover .tc-rec-foto img{transform:scale(1.03)}
+.tc-rec-foto::after{content:"";position:absolute;left:0;right:0;top:0;height:4rem;background:linear-gradient(to bottom,rgba(0,0,0,.5),transparent);pointer-events:none}
+.tc-rec-cuerpo{flex:1;display:flex;flex-direction:column;justify-content:space-between;padding:1rem}
+.tc-rec-fila{display:flex;align-items:center;justify-content:space-between;gap:.5rem;font-size:.75rem;color:#9B90A6}
+.tc-rec-cat{font-weight:500;color:#C5BBD0}
+.tc-rec-nombre{margin-top:.5rem;font-family:'Outfit',system-ui,sans-serif;font-size:1rem;font-weight:600;color:#fff}
+.tc-rec-desc{margin-top:.25rem;font-size:.75rem;line-height:1.5;color:#A99FB2}
+.tc-rec-pie{margin-top:1rem;border-top:1px solid rgba(255,255,255,.08);padding-top:.875rem}
+.tc-rec-precios{display:flex;align-items:center;gap:.5rem}
+.tc-rec-tachado{font-family:'Outfit',system-ui,sans-serif;font-size:1.25rem;font-weight:700;font-variant-numeric:tabular-nums;color:#f87171;text-decoration:line-through;text-decoration-thickness:2px}
+.tc-rec-pildora{border-radius:.375rem;border:1px solid rgba(52,211,153,.5);background:rgba(16,185,129,.15);padding:.125rem .5rem;font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;font-variant-numeric:tabular-nums;color:#6ee7b7}
+.tc-rec-precio-solo{font-family:'Outfit',system-ui,sans-serif;font-size:1.125rem;font-weight:700;color:#fff}
+.tc-rec-ahorro{margin-top:.375rem;font-size:11px;color:#B8ADC2}
+.tc-rec-ahorro b{font-weight:600;color:#6ee7b7}
+.tc-rec-btn{margin-top:.875rem;display:inline-flex;width:100%;align-items:center;justify-content:center;gap:.375rem;border-radius:.75rem;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);padding:.5rem .875rem;font-size:.75rem;font-weight:600;color:#F4F1F5;cursor:pointer;white-space:nowrap;transition:background .2s,color .2s,border-color .2s}
+.tc-rec-btn:hover{background:#F8F5FA;color:#0B0608;border-color:#fff}
+.tc-rec-btn .material-symbols-outlined{font-size:14px;color:#F472B6}
+.tc-rec-btn.tc-rec-en-lista{border-color:rgba(52,211,153,.6);background:rgba(16,185,129,.2);color:#a7f3d0}
+.tc-rec-btn.tc-rec-en-lista .material-symbols-outlined{color:#6ee7b7}
+</style>
 </head>
 <body class="bg-cyber-dark font-archivo text-[#f1e9ed] antialiased selection:bg-pink-primary selection:text-white">
 <!-- 1. HEADER (Glassmorphism & Fixed Navigation) -->
@@ -2913,7 +2969,18 @@ HORARIOS DE ATENCIÓN
       "mica-sencilla": 50, "mica-completa": 100, "mica-ceramica": 100,
       "mica-privacidad": 150, "mica-hidro-hd": 150, "mica-hidro-priv": 250
     };
+    /* v18 (2026-11-25): el precio anterior se escribe en el panel
+       (columna anterior). Vacío = la regla automática actual;
+       0 = sin descuento; número = ese es el anterior. Si rebaja
+       está en 0, el producto no se muestra en rebaja aunque tenga
+       anterior (ni tachado, ni insignia, ni «Ahorras»). */
     function precioAnterior(p) {
+      if (p.rebaja === 0 || p.rebaja === '0') return null;
+      if (p.anterior === 0 || p.anterior === '0') return null;
+      if (p.anterior !== '' && p.anterior != null) {
+        const n = Math.floor(Number(p.anterior));
+        return isNaN(n) ? null : n;
+      }
       if (p.cat === "fundas") return 250;
       if (p.cat === "audifonos") return p.price + 200;
       if (p.cat === "micas") return ANTERIORES_MICAS[p.code] || null;
@@ -3519,43 +3586,45 @@ HORARIOS DE ATENCIÓN
       /* Textos escritos por Axel en el panel (mat1/mat2/mat3): si un
          bloque tiene texto, ese bloque usa el texto de Axel (y el
          bloque existe aunque el dato automático falte); si está
-         vacío, usa el texto automático actual. Los títulos no cambian. */
+         vacío, usa el texto automático actual. Los títulos se
+         escriben en el panel (tit1/tit2/tit3); vacío = título automático. */
       const mat = [(p.mat1 || "").trim(), (p.mat2 || "").trim(), (p.mat3 || "").trim()];
+      const tit = [(p.tit1 || "").trim(), (p.tit2 || "").trim(), (p.tit3 || "").trim()];
       if (p.cat === "fundas") {
         const b = [];
-        if (etq.has("magsafe")) b.push({ t: "Fijación MagSafe", x: mat[0] || "El aro magnético alinea el celular con cargadores y soportes MagSafe, sin quitar la funda." });
+        if (etq.has("magsafe")) b.push({ t: tit[0] || "Fijación MagSafe", x: mat[0] || "El aro magnético alinea el celular con cargadores y soportes MagSafe, sin quitar la funda." });
         else {
           const ms = (p.modelos && p.modelos.length) ? p.modelos : (p.model ? [p.model] : []);
           const msTxt = ms.join(", ");
-          if (/universal/i.test(msTxt)) b.push({ t: "Universal", x: mat[0] || "Sirve para cualquier modelo." });
-          else b.push({ t: "Ajuste", x: mat[0] || "Hecha a la medida de " + p.brand + " " + msTxt + "; cubre la parte de atrás y los bordes." });
+          if (/universal/i.test(msTxt)) b.push({ t: tit[0] || "Universal", x: mat[0] || "Sirve para cualquier modelo." });
+          else b.push({ t: tit[0] || "Ajuste", x: mat[0] || "Hecha a la medida de " + p.brand + " " + msTxt + "; cubre la parte de atrás y los bordes." });
         }
         const matTxt = etq.has("transparente") ? "Acabado transparente: se ve el color del celular." : etq.has("piel") ? "Tacto tipo piel, suave al agarrar y sin resbalar." : etq.has("espejo") ? "Acabado espejo que refleja la luz." : etq.has("mate") ? "Acabado mate, sin brillo." : "Cubre la parte de atrás y los bordes del celular.";
-        b.push({ t: "Textura exterior", x: mat[1] || matTxt });
-        b.push({ t: "Módulo de cámara", x: mat[2] || "El recorte deja libre la cámara para tomar fotos sin quitar la funda." });
+        b.push({ t: tit[1] || "Textura exterior", x: mat[1] || matTxt });
+        b.push({ t: tit[2] || "Módulo de cámara", x: mat[2] || "El recorte deja libre la cámara para tomar fotos sin quitar la funda." });
         return b;
       }
       if (p.cat === "micas") {
         const b = [];
-        if (sub || mat[0]) b.push({ t: "Lo que protege", x: mat[0] || sub });
-        if (line.toLowerCase().includes("instalación gratis") || mat[1]) b.push({ t: "Instalación gratis", x: mat[1] || "La instalamos en la tienda, sin costo." });
-        if (line.toLowerCase().includes("cambio gratis") || mat[2]) b.push({ t: "Un cambio gratis", x: mat[2] || "Incluye 1 cambio gratis en precio actual." });
+        if (sub || mat[0]) b.push({ t: tit[0] || "Lo que protege", x: mat[0] || sub });
+        if (line.toLowerCase().includes("instalación gratis") || mat[1]) b.push({ t: tit[1] || "Instalación gratis", x: mat[1] || "La instalamos en la tienda, sin costo." });
+        if (line.toLowerCase().includes("cambio gratis") || mat[2]) b.push({ t: tit[2] || "Un cambio gratis", x: mat[2] || "Incluye 1 cambio gratis en precio actual." });
         return b;
       }
       if (p.cat === "audifonos") {
         const b = [];
-        if (normText([p.line, p.sub, p.tags].join(" ")).includes("bluetooth") || mat[0]) b.push({ t: "Conexión", x: mat[0] || "Bluetooth: se conectan sin cables a tu celular." });
-        if (sub || mat[1]) b.push({ t: "El modelo", x: mat[1] || sub });
+        if (normText([p.line, p.sub, p.tags].join(" ")).includes("bluetooth") || mat[0]) b.push({ t: tit[0] || "Conexión", x: mat[0] || "Bluetooth: se conectan sin cables a tu celular." });
+        if (sub || mat[1]) b.push({ t: tit[1] || "El modelo", x: mat[1] || sub });
         const horas = [...(line + " " + (p.model || "")).matchAll(/(\d+)\s*h\b/g)].map(m => Number(m[1]));
-        if (horas.length || mat[2]) b.push({ t: "Batería", x: mat[2] || ("Hasta " + Math.max(...horas) + " h de batería.") });
+        if (horas.length || mat[2]) b.push({ t: tit[2] || "Batería", x: mat[2] || ("Hasta " + Math.max(...horas) + " h de batería.") });
         return b;
       }
       if (p.cat === "baterias") {
         const b = [];
         const mah = (p.name + " " + (p.model || "")).match(/([\d,]+)\s*mAh/);
-        if (mah || mat[0]) b.push({ t: "Capacidad", x: mat[0] || (mah[1] + " mAh.") });
-        if (line.toLowerCase().includes("cables integrados")) b.push({ t: "Cables integrados", x: mat[1] || "Trae sus cables integrados, no necesitas llevar otro." });
-        else if (sub || mat[1]) b.push({ t: "Magnética", x: mat[1] || sub });
+        if (mah || mat[0]) b.push({ t: tit[0] || "Capacidad", x: mat[0] || (mah[1] + " mAh.") });
+        if (line.toLowerCase().includes("cables integrados")) b.push({ t: tit[1] || "Cables integrados", x: mat[1] || "Trae sus cables integrados, no necesitas llevar otro." });
+        else if (sub || mat[1]) b.push({ t: tit[1] || "Magnética", x: mat[1] || sub });
         return b;
       }
       return [];
@@ -3599,39 +3668,40 @@ HORARIOS DE ATENCIÓN
         if (primero) otros.push(primero);
       });
       if (otros.length === 0) { sec.classList.add("hidden"); grid.innerHTML = ""; return; }
-      /* La tarjeta reusa el patrón de visorCardHTML (foto cuadrada con
-         zoom al pasar, insignia Nuevo, nombre, precio) y suma la
-         etiqueta de compatibilidad, la descripción corta y el botón
-         Agregar. El botón NO lleva la clase add-btn: refreshCardButtons
-         reescribiría su texto a "+ Carrito"; su estado (Agregar / En
-         tu lista) lo pinta esta función desde inquiryItems y se
-         repinta tras cada toque. */
+      /* Diseño de AI Studio (2026-11-25, ProductDetailView.tsx):
+         insignia «-X% · En rebaja» arriba a la izquierda, categoría
+         y compatibilidad en una fila, precio tachado en rojo + píldora
+         verde, «Precio en línea · Ahorras $X MXN» y botón oscuro
+         «Agregar a mi lista» a todo lo ancho. El botón NO lleva la
+         clase add-btn: refreshCardButtons reescribiría su texto a
+         "+ Carrito"; su estado (Agregar / Agregado) lo pinta esta
+         función desde inquiryItems y se repinta tras cada toque. */
       grid.innerHTML = otros.map(p => {
         const etq = etiquetaCompatibilidad(p);
         const desc = (p.sub || p.line || "").trim();
-        const nuevo = etiquetasProducto(p).has("nuevos");
         const ant = precioAnterior(p);
         const pct = porcDescuento(p);
         const enLista = inquiryItems.some(i => i.code === p.code);
-        const btnCls = enLista
-          ? "px-3 py-2 rounded-full bg-pink-primary/10 border border-pink-500/30 text-pink-light"
-          : "pm-agregar px-3 py-2 rounded-full";
+        const btnCls = enLista ? "tc-rec-btn tc-rec-en-lista" : "tc-rec-btn";
         const btnTxt = enLista
-          ? '<span class="material-symbols-outlined text-[17px]">check</span><span>En tu lista</span>'
-          : '<span class="material-symbols-outlined text-[17px]">add_shopping_cart</span><span>Agregar</span>';
-        return `<div class="product-card group p-3 rounded-2xl bg-surface-1 hover:bg-surface-2 border border-pink-500/15 hover:border-pink-500/40 transition-all cursor-pointer flex flex-col" onclick="irAProductoEnDetalle('${p.code}')">
-          <div class="relative w-full aspect-square rounded-xl overflow-hidden bg-surface-3 mb-3">
-            <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" alt="${p.name}" src="${p.img}"/>
-            ${nuevo ? '<span class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-pink-primary text-white font-archivo text-[10px] font-bold">Nuevo</span>' : ""}
-            ${ant ? `<span class="tc-insignia tc-insignia-der">-${pct}%</span>` : ""}
+          ? '<span class="material-symbols-outlined">check</span><span>Agregado a tu lista</span>'
+          : '<span class="material-symbols-outlined">add_shopping_cart</span><span>Agregar a mi lista</span>';
+        return `<div class="tc-rec group" onclick="irAProductoEnDetalle('${p.code}')">
+          <div class="tc-rec-foto">
+            <img loading="lazy" alt="${p.name}" src="${p.img}"/>
+            ${ant ? `<span class="tc-insignia">-${pct}% · En rebaja</span>` : ""}
           </div>
-          <span class="font-archivo text-xs text-pink-primary font-bold">${etq || p.catLabel}</span>
-          <h3 class="font-archivo font-bold text-sm text-white line-clamp-2 group-hover:text-pink-light transition-colors mt-1">${p.name}</h3>
-          ${desc ? `<p class="font-archivo text-xs text-text-muted mt-1 line-clamp-2">${desc}</p>` : ""}
-          <div class="flex-1"></div>
-          <div class="mt-3 pt-3 border-t border-white/10 flex items-center justify-between gap-2 tc-pie-rec">
-            ${ant ? `<span class="tc-precio-col"><span class="tc-tachado-sm">${money(ant)}</span><span class="tc-pildora">${money(p.price)} MXN</span></span>` : `<span class="font-unbounded text-base text-white font-extrabold">${money(p.price)}</span>`}
-            <button class="${btnCls} transition-all flex items-center gap-1.5 font-unbounded text-[11px] font-semibold" data-code="${p.code}" onclick="event.stopPropagation(); toggleInquiry('${p.code}'); pintarRecomendaciones();" title="Añadir a mi lista" type="button">${btnTxt}</button>
+          <div class="tc-rec-cuerpo">
+            <div>
+              <div class="tc-rec-fila"><span class="tc-rec-cat">${p.catLabel}</span>${etq ? `<span>${etq}</span>` : ""}</div>
+              <h3 class="tc-rec-nombre">${p.name}</h3>
+              ${desc ? `<p class="tc-rec-desc">${desc}</p>` : ""}
+            </div>
+            <div class="tc-rec-pie">
+              ${ant ? `<div class="tc-rec-precios"><span class="tc-rec-tachado">${money(ant)}</span><span class="tc-rec-pildora">${money(p.price)} MXN</span></div>
+              <p class="tc-rec-ahorro">Precio en línea · <b>Ahorras ${money(ahorroDescuento(p))} MXN</b></p>` : `<span class="tc-rec-precio-solo">${money(p.price)}</span>`}
+              <button class="${btnCls}" data-code="${p.code}" onclick="event.stopPropagation(); toggleInquiry('${p.code}'); pintarRecomendaciones();" title="Añadir a mi lista" type="button">${btnTxt}</button>
+            </div>
           </div>
         </div>`;
       }).join("");
@@ -4541,8 +4611,14 @@ HORARIOS DE ATENCIÓN
 <div class="pm-mat-grid mt-4" id="pm-materiales-grid"></div>
 </div>
 <div class="hidden" id="pm-recomienda">
-<h4 class="tc-sec-titulo">Te puede interesar</h4>
-<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-4" id="pm-recomienda-grid"></div>
+<div class="tc-rec-encabezado">
+<div>
+<p class="tc-rec-combo">+1 funda o +1 audífonos y ahorra hasta $50 MXN extra</p>
+<h4 class="tc-rec-titulo">Te puede interesar</h4>
+</div>
+<button class="tc-rec-ver-todo" onclick="volverVista()" type="button"><span>Ver todo el catálogo</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+</div>
+<div class="tc-rec-grid" id="pm-recomienda-grid"></div>
 </div>
 </div>
 </div>
