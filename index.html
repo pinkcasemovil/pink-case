@@ -2839,6 +2839,9 @@ HORARIOS DE ATENCIÓN
     // con los embebidos: la tienda nunca se queda sin catálogo.
     const BRIDGE_URL = 'https://script.google.com/macros/s/AKfycbxaLju4YnKKt5C55CTo4B4N01A0WacpsdVKw_QcWmu0D7GJjqYxNud2NaihwrVeDUjInw/exec';
     let catalogoActualizado = false;
+    /* Texto del carrito vacío (cadena C): el embebido es el respaldo;
+       el puente (acción ajustes) lo actualiza si trae texto. */
+    let textoCarritoVacio = "Aprovecha los mega descuentos y agrega tus accesorios favoritos";
     function refrescarCatalogo() {
       if (catalogoActualizado) return;
       const ctrl = (typeof AbortController === 'function') ? new AbortController() : null;
@@ -2864,8 +2867,37 @@ HORARIOS DE ATENCIÓN
           else renderGrid(activeCat === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.cat === activeCat));
           updateSuggestion();
           renderInquiry();
+          /* Vistas abiertas (corrección visor obsoleto): el refresco
+             repintaba la cuadrícula pero no el visor ni el detalle.
+             Si el visor está abierto, se repinta con la lista actual
+             (píldoras y tarjetas); si su grupo ya no existe, se
+             cierra la vista. Si el detalle abierto es de un producto
+             que ya no está en el catálogo, se cierra. La comprobación
+             es por el DOM, porque pmCode y visorSlug no se limpian
+             al cerrar. */
+          var detalleAbierto = !document.getElementById("product-modal").classList.contains("hidden");
+          var visorAbierto = !document.getElementById("visor-modelo").classList.contains("hidden");
+          if (visorAbierto && visorSlug) {
+            if (grupoParaVisor(visorSlug)) { pintarFiltrosVisor(); pintarVisor(); }
+            else cerrarVistas();
+          }
+          if (detalleAbierto && pmCode && !byCode[pmCode]) cerrarVistas();
         })
         .catch(() => { if (timer) clearTimeout(timer); /* sin puente: quedan los embebidos */ });
+    }
+    /* Texto del carrito vacío desde el puente (cadena C). Si el puente
+       falla o trae el texto vacío, se queda el embebido de arriba. */
+    function refrescarAjustes() {
+      fetch(BRIDGE_URL + '?action=ajustes')
+        .then(r => { if (!r.ok) throw new Error('http'); return r.json(); })
+        .then(res => {
+          if (!res || !res.ok || !res.ajustes) return;
+          const t = (res.ajustes.texto_carrito_vacio || '').trim();
+          if (!t || t === textoCarritoVacio) return;
+          textoCarritoVacio = t;
+          renderInquiry();
+        })
+        .catch(() => { /* sin puente: queda el texto embebido */ });
     }
 
     const money = n => "$" + n.toLocaleString("es-MX");
@@ -3237,9 +3269,14 @@ HORARIOS DE ATENCIÓN
       if (p.cat === "micas") {
         if (campoMica) { campoMica.value = ""; campoMica.disabled = false; }
         if (ayudaMica) ayudaMica.checked = false;
-        if (notaMica) notaMica.textContent = (p.code === "mica-hidro-hd" || p.code === "mica-hidro-priv")
-          ? "Compatible con cualquier pantalla, incluidas las curvas."
-          : "No compatible con pantallas curvas.";
+        /* Compat (cadena B): si Axel escribió una nota en el panel
+           (p.compat), se usa; si está vacía, la nota automática por
+           tipo: hidrogel sí va con curvas, el resto no. */
+        if (notaMica) notaMica.textContent = (p.compat && String(p.compat).trim())
+          ? String(p.compat).trim()
+          : ((p.code === "mica-hidro-hd" || p.code === "mica-hidro-priv")
+            ? "Compatible con cualquier pantalla, incluidas las curvas."
+            : "No compatible con pantallas curvas.");
         if (wrapMica) wrapMica.classList.remove("hidden");
       } else if (wrapMica) {
         wrapMica.classList.add("hidden");
@@ -3850,9 +3887,12 @@ HORARIOS DE ATENCIÓN
       if (dama === null ? (t.includes("flor") || t.includes("rosas") || t.includes("rosita") || t.includes("coraz")) : dama) et.add("dama");
       const nuevo = campoSi(p, "nuevo");
       if (nuevo === null ? NUEVOS_RESPALDO.includes(p.code) : nuevo) et.add("nuevos");
+      /* Caballero: SOLO el campo real (campoSi); sin inferencia del
+         nombre, porque ninguna funda trae «caballero» en el nombre. */
+      if (campoSi(p, "caballero")) et.add("caballero");
       return et;
     }
-    const FILTROS_VISOR = [["todos", "Todos"], ["transparente", "Transparente"], ["piel", "Tipo piel"], ["magsafe", "Con aro MagSafe"], ["dama", "Dama"], ["nuevos", "Nuevos"]];
+    const FILTROS_VISOR = [["todos", "Todos"], ["transparente", "Transparente"], ["piel", "Tipo piel"], ["magsafe", "Con aro MagSafe"], ["dama", "Dama"], ["caballero", "Caballero"], ["nuevos", "Nuevos"]];
     let visorSlug = null, visorFiltro = "todos";
     let visorListaActual = null; /* lista que el visor está enseñando (con el filtro aplicado) */
     function pintarFiltrosVisor() {
@@ -4104,7 +4144,7 @@ HORARIOS DE ATENCIÓN
           <div class="tc-vacio">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
             <p class="t1">Tu lista está vacía</p>
-            <p class="t2">Aprovecha los mega descuentos y agrega tus accesorios favoritos</p>
+            <p class="t2">${textoCarritoVacio}</p>
           </div>`;
         if (pill) pill.textContent = "";
         if (footerFilled) footerFilled.classList.add("hidden");
@@ -4424,6 +4464,7 @@ HORARIOS DE ATENCIÓN
         aplicarHash();
         if (fromShared) setTimeout(openCart, 450);
         refrescarCatalogo();
+        refrescarAjustes();
       }
     });
   </script>
