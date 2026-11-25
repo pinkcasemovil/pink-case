@@ -1422,7 +1422,7 @@
 /* Zoom del escenario (ProductStage). */
 .tc-zoom{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.9);padding:1rem;backdrop-filter:blur(12px)}
 .tc-zoom.hidden{display:none}
-.tc-zoom-panel{position:relative;width:100%;max-width:42rem;overflow:hidden;border-radius:1rem;border:1px solid rgba(255,255,255,.12);background:#0D0B10}
+.tc-zoom-panel{position:relative;width:100%;max-width:28rem;overflow:hidden;border-radius:1rem;border:1px solid rgba(255,255,255,.12);background:#0D0B10}
 .tc-zoom-enc{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.08);padding:.875rem 1.25rem}
 .tc-zoom-enc span{font-size:.875rem;font-weight:500;color:#F4F1F6}
 .tc-zoom-x{display:inline-flex;height:2.25rem;width:2.25rem;align-items:center;justify-content:center;border-radius:.5rem;color:#A99FB2;background:none;border:none;cursor:pointer}
@@ -1435,6 +1435,7 @@
 .tc-zoom-nav:hover{background:rgba(255,255,255,.07)}
 .tc-zoom-nav svg{height:1rem;width:1rem}
 .tc-zoom-cont{font-family:'JetBrains Mono',monospace;font-size:.75rem;font-variant-numeric:tabular-nums;color:#9B90A6}
+@media (max-width:639px){.tc-zoom-panel{max-width:16.25rem}.tc-zoom-enc{padding:.625rem .75rem}.tc-zoom-enc span{font-size:.75rem}.tc-zoom-pie{padding:.625rem .75rem}}
 /* Secciones propias de la página que se conservan debajo del detalle
    (la app no las tiene): armonización ligera al lenguaje de la app. */
 .tc-detalle-abajo{margin:0 auto;max-width:72rem;padding:0 1rem 3.5rem}
