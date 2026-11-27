@@ -1325,6 +1325,7 @@
 .tc-card-precio-fila{display:flex;align-items:center;gap:.625rem;flex-wrap:wrap}
 .tc-tachado{font-family:'Outfit',system-ui,sans-serif;font-size:1.5rem;font-weight:700;font-variant-numeric:tabular-nums;color:#f87171;text-decoration:line-through;text-decoration-thickness:2px}
 .tc-pildora{border-radius:.375rem;border:1px solid rgba(52,211,153,.5);background:rgba(16,185,129,.15);padding:.125rem .625rem;font-family:'JetBrains Mono',monospace;font-size:.875rem;font-weight:700;font-variant-numeric:tabular-nums;color:#6ee7b7;box-shadow:0 0 20px -6px rgba(16,185,129,.55);white-space:nowrap}
+.tc-pildora-dorada{border-radius:.375rem;border:1px solid rgba(251,191,36,.55);background:rgba(251,191,36,.14);padding:.125rem .625rem;font-family:'JetBrains Mono',monospace;font-size:.875rem;font-weight:700;font-variant-numeric:tabular-nums;color:#fde68a;box-shadow:0 0 20px -6px rgba(251,191,36,.55);white-space:nowrap}
 .tc-card-ahorro{margin-top:.375rem;font-size:.75rem;color:#B8ADC2}
 .tc-card-ahorro b{font-weight:600;color:#6ee7b7}
 .tc-card-prox{font-size:.75rem;color:#9B90A6}
@@ -3927,7 +3928,7 @@ HORARIOS DE ATENCIÓN
           </div>
           <div class="tc-card-precio">
             ${resumen ? `<div class="tc-card-precio-fila"><span class="tc-tachado">${money(resumen.antDesde)}</span><span class="tc-pildora">desde ${money(resumen.desde)} MXN</span></div>
-            <p class="tc-card-ahorro"><span class="tc-sub-precio">Precio en línea · </span><b>Ahorras ${money(resumen.ahorro)} MXN</b></p>` : (Number.isFinite(g.desde) ? `<div class="tc-card-precio-fila"><span class="tc-pildora">desde ${money(g.desde)} MXN</span></div>` : `<p class="tc-card-prox">Próximamente</p>`)}
+            <p class="tc-card-ahorro"><span class="tc-sub-precio">Precio en línea · </span><b>Ahorras ${money(resumen.ahorro)} MXN</b></p>` : (Number.isFinite(g.desde) ? `<div class="tc-card-precio-fila"><span class="tc-pildora-dorada">desde ${money(g.desde)} MXN</span></div>` : `<p class="tc-card-prox">Próximamente</p>`)}
             <button type="button" class="tc-card-boton" onclick="event.stopPropagation(); irAModelo('${g.slug}')"><span>${ver}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></button>
           </div>
         </div>
