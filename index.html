@@ -3631,9 +3631,9 @@ HORARIOS DE ATENCIÓN
         if (etq.has("magsafe")) b.push({ t: tit[0] || "Fijación MagSafe", x: mat[0] || "El aro magnético alinea el celular con cargadores y soportes MagSafe, sin quitar la funda." });
         else {
           const ms = (p.modelos && p.modelos.length) ? p.modelos : (p.model ? [p.model] : []);
-          const msTxt = ms.join(", ");
+          const msTxt = ms.map(m => (p.brand && m.toLowerCase().startsWith(p.brand.toLowerCase())) ? m : p.brand + " " + m).join(", ");
           if (/universal/i.test(msTxt)) b.push({ t: tit[0] || "Universal", x: mat[0] || "Sirve para cualquier modelo." });
-          else b.push({ t: tit[0] || "Ajuste", x: mat[0] || "Hecha a la medida de " + p.brand + " " + msTxt + "; cubre la parte de atrás y los bordes." });
+          else b.push({ t: tit[0] || "Ajuste", x: mat[0] || "Hecha a la medida de " + msTxt + "; cubre la parte de atrás y los bordes." });
         }
         const matTxt = etq.has("transparente") ? "Acabado transparente: se ve el color del celular." : etq.has("piel") ? "Tacto tipo piel, suave al agarrar y sin resbalar." : etq.has("espejo") ? "Acabado espejo que refleja la luz." : etq.has("mate") ? "Acabado mate, sin brillo." : "Cubre la parte de atrás y los bordes del celular.";
         b.push({ t: tit[1] || "Textura exterior", x: mat[1] || matTxt });
