@@ -1327,6 +1327,8 @@
 .tc-pildora{border-radius:.375rem;border:1px solid rgba(52,211,153,.5);background:rgba(16,185,129,.15);padding:.125rem .625rem;font-family:'JetBrains Mono',monospace;font-size:.875rem;font-weight:700;font-variant-numeric:tabular-nums;color:#6ee7b7;box-shadow:0 0 20px -6px rgba(16,185,129,.55);white-space:nowrap}
 .tc-pildora-dorada{border-radius:.375rem;border:1px solid rgba(251,191,36,.55);background:rgba(251,191,36,.14);padding:.125rem .625rem;font-family:'JetBrains Mono',monospace;font-size:.875rem;font-weight:700;font-variant-numeric:tabular-nums;color:#fde68a;box-shadow:0 0 20px -6px rgba(251,191,36,.55);white-space:nowrap}
 .tc-pildora-blanca{border-radius:.375rem;border:1px solid rgba(255,255,255,.6);background:rgba(255,255,255,.12);padding:.125rem .625rem;font-family:'JetBrains Mono',monospace;font-size:.875rem;font-weight:700;font-variant-numeric:tabular-nums;color:#ffffff;box-shadow:0 0 20px -6px rgba(255,255,255,.55);white-space:nowrap}
+.tc-pildora-par{display:inline-flex;align-items:center;gap:.375rem;flex-wrap:wrap}
+.tc-pildora-premium{border-radius:.375rem;border:1px solid rgba(251,191,36,.55);background:rgba(251,191,36,.08);padding:.125rem .625rem;font-family:'JetBrains Mono',monospace;font-size:.875rem;font-weight:700;color:#fde68a;white-space:nowrap}
 .tc-card-ahorro{margin-top:.375rem;font-size:.75rem;color:#B8ADC2}
 .tc-card-ahorro b{font-weight:600;color:#6ee7b7}
 .tc-card-prox{font-size:.75rem;color:#9B90A6}
@@ -1396,6 +1398,7 @@
 .tc-franja-pildora{display:inline-flex;align-items:center;gap:.375rem;border-radius:.5rem;border:1px solid rgba(52,211,153,.5);background:rgba(16,185,129,.15);padding:.25rem .75rem;font-family:'JetBrains Mono',monospace;font-size:1.125rem;font-weight:700;font-variant-numeric:tabular-nums;color:#6ee7b7;white-space:nowrap}
 .tc-franja-pildora-dorada{display:inline-flex;align-items:center;gap:.375rem;border-radius:.5rem;border:1px solid rgba(251,191,36,.55);background:rgba(251,191,36,.14);padding:.25rem .75rem;font-family:'JetBrains Mono',monospace;font-size:1.125rem;font-weight:700;font-variant-numeric:tabular-nums;color:#fde68a;white-space:nowrap}
 .tc-franja-pildora-blanca{display:inline-flex;align-items:center;gap:.375rem;border-radius:.5rem;border:1px solid rgba(255,255,255,.6);background:rgba(255,255,255,.12);padding:.25rem .75rem;font-family:'JetBrains Mono',monospace;font-size:1.125rem;font-weight:700;font-variant-numeric:tabular-nums;color:#ffffff;white-space:nowrap}
+.tc-franja-premium{display:inline-flex;align-items:center;gap:.375rem;border-radius:.5rem;border:1px solid rgba(251,191,36,.55);background:rgba(251,191,36,.08);padding:.25rem .75rem;font-family:'JetBrains Mono',monospace;font-size:1.125rem;font-weight:700;color:#fde68a;white-space:nowrap}
 .tc-franja-ahorro{margin-top:.5rem;font-size:.75rem;color:#C5BBD0}
 .tc-franja-ahorro b{font-weight:600;color:#6ee7b7}
 .tc-selector-wrap{margin-top:1.75rem}
@@ -1612,6 +1615,7 @@
 .tc-rec-pildora{border-radius:.375rem;border:1px solid rgba(52,211,153,.5);background:rgba(16,185,129,.15);padding:.125rem .5rem;font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;font-variant-numeric:tabular-nums;color:#6ee7b7}
 .tc-rec-pildora-dorada{border-radius:.375rem;border:1px solid rgba(251,191,36,.55);background:rgba(251,191,36,.14);padding:.125rem .5rem;font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;font-variant-numeric:tabular-nums;color:#fde68a}
 .tc-rec-pildora-blanca{border-radius:.375rem;border:1px solid rgba(255,255,255,.6);background:rgba(255,255,255,.12);padding:.125rem .5rem;font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;font-variant-numeric:tabular-nums;color:#ffffff}
+.tc-rec-premium{border-radius:.375rem;border:1px solid rgba(251,191,36,.55);background:rgba(251,191,36,.08);padding:.125rem .5rem;font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;color:#fde68a}
 .tc-rec-precio-solo{font-family:'Outfit',system-ui,sans-serif;font-size:1.125rem;font-weight:700;color:#fff}
 .tc-rec-ahorro{margin-top:.375rem;font-size:11px;color:#B8ADC2}
 .tc-rec-ahorro b{font-weight:600;color:#6ee7b7}
@@ -3066,7 +3070,7 @@ HORARIOS DE ATENCIÓN
         <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between gap-2 tc-pie-suelto">
           <div>
             ${ant ? `<span class="tc-precio-col"><span class="tc-tachado-sm">${money(ant)}</span><span class="tc-pildora">${money(p.price)} MXN</span></span>`
-            : `<span class="tc-pildora${p.price >= 400 ? "-dorada" : "-blanca"}">${money(p.price)} MXN</span>
+            : `${p.price >= 400 ? `<span class="tc-pildora-par"><span class="tc-pildora-dorada">${money(p.price)} MXN</span><span class="tc-pildora-premium">Premium</span></span>` : `<span class="tc-pildora-blanca">${money(p.price)} MXN</span>`}
             <span class="block font-archivo text-[11px] text-text-muted">Precio web</span>`}
           </div>
           <button class="add-btn px-3 py-2 rounded-xl bg-pink-primary/10 hover:bg-pink-primary border border-pink-500/30 text-pink-light hover:text-white transition-all flex items-center gap-1.5 font-unbounded text-[11px] font-semibold" data-code="${p.code}" onclick="toggleInquiry('${p.code}')" title="Añadir o quitar de mi consulta" type="button">
@@ -3300,7 +3304,7 @@ HORARIOS DE ATENCIÓN
          descuento: solo el precio, sin tachado ni «En rebaja». */
       document.getElementById("tc-franja-precios").innerHTML = tieneDesc
         ? `<span class="tc-franja-tachado">${money(ant)}</span><span class="tc-franja-pildora">${money(p.price)} MXN</span>`
-        : `<span class="tc-franja-pildora${p.price >= 400 ? "-dorada" : "-blanca"}">${money(p.price)} MXN</span>`;
+        : (p.price >= 400 ? `<span class="tc-pildora-par"><span class="tc-franja-pildora-dorada">${money(p.price)} MXN</span><span class="tc-franja-premium">Premium</span></span>` : `<span class="tc-franja-pildora-blanca">${money(p.price)} MXN</span>`);
       document.getElementById("tc-franja-ahorro").innerHTML = tieneDesc
         ? `Precio en línea · <b>En rebaja · Ahorras ${money(ahorro)} MXN</b>`
         : `Precio en línea`;
@@ -3321,7 +3325,7 @@ HORARIOS DE ATENCIÓN
          reales). El elegido se conserva si el producto lo soporta;
          si no, se usa el modelo de origen (visor) o el primero. */
       const opciones = (p.cat === "fundas")
-        ? ((p.modelos && p.modelos.length) ? p.modelos : (p.model ? [p.model] : [])).map(m => p.brand + " " + m)
+        ? ((p.modelos && p.modelos.length) ? p.modelos : (p.model ? [p.model] : [])).map(m => (p.brand && m.toLowerCase().startsWith(p.brand.toLowerCase())) ? m : p.brand + " " + m)
         : [];
       const wrapSel = document.getElementById("tc-selector-wrap");
       if (opciones.length) {
@@ -3680,7 +3684,7 @@ HORARIOS DE ATENCIÓN
        abre el producto en el detalle (replaceState, como la tira del
        navegador); el botón Agregar mete a la lista sin abrir el detalle. */
     function etiquetaCompatibilidad(p) {
-      if (p.cat === "fundas") { const ms = (p.modelos && p.modelos.length) ? p.modelos : (p.model ? [p.model] : []); return ms.length ? p.brand + " " + ms.join(" · ") : ""; }
+      if (p.cat === "fundas") { const ms = (p.modelos && p.modelos.length) ? p.modelos : (p.model ? [p.model] : []); const disp = ms.map(m => (p.brand && m.toLowerCase().startsWith(p.brand.toLowerCase())) ? m : p.brand + " " + m); return disp.length ? disp.join(" · ") : ""; }
       if (p.cat === "audifonos") { return tipoAudifono(p) || ""; }
       return "";
     }
@@ -3730,7 +3734,7 @@ HORARIOS DE ATENCIÓN
             </div>
             <div class="tc-rec-pie">
               ${ant ? `<div class="tc-rec-precios"><span class="tc-rec-tachado">${money(ant)}</span><span class="tc-rec-pildora">${money(p.price)} MXN</span></div>
-              <p class="tc-rec-ahorro">Precio en línea · <b>Ahorras ${money(ahorroDescuento(p))} MXN</b></p>` : `<span class="tc-rec-pildora${p.price >= 400 ? "-dorada" : "-blanca"}">${money(p.price)} MXN</span>`}
+              <p class="tc-rec-ahorro">Precio en línea · <b>Ahorras ${money(ahorroDescuento(p))} MXN</b></p>` : (p.price >= 400 ? `<span class="tc-pildora-par"><span class="tc-rec-pildora-dorada">${money(p.price)} MXN</span><span class="tc-rec-premium">Premium</span></span>` : `<span class="tc-rec-pildora-blanca">${money(p.price)} MXN</span>`)}
               <button class="${btnCls}" data-code="${p.code}" onclick="event.stopPropagation(); toggleInquiry('${p.code}'); pintarRecomendaciones();" title="Añadir a mi lista" type="button">${btnTxt}</button>
             </div>
           </div>
@@ -3746,7 +3750,7 @@ HORARIOS DE ATENCIÓN
        diseños (más primero) y los de un solo diseño quedan al final. */
     function tituloModelo(brand, m) {
       if (/universal/i.test(m)) return "Universal";
-      const bonito = m.split(" ").map(w => w ? w.charAt(0).toUpperCase() + w.slice(1) : w).join(" ");
+      const bonito = m.split(" ").map(w => /^(iphone)$/i.test(w) ? "iPhone" : (w ? w.charAt(0).toUpperCase() + w.slice(1) : w)).join(" ");
       if (bonito.toLowerCase().startsWith((brand || "").toLowerCase())) return bonito;
       return (brand ? brand + " " : "") + bonito;
     }
@@ -3950,7 +3954,7 @@ HORARIOS DE ATENCIÓN
           </div>
           <div class="tc-card-precio">
             ${resumen ? `<div class="tc-card-precio-fila"><span class="tc-tachado">${money(resumen.antDesde)}</span><span class="tc-pildora">desde ${money(resumen.desde)} MXN</span></div>
-            <p class="tc-card-ahorro"><span class="tc-sub-precio">Precio en línea · </span><b>Ahorras ${money(resumen.ahorro)} MXN</b></p>` : (Number.isFinite(g.desde) ? `<div class="tc-card-precio-fila"><span class="${g.desde >= 400 ? "tc-pildora-dorada" : "tc-pildora-blanca"}">desde ${money(g.desde)} MXN</span></div>` : `<p class="tc-card-prox">Próximamente</p>`)}
+            <p class="tc-card-ahorro"><span class="tc-sub-precio">Precio en línea · </span><b>Ahorras ${money(resumen.ahorro)} MXN</b></p>` : (Number.isFinite(g.desde) ? `<div class="tc-card-precio-fila">${g.desde >= 400 ? `<span class="tc-pildora-par"><span class="tc-pildora-dorada">desde ${money(g.desde)} MXN</span><span class="tc-pildora-premium">Premium</span></span>` : `<span class="tc-pildora-blanca">desde ${money(g.desde)} MXN</span>`}</div>` : `<p class="tc-card-prox">Próximamente</p>`)}
             <button type="button" class="tc-card-boton" onclick="event.stopPropagation(); irAModelo('${g.slug}')"><span>${ver}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></button>
           </div>
         </div>
@@ -4055,7 +4059,7 @@ HORARIOS DE ATENCIÓN
         <h3 class="font-archivo font-bold text-sm text-white line-clamp-2 group-hover:text-pink-light transition-colors">${p.name}</h3>
         ${ant ? `<div class="tc-precio-suelto"><span class="tc-tachado-sm">${money(ant)}</span><span class="tc-pildora">${money(p.price)} MXN</span></div>
         <span class="block font-archivo text-[11px] text-text-muted mt-0.5"><span class="tc-sub-precio">Precio en línea · </span><span class="tc-ahorro">Ahorras ${money(aho)} MXN</span></span>`
-        : `<span class="tc-pildora${p.price >= 400 ? "-dorada" : "-blanca"}">${money(p.price)} MXN</span>`}
+        : (p.price >= 400 ? `<span class="tc-pildora-par"><span class="tc-pildora-dorada">${money(p.price)} MXN</span><span class="tc-pildora-premium">Premium</span></span>` : `<span class="tc-pildora-blanca">${money(p.price)} MXN</span>`)}
       </div>`;
     }
 
