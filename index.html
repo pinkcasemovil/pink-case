@@ -1326,6 +1326,7 @@
 .tc-tachado{font-family:'Outfit',system-ui,sans-serif;font-size:1.5rem;font-weight:700;font-variant-numeric:tabular-nums;color:#f87171;text-decoration:line-through;text-decoration-thickness:2px}
 .tc-pildora{border-radius:.375rem;border:1px solid rgba(52,211,153,.5);background:rgba(16,185,129,.15);padding:.125rem .625rem;font-family:'JetBrains Mono',monospace;font-size:.875rem;font-weight:700;font-variant-numeric:tabular-nums;color:#6ee7b7;box-shadow:0 0 20px -6px rgba(16,185,129,.55);white-space:nowrap}
 .tc-pildora-dorada{border-radius:.375rem;border:1px solid rgba(251,191,36,.55);background:rgba(251,191,36,.14);padding:.125rem .625rem;font-family:'JetBrains Mono',monospace;font-size:.875rem;font-weight:700;font-variant-numeric:tabular-nums;color:#fde68a;box-shadow:0 0 20px -6px rgba(251,191,36,.55);white-space:nowrap}
+.tc-pildora-blanca{border-radius:.375rem;border:1px solid rgba(255,255,255,.6);background:rgba(255,255,255,.12);padding:.125rem .625rem;font-family:'JetBrains Mono',monospace;font-size:.875rem;font-weight:700;font-variant-numeric:tabular-nums;color:#ffffff;box-shadow:0 0 20px -6px rgba(255,255,255,.55);white-space:nowrap}
 .tc-card-ahorro{margin-top:.375rem;font-size:.75rem;color:#B8ADC2}
 .tc-card-ahorro b{font-weight:600;color:#6ee7b7}
 .tc-card-prox{font-size:.75rem;color:#9B90A6}
@@ -1393,6 +1394,8 @@
 .tc-franja-tachado{font-family:'Outfit',system-ui,sans-serif;font-size:1.875rem;font-weight:700;letter-spacing:-.025em;font-variant-numeric:tabular-nums;color:#f87171;text-decoration:line-through;text-decoration-thickness:2px}
 .tc-franja-precio{font-family:'Outfit',system-ui,sans-serif;font-size:1.875rem;font-weight:700;letter-spacing:-.025em;font-variant-numeric:tabular-nums;color:#fff}
 .tc-franja-pildora{display:inline-flex;align-items:center;gap:.375rem;border-radius:.5rem;border:1px solid rgba(52,211,153,.5);background:rgba(16,185,129,.15);padding:.25rem .75rem;font-family:'JetBrains Mono',monospace;font-size:1.125rem;font-weight:700;font-variant-numeric:tabular-nums;color:#6ee7b7;white-space:nowrap}
+.tc-franja-pildora-dorada{display:inline-flex;align-items:center;gap:.375rem;border-radius:.5rem;border:1px solid rgba(251,191,36,.55);background:rgba(251,191,36,.14);padding:.25rem .75rem;font-family:'JetBrains Mono',monospace;font-size:1.125rem;font-weight:700;font-variant-numeric:tabular-nums;color:#fde68a;white-space:nowrap}
+.tc-franja-pildora-blanca{display:inline-flex;align-items:center;gap:.375rem;border-radius:.5rem;border:1px solid rgba(255,255,255,.6);background:rgba(255,255,255,.12);padding:.25rem .75rem;font-family:'JetBrains Mono',monospace;font-size:1.125rem;font-weight:700;font-variant-numeric:tabular-nums;color:#ffffff;white-space:nowrap}
 .tc-franja-ahorro{margin-top:.5rem;font-size:.75rem;color:#C5BBD0}
 .tc-franja-ahorro b{font-weight:600;color:#6ee7b7}
 .tc-selector-wrap{margin-top:1.75rem}
@@ -1607,6 +1610,8 @@
 .tc-rec-precios{display:flex;align-items:center;gap:.5rem}
 .tc-rec-tachado{font-family:'Outfit',system-ui,sans-serif;font-size:1.25rem;font-weight:700;font-variant-numeric:tabular-nums;color:#f87171;text-decoration:line-through;text-decoration-thickness:2px}
 .tc-rec-pildora{border-radius:.375rem;border:1px solid rgba(52,211,153,.5);background:rgba(16,185,129,.15);padding:.125rem .5rem;font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;font-variant-numeric:tabular-nums;color:#6ee7b7}
+.tc-rec-pildora-dorada{border-radius:.375rem;border:1px solid rgba(251,191,36,.55);background:rgba(251,191,36,.14);padding:.125rem .5rem;font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;font-variant-numeric:tabular-nums;color:#fde68a}
+.tc-rec-pildora-blanca{border-radius:.375rem;border:1px solid rgba(255,255,255,.6);background:rgba(255,255,255,.12);padding:.125rem .5rem;font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;font-variant-numeric:tabular-nums;color:#ffffff}
 .tc-rec-precio-solo{font-family:'Outfit',system-ui,sans-serif;font-size:1.125rem;font-weight:700;color:#fff}
 .tc-rec-ahorro{margin-top:.375rem;font-size:11px;color:#B8ADC2}
 .tc-rec-ahorro b{font-weight:600;color:#6ee7b7}
@@ -3061,7 +3066,7 @@ HORARIOS DE ATENCIÓN
         <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between gap-2 tc-pie-suelto">
           <div>
             ${ant ? `<span class="tc-precio-col"><span class="tc-tachado-sm">${money(ant)}</span><span class="tc-pildora">${money(p.price)} MXN</span></span>`
-            : `<span class="font-unbounded text-lg text-white font-extrabold">${money(p.price)}</span>
+            : `<span class="tc-pildora${p.price >= 400 ? "-dorada" : "-blanca"}">${money(p.price)} MXN</span>
             <span class="block font-archivo text-[11px] text-text-muted">Precio web</span>`}
           </div>
           <button class="add-btn px-3 py-2 rounded-xl bg-pink-primary/10 hover:bg-pink-primary border border-pink-500/30 text-pink-light hover:text-white transition-all flex items-center gap-1.5 font-unbounded text-[11px] font-semibold" data-code="${p.code}" onclick="toggleInquiry('${p.code}')" title="Añadir o quitar de mi consulta" type="button">
@@ -3295,7 +3300,7 @@ HORARIOS DE ATENCIÓN
          descuento: solo el precio, sin tachado ni «En rebaja». */
       document.getElementById("tc-franja-precios").innerHTML = tieneDesc
         ? `<span class="tc-franja-tachado">${money(ant)}</span><span class="tc-franja-pildora">${money(p.price)} MXN</span>`
-        : `<span class="tc-franja-precio">${money(p.price)} MXN</span>`;
+        : `<span class="tc-franja-pildora${p.price >= 400 ? "-dorada" : "-blanca"}">${money(p.price)} MXN</span>`;
       document.getElementById("tc-franja-ahorro").innerHTML = tieneDesc
         ? `Precio en línea · <b>En rebaja · Ahorras ${money(ahorro)} MXN</b>`
         : `Precio en línea`;
@@ -3540,6 +3545,7 @@ HORARIOS DE ATENCIÓN
     function grupoDeProducto(p) {
       if (p.cat === "fundas") return gruposDeFundas().find(g => g.productos.some(x => x.code === p.code)) || null;
       if (p.cat === "audifonos") { const t = tipoAudifono(p); if (!t) return null; return gruposDeAudifonos().find(g => g.titulo === t) || null; }
+      if (p.cat === "micas") return gruposDeMicas().find(g => g.productos.some(x => x.code === p.code)) || null;
       return null;
     }
     /* Lista que recorre el navegador: si el detalle se abrió desde el
@@ -3724,7 +3730,7 @@ HORARIOS DE ATENCIÓN
             </div>
             <div class="tc-rec-pie">
               ${ant ? `<div class="tc-rec-precios"><span class="tc-rec-tachado">${money(ant)}</span><span class="tc-rec-pildora">${money(p.price)} MXN</span></div>
-              <p class="tc-rec-ahorro">Precio en línea · <b>Ahorras ${money(ahorroDescuento(p))} MXN</b></p>` : `<span class="tc-rec-precio-solo">${money(p.price)}</span>`}
+              <p class="tc-rec-ahorro">Precio en línea · <b>Ahorras ${money(ahorroDescuento(p))} MXN</b></p>` : `<span class="tc-rec-pildora${p.price >= 400 ? "-dorada" : "-blanca"}">${money(p.price)} MXN</span>`}
               <button class="${btnCls}" data-code="${p.code}" onclick="event.stopPropagation(); toggleInquiry('${p.code}'); pintarRecomendaciones();" title="Añadir a mi lista" type="button">${btnTxt}</button>
             </div>
           </div>
@@ -3780,7 +3786,7 @@ HORARIOS DE ATENCIÓN
       const ta = a.titulo.toLowerCase(), tb = b.titulo.toLowerCase();
       return tb > ta ? 1 : tb < ta ? -1 : 0;
     }
-    function grupoPorSlug(slug) { return gruposDeFundas().find(g => g.slug === slug) || gruposDeAudifonos().find(g => g.slug === slug); }
+    function grupoPorSlug(slug) { return gruposDeFundas().find(g => g.slug === slug) || gruposDeAudifonos().find(g => g.slug === slug) || gruposDeMicas().find(g => g.slug === slug); }
     /* Audífonos agrupados por tipo: Diadema, Inalámbricos y De cable
        (siempre presente; vacío = Próximamente). El tipo se lee primero
        del campo real del producto (tipo) cuando el puente lo trae; si
@@ -3825,6 +3831,18 @@ HORARIOS DE ATENCIÓN
       if (lista.length) grupos.push(grupoAudifonos("De cable", porTipo.get("De cable") || []));
       return grupos;
     }
+    /* Micas en UNA tarjeta: las calidades (tradicional, completa 9D,
+       cerámica, privacidad, hidrogel HD, hidrogel privacidad) son
+       para TODOS los modelos, así que no se agrupan por modelo: el
+       grupo es la categoría entera. Título «Para todos los modelos»:
+       es lo que el cliente necesita saber (anota su teléfono en el
+       detalle). Sin micas en la lista, no hay grupo. */
+    function gruposDeMicas(micas) {
+      const lista = micas || PRODUCTS.filter(p => p.cat === "micas");
+      if (!lista.length) return [];
+      return [{ kind: "micas", titulo: "Para todos los modelos", slug: "micas",
+        productos: lista, desde: Math.min(...lista.map(p => p.price)), foto: lista[0].img }];
+    }
     /* Tipo nombrado en la búsqueda: "diadema", "tws"/"inalámbricos" o
        "cable". Devuelve el slug del tipo o null. */
     function tipoNombradoEnBusqueda(tokens) {
@@ -3842,10 +3860,10 @@ HORARIOS DE ATENCIÓN
     let gruposVisibles = new Map();
     function grupoParaVisor(slug) { return gruposVisibles.get(slug) || grupoPorSlug(slug); }
     function aTarjetas(list) {
-      /* Se agrupa en "Ver todo", en "Fundas", en "Audífonos" y en
-         búsqueda. En las sugerencias del asesor y en las demás
-         categorías se muestran los productos uno por uno. */
-      if (activeCat !== "all" && activeCat !== "fundas" && activeCat !== "audifonos" && activeCat !== "buscar") {
+      /* Se agrupa en "Ver todo", en "Fundas", en "Audífonos", en
+         "Micas" y en búsqueda. En las sugerencias del asesor y en
+         las demás categorías se muestran los productos uno por uno. */
+      if (activeCat !== "all" && activeCat !== "fundas" && activeCat !== "audifonos" && activeCat !== "micas" && activeCat !== "buscar") {
         gruposVisibles = new Map();
         return list.map(p => ({ tipo: "producto", p }));
       }
@@ -3853,6 +3871,8 @@ HORARIOS DE ATENCIÓN
       /* Audífonos: se agrupan por tipo. En "Ver todo" van después de
          los grupos de fundas y antes de los productos sueltos. */
       let gruposAud = gruposDeAudifonos(list.filter(p => p.cat === "audifonos"));
+      /* Micas: un solo grupo con todas las calidades de la lista. */
+      let gruposMicas = gruposDeMicas(list.filter(p => p.cat === "micas"));
       if (activeCat === "buscar") {
         /* Si lo buscado nombra uno o más modelos (las palabras que
            aparecen en títulos de modelo), solo se enseñan esos modelos:
@@ -3882,12 +3902,13 @@ HORARIOS DE ATENCIÓN
           gruposAud.push(grupoAudifonos("De cable", []));
         }
       }
-      gruposVisibles = new Map([...grupos, ...gruposAud].map(g => [g.slug, g]));
-      const resto = list.filter(p => p.cat !== "fundas" && (p.cat !== "audifonos" || !tipoAudifono(p))).map(p => ({ tipo: "producto", p }));
+      gruposVisibles = new Map([...grupos, ...gruposAud, ...gruposMicas].map(g => [g.slug, g]));
+      const resto = list.filter(p => p.cat !== "fundas" && p.cat !== "micas" && (p.cat !== "audifonos" || !tipoAudifono(p))).map(p => ({ tipo: "producto", p }));
       const soloGrupos = grupos.map(g => ({ tipo: "grupo", grupo: g }));
       soloGrupos.sort((a, b) => compararGrupos(a.grupo, b.grupo));
       const soloGruposAud = gruposAud.map(g => ({ tipo: "grupo", grupo: g }));
-      return [...soloGrupos, ...soloGruposAud, ...resto];
+      const soloGruposMicas = gruposMicas.map(g => ({ tipo: "grupo", grupo: g }));
+      return [...soloGrupos, ...soloGruposAud, ...soloGruposMicas, ...resto];
     }
     /* Precios "de partida" del grupo, como la tarjeta de la app
        (startingRegularPrice / startingPrice): los del producto MÁS
@@ -3905,10 +3926,11 @@ HORARIOS DE ATENCIÓN
     function grupoCardHTML(g) {
       const n = g.productos.length;
       const esAud = g.kind === "audifonos";
-      const etiqueta = esAud ? "Audífonos" : "Fundas";
-      const ver = esAud ? "Ver modelos" : "Ver diseños";
-      const cuenta = esAud ? n + (n === 1 ? " modelo" : " modelos") : n + (n === 1 ? " diseño" : " diseños");
-      const altFoto = esAud ? "Audífonos " + g.titulo : "Fundas para " + g.titulo;
+      const esMicas = g.kind === "micas";
+      const etiqueta = esAud ? "Audífonos" : esMicas ? "Micas" : "Fundas";
+      const ver = esAud ? "Ver modelos" : esMicas ? "Ver calidades" : "Ver diseños";
+      const cuenta = esAud ? n + (n === 1 ? " modelo" : " modelos") : esMicas ? n + (n === 1 ? " calidad" : " calidades") : n + (n === 1 ? " diseño" : " diseños");
+      const altFoto = esAud ? "Audífonos " + g.titulo : esMicas ? "Micas de protección" : "Fundas para " + g.titulo;
       const proximamente = esAud && n === 0;
       const resumen = proximamente ? null : resumenGrupo(g.productos);
       const foto = g.foto
@@ -3928,7 +3950,7 @@ HORARIOS DE ATENCIÓN
           </div>
           <div class="tc-card-precio">
             ${resumen ? `<div class="tc-card-precio-fila"><span class="tc-tachado">${money(resumen.antDesde)}</span><span class="tc-pildora">desde ${money(resumen.desde)} MXN</span></div>
-            <p class="tc-card-ahorro"><span class="tc-sub-precio">Precio en línea · </span><b>Ahorras ${money(resumen.ahorro)} MXN</b></p>` : (Number.isFinite(g.desde) ? `<div class="tc-card-precio-fila"><span class="tc-pildora-dorada">desde ${money(g.desde)} MXN</span></div>` : `<p class="tc-card-prox">Próximamente</p>`)}
+            <p class="tc-card-ahorro"><span class="tc-sub-precio">Precio en línea · </span><b>Ahorras ${money(resumen.ahorro)} MXN</b></p>` : (Number.isFinite(g.desde) ? `<div class="tc-card-precio-fila"><span class="${g.desde >= 400 ? "tc-pildora-dorada" : "tc-pildora-blanca"}">desde ${money(g.desde)} MXN</span></div>` : `<p class="tc-card-prox">Próximamente</p>`)}
             <button type="button" class="tc-card-boton" onclick="event.stopPropagation(); irAModelo('${g.slug}')"><span>${ver}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></button>
           </div>
         </div>
@@ -4033,7 +4055,7 @@ HORARIOS DE ATENCIÓN
         <h3 class="font-archivo font-bold text-sm text-white line-clamp-2 group-hover:text-pink-light transition-colors">${p.name}</h3>
         ${ant ? `<div class="tc-precio-suelto"><span class="tc-tachado-sm">${money(ant)}</span><span class="tc-pildora">${money(p.price)} MXN</span></div>
         <span class="block font-archivo text-[11px] text-text-muted mt-0.5"><span class="tc-sub-precio">Precio en línea · </span><span class="tc-ahorro">Ahorras ${money(aho)} MXN</span></span>`
-        : `<span class="font-unbounded text-base text-white font-extrabold">${money(p.price)}</span>`}
+        : `<span class="tc-pildora${p.price >= 400 ? "-dorada" : "-blanca"}">${money(p.price)} MXN</span>`}
       </div>`;
     }
 
