@@ -3927,7 +3927,7 @@ HORARIOS DE ATENCIÓN
           </div>
           <div class="tc-card-precio">
             ${resumen ? `<div class="tc-card-precio-fila"><span class="tc-tachado">${money(resumen.antDesde)}</span><span class="tc-pildora">desde ${money(resumen.desde)} MXN</span></div>
-            <p class="tc-card-ahorro"><span class="tc-sub-precio">Precio en línea · </span><b>Ahorras ${money(resumen.ahorro)} MXN</b></p>` : `<p class="tc-card-prox">Próximamente</p>`}
+            <p class="tc-card-ahorro"><span class="tc-sub-precio">Precio en línea · </span><b>Ahorras ${money(resumen.ahorro)} MXN</b></p>` : (Number.isFinite(g.desde) ? `<div class="tc-card-precio-fila"><span class="tc-pildora">desde ${money(g.desde)} MXN</span></div>` : `<p class="tc-card-prox">Próximamente</p>`)}
             <button type="button" class="tc-card-boton" onclick="event.stopPropagation(); irAModelo('${g.slug}')"><span>${ver}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></button>
           </div>
         </div>
