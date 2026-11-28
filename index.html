@@ -3680,8 +3680,10 @@ HORARIOS DE ATENCIÓN
        MARCADO como recomendado en el panel (recomendado == 1, visible);
        si una categoría no tiene ninguno marcado, el primer producto
        visible de esa categoría en el orden del catálogo (PRODUCTS).
-       Determinista, sin azar: siempre son 4 tarjetas y nunca se repite
-       la categoría del producto actual ni el producto mismo. La tarjeta
+       Determinista, sin azar: son hasta 4 tarjetas y nunca se repite
+       la categoría del producto actual ni el producto mismo. Si una
+       categoría no tiene productos, se completa con los siguientes
+       visibles de las otras categorías. La tarjeta
        abre el producto en el detalle (replaceState, como la tira del
        navegador); el botón Agregar mete a la lista sin abrir el detalle. */
     function etiquetaCompatibilidad(p) {
@@ -3703,6 +3705,20 @@ HORARIOS DE ATENCIÓN
         const primero = marcado || visibles[0];
         if (primero) otros.push(primero);
       });
+      /* Si faltan tarjetas (hay categorías sin productos, como ahora
+         que el catálogo real solo tiene fundas y micas), se completa
+         hasta 4 con los siguientes productos visibles de esas mismas
+         otras categorías, en el orden del catálogo. Nunca se repite
+         la categoría del producto actual ni el producto mismo. */
+      if (otros.length < 4) {
+        const ya = new Set(otros.map(p => p.code));
+        ["fundas", "micas", "audifonos", "baterias", "servicios"].forEach(c => {
+          if (actual && c === actual.cat) return;
+          PRODUCTS.filter(p => p.cat === c && p.visible !== 0 && p.visible !== "0" && p.code !== pmCode && !ya.has(p.code)).forEach(p => {
+            if (otros.length < 4) { otros.push(p); ya.add(p.code); }
+          });
+        });
+      }
       if (otros.length === 0) { sec.classList.add("hidden"); grid.innerHTML = ""; return; }
       /* Diseño de AI Studio (2026-11-25, ProductDetailView.tsx):
          insignia «-X% · En rebaja» arriba a la izquierda, categoría
